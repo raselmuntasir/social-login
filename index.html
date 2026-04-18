@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="bn" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top One Bazar | N607 Portable Turbo Fan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --brand-navy: #0a2351;
+            --brand-green: #48b24c;
+            --brand-orange: #ff9800;
+        }
+
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        .bg-navy {
+            background-color: var(--brand-navy);
+        }
+
+        .bg-green {
+            background-color: var(--brand-green);
+        }
+
+        .bg-orange {
+            background-color: var(--brand-orange);
+        }
+
+        .text-navy {
+            color: var(--brand-navy);
+        }
+
+        .text-green {
+            color: var(--brand-green);
+        }
+
+        .border-green {
+            border-color: var(--brand-green);
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .shadow-premium {
+            box-shadow: 0 20px 50px -12px rgba(10, 35, 81, 0.15);
+        }
+
+        @keyframes bounce-subtle {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .animate-float {
+            animation: bounce-subtle 4s ease-in-out infinite;
+        }
+
+        .loader {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #FFF;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body class="overflow-x-hidden">
+
+    <!-- Sticky Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-100 shadow-sm">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <img src="logo.png" alt="Top One Bazar" class="h-10 w-auto">
+                <span class="text-xl font-bold text-navy tracking-tight">Top One Bazar</span>
+            </div>
+            <a href="#order"
+                class="bg-orange text-white px-5 py-2 rounded-full font-bold text-sm hover:scale-105 transition-all shadow-lg shadow-orange/20">অর্ডার
+                করুন</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative pt-28 pb-16 md:pt-40 md:pb-24 overflow-hidden bg-gradient-to-br from-white to-slate-50">
+        <div class="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
+            <div class="text-center md:text-left order-2 md:order-1">
+                <div
+                    class="inline-block px-4 py-1 bg-green/10 text-green rounded-full text-xs font-bold mb-6 tracking-wider">
+                    PREMIUM QUALITY FAN</div>
+                <h1 class="text-4xl md:text-6xl font-bold text-navy leading-tight mb-6">
+                    গরমে স্বস্তি এখন <span class="text-green">হাতের মুঠোয়!</span>
+                </h1>
+                <p class="text-slate-600 text-lg md:text-xl mb-8 font-medium">
+                    N607 Portable Turbo Fan – পকেটে রাখুন, যেখানে খুশি ঠান্ডা বাতাস নিন।
+                </p>
+
+                <div class="flex items-center justify-center md:justify-start gap-4 mb-10">
+                    <span class="text-4xl font-black text-navy">৳790</span>
+                    <span class="text-xl text-slate-400 line-through">৳1200</span>
+                    <span class="bg-red-500 text-white px-3 py-1 rounded-lg text-xs font-bold italic animate-pulse">Save
+                        ৳410!</span>
+                </div>
+
+                <a href="#order"
+                    class="inline-block w-full md:w-auto bg-orange text-white px-10 py-5 rounded-2xl font-bold text-xl hover:scale-105 transition-all shadow-2xl shadow-orange/40 text-center">
+                    এখনই অর্ডার করুন
+                </a>
+            </div>
+            <div class="order-1 md:order-2 flex justify-center relative">
+                <div class="absolute inset-0 bg-green/20 blur-[100px] rounded-full -z-10 animate-pulse"></div>
+                <img src="hero.png" alt="N607 Turbo Fan"
+                    class="w-full max-w-sm md:max-w-md animate-float drop-shadow-2xl">
+            </div>
+        </div>
+    </section>
+
+    <!-- Pain Point Section -->
+    <section class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div
+                    class="p-8 rounded-3xl bg-slate-50 text-center border border-slate-100 hover:shadow-xl transition-all">
+                    <div class="text-5xl mb-6">😰</div>
+                    <h3 class="text-xl font-bold text-navy mb-3">লোডশেডিং</h3>
+                    <p class="text-slate-500 text-sm">হঠাৎ বিদ্যুৎ চলে গেলেও আপনার চারপাশ থাকবে ঠান্ডা ও আরামদায়ক।</p>
+                </div>
+                <div
+                    class="p-8 rounded-3xl bg-slate-50 text-center border border-slate-100 hover:shadow-xl transition-all">
+                    <div class="text-5xl mb-6">🥵</div>
+                    <h3 class="text-xl font-bold text-navy mb-3">অফিসে গরম</h3>
+                    <p class="text-slate-500 text-sm">অফিসের ডেস্ক বা রাস্তায় দীর্ঘক্ষণ ঘাম থেকে বাঁচতে এটিই সেরা
+                        সমাধান।</p>
+                </div>
+                <div
+                    class="p-8 rounded-3xl bg-slate-50 text-center border border-slate-100 hover:shadow-xl transition-all">
+                    <div class="text-5xl mb-6">😓</div>
+                    <h3 class="text-xl font-bold text-navy mb-3">ট্রাভেলে অস্বস্তি</h3>
+                    <p class="text-slate-500 text-sm">ভ্রমণের সময় পকেটে বা ব্যাগে নিয়ে ঘুরুন, যেখানেই যান বাতাস থাকবে
+                        সাথে।</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-24 bg-slate-50">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-5xl font-bold text-navy mb-16">অবিশ্বাস্য সব ফিচার্স</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-10">
+                <div
+                    class="bg-white p-8 rounded-[2.5rem] shadow-premium hover:border-green border-2 border-transparent transition-all">
+                    <div class="text-4xl mb-6">🔋</div>
+                    <h4 class="font-bold text-navy mb-2">1800mAh Battery</h4>
+                    <p class="text-slate-500 text-xs">5 to 12 hours backup</p>
+                </div>
+                <div
+                    class="bg-white p-8 rounded-[2.5rem] shadow-premium hover:border-green border-2 border-transparent transition-all">
+                    <div class="text-4xl mb-6">💨</div>
+                    <h4 class="font-bold text-navy mb-2">13,550 RPM</h4>
+                    <p class="text-slate-500 text-xs">Turbo Speed Fan</p>
+                </div>
+                <div
+                    class="bg-white p-8 rounded-[2.5rem] shadow-premium hover:border-green border-2 border-transparent transition-all">
+                    <div class="text-4xl mb-6">5️⃣</div>
+                    <h4 class="font-bold text-navy mb-2">5 Speed Levels</h4>
+                    <p class="text-slate-500 text-xs">Customizable Airflow</p>
+                </div>
+                <div
+                    class="bg-white p-8 rounded-[2.5rem] shadow-premium hover:border-green border-2 border-transparent transition-all">
+                    <div class="text-4xl mb-6">📊</div>
+                    <h4 class="font-bold text-navy mb-2">Digital Display</h4>
+                    <h4 class="font-bold text-navy mb-2">Digital Display</h4>
+                    <p class="text-slate-500 text-xs">See speed & battery</p>
+                </div>
+                <div
+                    class="bg-white p-8 rounded-[2.5rem] shadow-premium hover:border-green border-2 border-transparent transition-all">
+                    <div class="text-4xl mb-6">⚡</div>
+                    <h4 class="font-bold text-navy mb-2">Type-C Fast</h4>
+                    <p class="text-slate-500 text-xs">Quick charge support</p>
+                </div>
+                <div
+                    class="bg-white p-8 rounded-[2.5rem] shadow-premium hover:border-green border-2 border-transparent transition-all">
+                    <div class="text-4xl mb-6">🎒</div>
+                    <h4 class="font-bold text-navy mb-2">Travel Friendly</h4>
+                    <p class="text-slate-500 text-xs">Lightweight design</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What's In The Box -->
+    <section class="py-24 bg-white">
+        <div class="container mx-auto px-4 max-w-4xl">
+            <div class="bg-navy rounded-[3rem] p-12 text-white overflow-hidden relative">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-green/20 blur-[80px] -mr-32 -mt-32"></div>
+                <h2 class="text-3xl font-bold mb-10 text-center">বক্সের ভেতরে যা যা থাকছে</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="text-center p-6 bg-white/5 rounded-2xl border border-white/10">
+                        <div class="text-4xl mb-4">🌀</div>
+                        <p class="font-bold">N607 Fan</p>
+                    </div>
+                    <div class="text-center p-6 bg-white/5 rounded-2xl border border-white/10">
+                        <div class="text-4xl mb-4">🔌</div>
+                        <p class="font-bold">Type-C Cable</p>
+                    </div>
+                    <div class="text-center p-6 bg-white/5 rounded-2xl border border-white/10">
+                        <div class="text-4xl mb-4">🎗</div>
+                        <p class="font-bold">Neck Strap</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Social Proof -->
+    <section class="py-24 bg-slate-50">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-16 gap-8">
+                <div class="text-center md:text-left">
+                    <h2 class="text-3xl font-bold text-navy mb-2">কাস্টমারদের মতামত</h2>
+                    <p class="text-slate-500 font-bold">500+ Happy Customers ★★★★★</p>
+                </div>
+                <div class="flex gap-4">
+                    <div
+                        class="bg-white px-6 py-3 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-2">
+                        <span class="text-green text-xl">🚚</span>
+                        <span class="text-xs font-bold text-navy">Fast Delivery</span>
+                    </div>
+                </div>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                    <div class="text-yellow-400 mb-4">★★★★★</div>
+                    <p class="text-slate-600 mb-6 italic">"ফ্যানের স্পিড অনেক ভালো। টাইপ-সি চার্জিং থাকায় খুব দ্রুত
+                        চার্জ হয়। ডেলিভারিও ২ দিনের মধ্যে পেয়েছি।"</p>
+                    <div class="font-bold text-navy">- রাসেল আহমেদ, ঢাকা</div>
+                </div>
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                    <div class="text-yellow-400 mb-4">★★★★★</div>
+                    <p class="text-slate-600 mb-6 italic">"ডিজিটাল ডিসপ্লে ফিচারটা জোস! কত পারসেন্ট চার্জ আছে সেটা দেখে
+                        খুব সুবিধা হয়। হাইলি রেকমেন্ডেড।"</p>
+                    <div class="font-bold text-navy">- তানিয়া সুলতানা, খুলনা</div>
+                </div>
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
+                    <div class="text-yellow-400 mb-4">★★★★★</div>
+                    <p class="text-slate-600 mb-6 italic">"পকেটে নিয়ে ঘুরতে সুবিধা। লোডশেডিংয়ের সময় আমার প্রধান ভরসা এই
+                        টার্বো ফ্যানটা।"</p>
+                    <div class="font-bold text-navy">- হাসান মাহমুদ, চট্টগ্রাম</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Urgency Section -->
+    <section class="py-20 bg-green/5">
+        <div class="container mx-auto px-4 text-center max-w-2xl">
+            <div class="bg-white p-12 rounded-[3.5rem] shadow-premium border-2 border-green/20">
+                <div class="text-red-500 font-bold text-sm uppercase tracking-widest mb-6 animate-pulse">সীমিত সময়ের
+                    অফার!</div>
+                <div class="flex justify-center gap-4 mb-10" id="timer">
+                    <div class="w-20 h-20 bg-navy rounded-2xl flex flex-col justify-center items-center text-white">
+                        <span class="text-2xl font-bold" id="days">02</span>
+                        <span class="text-[10px] uppercase font-bold text-slate-400">Days</span>
+                    </div>
+                    <div class="w-20 h-20 bg-navy rounded-2xl flex flex-col justify-center items-center text-white">
+                        <span class="text-2xl font-bold" id="hours">12</span>
+                        <span class="text-[10px] uppercase font-bold text-slate-400">Hours</span>
+                    </div>
+                    <div class="w-20 h-20 bg-navy rounded-2xl flex flex-col justify-center items-center text-white">
+                        <span class="text-2xl font-bold" id="mins">45</span>
+                        <span class="text-[10px] uppercase font-bold text-slate-400">Mins</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Order Section (Advanced Checkout) -->
+    <section id="order" class="py-24 bg-slate-50">
+        <div class="container mx-auto px-4 max-w-6xl">
+            <div class="bg-orange p-4 rounded-t-3xl text-center">
+                <h2 class="text-xl md:text-2xl font-bold text-white">অর্ডার করতে নিচের ফর্মটি সম্পূর্ণ পূরণ করুন।</h2>
+            </div>
+
+            <form id="orderForm"
+                class="bg-white p-6 md:p-12 rounded-b-3xl shadow-premium grid md:grid-cols-12 gap-12 relative overflow-hidden">
+                <!-- Loader -->
+                <div id="formLoader"
+                    class="absolute inset-0 z-50 bg-white/80 backdrop-blur-sm hidden items-center justify-center">
+                    <span class="loader border-navy"></span>
+                </div>
+
+                <!-- Success State -->
+                <div id="successModal"
+                    class="absolute inset-0 z-50 bg-white hidden flex-col items-center justify-center text-center p-8">
+                    <div
+                        class="w-24 h-24 bg-green rounded-full flex items-center justify-center text-white text-4xl mb-6 shadow-xl shadow-green/20">
+                        ✓</div>
+                    <h2 class="text-3xl font-bold text-navy mb-4">অর্ডার সফল হয়েছে!</h2>
+                    <p class="text-slate-500 mb-8 font-medium">ধন্যবাদ! আমাদের প্রতিনিধি খুব শীঘ্রই আপনার নাম্বারে কল
+                        করে অর্ডারটি কনফার্ম করবেন।</p>
+                    <button type="button" onclick="location.reload()"
+                        class="bg-navy text-white px-10 py-4 rounded-2xl font-bold hover:scale-105 transition-all">ফিরে
+                        যান</button>
+                </div>
+
+                <!-- Left: Billing Details -->
+                <div class="md:col-span-7 space-y-8">
+                    <h3 class="text-xl font-bold text-navy border-b pb-4">Billing details</h3>
+
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">আপনার নাম <span
+                                    class="text-red-500">*</span></label>
+                            <input type="text" id="name" required placeholder="পুরো নাম লিখুন"
+                                class="w-full border-slate-200 rounded-xl px-4 py-3 focus:border-green outline-none transition-all bg-slate-50">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">আপনার ফোন নাম্বার <span
+                                    class="text-red-500">*</span></label>
+                            <input type="tel" id="phone" required placeholder="017XXXXXXXX"
+                                class="w-full border-slate-200 rounded-xl px-4 py-3 focus:border-green outline-none transition-all bg-slate-50">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">আপনার সম্পূর্ণ ঠিকানা <span
+                                    class="text-red-500">*</span></label>
+                            <textarea id="address" required rows="2" placeholder="বাসা নং, রোড নং, এলাকা ও থানা"
+                                class="w-full border-slate-200 rounded-xl px-4 py-3 focus:border-green outline-none transition-all bg-slate-50 resize-none"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">জেলা নির্বাচন করুন <span
+                                    class="text-red-500">*</span></label>
+                            <select id="district" required onchange="onDistrictChange()"
+                                class="w-full border-slate-200 rounded-xl px-4 py-3 focus:border-green outline-none transition-all bg-slate-50 font-bold">
+                                <option value="">লোড হচ্ছে...</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">থানা/উপজেলা (ম্যানুয়ালি লিখুন)
+                                <span class="text-red-500">*</span></label>
+                            <input type="text" id="police_station" required
+                                placeholder="আপনার থানা বা উপজেলার নাম লিখুন"
+                                class="w-full border-slate-200 rounded-xl px-4 py-3 focus:border-green outline-none transition-all bg-white font-bold">
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-navy">Shipping</h4>
+                        <div
+                            class="flex justify-between items-center p-4 bg-slate-50 rounded-xl border border-slate-100">
+                            <span id="shippingText" class="text-sm font-medium">ঢাকা সিটি কর্পোরেশন:</span>
+                            <span class="font-bold">৳<span id="shippingCost">70</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Product & Summary -->
+                <div class="md:col-span-5 space-y-8">
+                    <h3 class="text-xl font-bold text-navy border-b pb-4">Your Products</h3>
+
+                    <!-- Product Selection (Dynamic Quantity) -->
+                    <div class="space-y-6">
+                        <div
+                            class="flex items-center gap-4 p-5 rounded-2xl border-2 border-green bg-green/5 transition-all">
+                            <img src="hero.png" class="h-20 w-20 object-contain rounded-xl bg-white p-2 shadow-sm"
+                                alt="N607">
+                            <div class="flex-1">
+                                <p class="font-bold text-navy text-sm mb-3">N607 Portable Turbo Fan</p>
+                                <div class="flex items-center gap-6">
+                                    <!-- Quantity Selector -->
+                                    <div
+                                        class="flex items-center bg-white border border-slate-200 rounded-lg overflow-hidden h-10">
+                                        <button type="button" onclick="changeQty(-1)"
+                                            class="px-3 hover:bg-slate-50 border-r border-slate-200 font-bold text-slate-600">-</button>
+                                        <input type="number" id="manual_qty" value="1" readonly
+                                            class="w-10 text-center font-bold text-navy outline-none bg-transparent pointer-events-none">
+                                        <button type="button" onclick="changeQty(1)"
+                                            class="px-3 hover:bg-slate-50 border-l border-slate-200 font-bold text-slate-600">+</button>
+                                    </div>
+                                    <p class="text-xl font-black text-navy">৳<span id="unitPriceDisplay">790</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order Summary Table -->
+                    <div class="space-y-4 pt-4">
+                        <h4 class="font-bold text-navy">Your order</h4>
+                        <div class="border rounded-2xl overflow-hidden text-sm">
+                            <div class="flex justify-between p-4 border-b bg-slate-50 font-bold">
+                                <span>Product</span>
+                                <span>Subtotal</span>
+                            </div>
+                            <div class="flex justify-between p-4 border-b">
+                                <span class="text-slate-500">N607 Turbo Fan × <span id="summaryQty">1</span></span>
+                                <span class="font-bold">৳<span id="summarySubtotal">790</span></span>
+                            </div>
+                            <div class="flex justify-between p-4 border-b">
+                                <span class="text-slate-500">Shipping</span>
+                                <span class="font-bold">৳<span id="summaryShipping">70</span></span>
+                            </div>
+                            <div class="flex justify-between p-4 bg-navy text-white font-black text-lg">
+                                <span>Total</span>
+                                <span>৳<span id="summaryTotal">860</span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Methods (Only COD) -->
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3 p-5 bg-green/5 border border-green/20 rounded-2xl">
+                            <div class="w-10 h-10 bg-green/20 rounded-full flex items-center justify-center text-green">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-bold text-navy text-sm">Cash on delivery</p>
+                                <p class="text-[10px] text-slate-500 uppercase font-black tracking-widest">পণ্য হাতে
+                                    পেয়ে টাকা পরিশোধ করুন</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full bg-navy text-white py-6 rounded-2xl font-black text-xl shadow-2xl shadow-navy/20 hover:scale-[1.02] transition-all">
+                        Place Order ৳<span id="btnTotal">860</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-20 bg-white border-t border-slate-100 text-center">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-center gap-2 mb-6">
+                <img src="logo.png" alt="Top One Bazar" class="h-10 w-auto">
+                <span class="text-2xl font-bold text-navy tracking-tight">Top One Bazar</span>
+            </div>
+            <p class="text-slate-500 font-bold italic mb-8 max-w-sm mx-auto leading-relaxed">"বিশ্বাসযোগ্য পণ্য, দ্রুত
+                ডেলিভারি"</p>
+
+            <div class="flex flex-col gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest">
+                <span>Contact: 01314147868</span>
+                <span>© 2026 TOP ONE BAZAR | ALL RIGHTS RESERVED</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Supabase Initialization
+        const SUPABASE_URL = 'https://cmdculyngchoxcnzaypt.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNtZGN1bHluZ2Nob3hjbnpheXB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MjU3NDQsImV4cCI6MjA5MjAwMTc0NH0.gCks8rNvyQ9hV8vR3oVkrEN5WaLGuN0aja6SK-gY7g0';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Steadfast Courier API Integration
+        let STEADFAST_API_KEY = '';
+        let STEADFAST_SECRET_KEY = '';
+        const STEADFAST_BASE_URL = 'https://portal.packzy.com/api/v1';
+
+        let allPoliceStations = [];
+
+        async function fetchSteadfastData() {
+            try {
+                // First, fetch keys from Supabase Settings table
+                const { data: settings, error: sError } = await _supabase.from('settings').select('*');
+                if (!sError && settings) {
+                    settings.forEach(item => {
+                        if (item.key === 'steadfast_api_key') STEADFAST_API_KEY = item.value;
+                        if (item.key === 'steadfast_secret_key') STEADFAST_SECRET_KEY = item.value;
+                    });
+                }
+
+                if (!STEADFAST_API_KEY || !STEADFAST_SECRET_KEY) {
+                    console.warn("Steadfast Keys not found in Settings table.");
+                    return;
+                }
+
+                const response = await fetch(`${STEADFAST_BASE_URL}/police_stations`, {
+                    method: 'GET',
+                    headers: {
+                        'Api-Key': STEADFAST_API_KEY,
+                        'Secret-Key': STEADFAST_SECRET_KEY,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                if (data && data.data) {
+                    allPoliceStations = data.data;
+                    populateDistricts();
+                }
+            } catch (err) {
+                console.error("Steadfast API Error:", err);
+                const districtDropdown = document.getElementById('district');
+                if (districtDropdown) districtDropdown.innerHTML = '<option value="">Error (ম্যানুয়ালি লিখুন)</option>';
+            }
+        }
+
+        async function fetchSteadfastData() {
+            try {
+                populateDistricts(); // Initial load with fallback
+
+                const { data: settings, error: sError } = await _supabase.from('settings').select('*');
+                if (!sError && settings) {
+                    settings.forEach(item => {
+                        if (item.key === 'steadfast_api_key') STEADFAST_API_KEY = item.value;
+                        if (item.key === 'steadfast_secret_key') STEADFAST_SECRET_KEY = item.value;
+                    });
+                }
+
+                if (!STEADFAST_API_KEY || !STEADFAST_SECRET_KEY) return;
+
+                const response = await fetch(`${STEADFAST_BASE_URL}/police_stations`, {
+                    method: 'GET',
+                    headers: {
+                        'Api-Key': STEADFAST_API_KEY,
+                        'Secret-Key': STEADFAST_SECRET_KEY,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                if (data && data.data) {
+                    allPoliceStations = data.data;
+                    populateDistricts(); // Reload dropdown with live API data
+                    console.log("Steadfast Data Loaded.");
+                }
+            } catch (err) {
+                console.error("Steadfast API Error:", err);
+            }
+        }
+
+        function populateDistricts() {
+            const districtDropdown = document.getElementById('district');
+            if (!districtDropdown) return;
+
+            let items = [];
+            if (allPoliceStations && allPoliceStations.length > 0) {
+                items = [...new Set(allPoliceStations.map(st => st.name))].sort();
+            }
+
+            districtDropdown.innerHTML = '<option value="">জেলা বা এরিয়া নির্বাচন করুন</option>' +
+                items.map(d => `<option value="${d}">${d}</option>`).join('');
+        }
+
+        function onDistrictChange() {
+            updateTotal();
+        }
+
+        // Price Configuration
+        const unitPrice = 790;
+        const discountPrices = { "1": 790, "2": 1550, "3": 2300 };
+
+        function changeQty(amount) {
+            const input = document.getElementById('manual_qty');
+            let current = parseInt(input.value);
+            current += amount;
+            if (current < 1) current = 1;
+            if (current > 10) current = 10;
+            input.value = current;
+            updateTotal();
+        }
+
+        function updateTotal() {
+            const qtyInput = document.getElementById('manual_qty');
+            if (!qtyInput) return;
+            const qty = parseInt(qtyInput.value);
+            const district = document.getElementById('district').value;
+
+            let subtotal;
+            if (qty <= 3) {
+                subtotal = discountPrices[qty.toString()];
+            } else {
+                subtotal = qty * 750;
+            }
+
+            // Shipping Logic
+            const lowerDist = district.toLowerCase();
+            const isInside = lowerDist.includes('dhaka city') || lowerDist === 'dhaka city' || lowerDist === 'gazipur' || lowerDist === 'narayanganj';
+            const shipping = isInside ? 70 : 130;
+            const total = subtotal + shipping;
+
+            // Update UI
+            document.getElementById('shippingCost').innerText = shipping;
+            document.getElementById('shippingText').innerText = isInside ? "ঢাকা ও পার্শ্ববর্তী এলাকা:" : "ঢাকার বাইরের এলাকা:";
+
+            document.getElementById('summaryQty').innerText = qty;
+            document.getElementById('summarySubtotal').innerText = subtotal;
+            document.getElementById('summaryShipping').innerText = shipping;
+            document.getElementById('summaryTotal').innerText = total;
+            document.getElementById('btnTotal').innerText = total;
+            document.getElementById('unitPriceDisplay').innerText = subtotal;
+        }
+
+        // Countdown Timer Logic
+        function updateTimer() {
+            const endDate = new Date();
+            endDate.setDate(endDate.getDate() + 3);
+            function tick() {
+                const now = new Date().getTime();
+                const distance = endDate.getTime() - now;
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+
+                document.getElementById('days').innerText = days.toString().padStart(2, '0');
+                document.getElementById('hours').innerText = hours.toString().padStart(2, '0');
+                document.getElementById('mins').innerText = minutes.toString().padStart(2, '0');
+            }
+            setInterval(tick, 1000);
+            tick();
+        }
+        updateTimer();
+
+        // Form Submission
+        const form = document.getElementById('orderForm');
+        const loader = document.getElementById('formLoader');
+        const successModal = document.getElementById('successModal');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loader.style.display = 'flex';
+
+            const qty = parseInt(document.getElementById('manual_qty').value);
+            const district = document.getElementById('district').value;
+
+            let subtotal;
+            if (qty <= 3) {
+                subtotal = discountPrices[qty.toString()];
+            } else {
+                subtotal = qty * 750;
+            }
+
+            const lowerDist = district.toLowerCase();
+            const shipping = (lowerDist === 'dhaka' || lowerDist === 'gazipur' || lowerDist === 'narayanganj') ? 70 : 130;
+
+            const payload = {
+                name: document.getElementById('name').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value + ", " + document.getElementById('police_station').value + " (" + district + ")",
+                quantity: qty,
+                color: 'Mint Green',
+                status: 'Pending',
+                total_price: subtotal + shipping
+            };
+
+            const { data, error } = await _supabase
+                .from('orders')
+                .insert([payload]);
+
+            loader.style.display = 'none';
+            if (error) {
+                alert('দুঃখিত! অর্ডার সম্পন্ন হয়নি। আবার চেষ্টা করুন।');
+                console.error(error);
+            } else {
+                successModal.classList.remove('hidden');
+                form.reset();
+            }
+        });
+
+        // Initial call
+        updateTotal();
+        fetchSteadfastData();
+    </script>
+</body>
+
+</html>
