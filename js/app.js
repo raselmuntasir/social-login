@@ -72,6 +72,7 @@ async function handleRouting() {
         fetchSteadfastDistricts();
         initOrderForm();
         fetchProductsForOrder();
+        initNumericFields();
     } else if (hash === '#/products') {
         container.innerHTML = productListHTML;
         highlightLink('link-inventory', false);
@@ -689,26 +690,23 @@ function initCourierSettings() {
 
 function initOrderForm() {
     const submitBtn = document.getElementById('submit-order');
-
-    // ─── Customer Auto-fill on Mobile Number ────────────────────────────
     const mobileInput = document.getElementById('order-mobile');
-    let autoFillTimer = null;
 
     if (mobileInput) {
-        mobileInput.addEventListener('input', () => {
-            const phone = mobileInput.value.trim();
-            const badge = document.getElementById('customer-autofill-badge');
-            const msg   = document.getElementById('customer-autofill-msg');
+        let debounceTimer;
+        mobileInput.addEventListener('input', (e) => {
+            const phone = e.target.value.trim();
+            clearTimeout(debounceTimer);
 
-            // Reset badge if too short
-            if (phone.length < 8) {
+            const badge = document.getElementById('customer-autofill-badge');
+            const msg = document.getElementById('customer-autofill-msg');
+
+            if (phone.length < 11) {
                 if (badge) badge.classList.add('hidden');
                 return;
             }
 
-            // Debounce: wait 500ms after user stops typing
-            clearTimeout(autoFillTimer);
-            autoFillTimer = setTimeout(async () => {
+            debounceTimer = setTimeout(async () => {
                 try {
                     const { data: customer } = await _supabase
                         .from('customers')
@@ -717,43 +715,42 @@ function initOrderForm() {
                         .single();
 
                     if (customer) {
-                        // Fill fields
                         const nameEl    = document.getElementById('order-name');
                         const emailEl   = document.getElementById('order-email');
                         const addressEl = document.getElementById('order-address');
                         const totalEl   = document.getElementById('cust-total-orders');
                         const doneEl    = document.getElementById('cust-completed-orders');
 
-                        if (nameEl    && customer.name)    nameEl.value    = customer.name;
-                        if (emailEl   && customer.email)   emailEl.value   = customer.email;
+                        if (nameEl && customer.name) nameEl.value = customer.name;
+                        if (emailEl && customer.email) emailEl.value = customer.email;
                         if (addressEl && customer.address) addressEl.value = customer.address;
-                        if (totalEl)  totalEl.value  = customer.total_orders   || 0;
+                        if (totalEl) totalEl.value = customer.total_orders || 0;
 
-                        // Count completed orders from orders table
                         const { count: completedCount } = await _supabase
                             .from('orders')
                             .select('id', { count: 'exact', head: true })
                             .eq('phone', phone)
                             .in('status', ['Completed', 'Delivered']);
+                        
                         if (doneEl) doneEl.value = completedCount || 0;
 
-                        // Show badge
                         if (badge && msg) {
                             msg.textContent = `✅ Returning Customer — ${customer.total_orders || 0} orders`;
                             badge.classList.remove('hidden');
                         }
                     } else {
-                        // New customer
                         if (badge && msg) {
                             msg.textContent = '🆕 New Customer';
                             badge.classList.remove('hidden');
                         }
-                        // Clear stats
                         const totalEl = document.getElementById('cust-total-orders');
                         const doneEl  = document.getElementById('cust-completed-orders');
                         if (totalEl) totalEl.value = 0;
                         if (doneEl)  doneEl.value  = 0;
                     }
+
+                    // Trigger Fraud Check / Success Rate Visualization
+                    performFraudCheck(phone);
                 } catch (err) {
                     console.warn('Customer lookup error:', err);
                 }
@@ -844,9 +841,9 @@ function initProductForm() {
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    previewImg.src = event.target.result;
-                    placeholder.classList.add('hidden');
-                    previewContainer.classList.remove('hidden');
+                    if (previewImg) previewImg.src = event.target.result;
+                    if (placeholder) placeholder.classList.add('hidden');
+                    if (previewContainer) previewContainer.classList.remove('hidden');
                 }
                 reader.readAsDataURL(file);
             }
@@ -864,13 +861,13 @@ function initProductForm() {
 
         if (file) {
             try {
-                // Try to upload to Supabase Storage
-                // Note: User needs to create a bucket named 'product-images' and set it to public
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+                // Compress product image to max 1000x1000
+                const compressedBlob = await compressImage(file, { maxWidth: 1000, maxHeight: 1000, quality: 0.7 });
+                
+                const fileName = `product_${Date.now()}.jpg`;
                 const { data, error } = await _supabase.storage
                     .from('product-images')
-                    .upload(fileName, file);
+                    .upload(fileName, compressedBlob, { contentType: 'image/jpeg' });
 
                 if (error) {
                     console.warn('Storage upload failed (Bucket might not exist):', error);
@@ -1239,9 +1236,11 @@ async function initGeneralSettings() {
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    previewImg.src = event.target.result;
-                    previewImg.classList.remove('hidden');
-                    placeholder.classList.add('hidden');
+                    if (previewImg) {
+                        previewImg.src = event.target.result;
+                        previewImg.classList.remove('hidden');
+                    }
+                    if (placeholder) placeholder.classList.add('hidden');
                 }
                 reader.readAsDataURL(file);
             }
@@ -1260,12 +1259,14 @@ async function initGeneralSettings() {
         const file = logoInput?.files[0];
         if (file) {
             try {
-                const fileExt = file.name.split('.').pop();
-                const fileName = `logo_${Date.now()}.${fileExt}`;
+                // Compress product image to max 1000x1000
+                const compressedBlob = await compressImage(file, { maxWidth: 1000, maxHeight: 1000, quality: 0.7 });
+                
+                const fileName = `logo_${Date.now()}.jpg`;
                 
                 const { data, error } = await _supabase.storage
                     .from('product-images')
-                    .upload(fileName, file);
+                    .upload(fileName, compressedBlob, { contentType: 'image/jpeg' });
 
                 if (error) {
                     console.warn('Storage upload failed:', error);
@@ -1427,8 +1428,10 @@ async function initProfilePage() {
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    profilePicPreview.src = event.target.result;
-                    profilePicPreview.classList.remove('hidden');
+                    if (profilePicPreview) {
+                        profilePicPreview.src = event.target.result;
+                        profilePicPreview.classList.remove('hidden');
+                    }
                     const picDefault = document.getElementById('profile-pic-default');
                     if (picDefault) picDefault.classList.add('hidden');
                 }
@@ -1444,25 +1447,40 @@ async function initProfilePage() {
             updateProfileBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Updating...';
             updateProfileBtn.disabled = true;
 
-            let imageUrl = profilePicPreview.src.startsWith('data:') ? '' : profilePicPreview.src;
-            if (profilePicPreview.src.includes('placeholder.com')) imageUrl = '';
+            let imageUrl = profilePicPreview.src;
+            if (imageUrl.startsWith('data:')) imageUrl = ''; // If it's base64 but not uploaded yet, reset it to empty for now
+
+            // 1. Get old image URL for cleanup
+            const oldImageUrl = _profileCache?.admin_image;
 
             // If a new file was selected, upload it
             const file = profilePicInput?.files[0];
             if (file) {
                 try {
-                    const fileExt = file.name.split('.').pop();
-                    const fileName = `admin_profile_${Date.now()}.${fileExt}`;
+                    // Compress profile image to max 500x500
+                    const compressedBlob = await compressImage(file, { maxWidth: 500, maxHeight: 500, quality: 0.8 });
+                    const fileName = `admin_profile_${Date.now()}.jpg`;
                     
                     const { data, error } = await _supabase.storage
                         .from('product-images')
-                        .upload(fileName, file);
+                        .upload(fileName, compressedBlob, { contentType: 'image/jpeg' });
 
                     if (!error) {
                         const { data: urlData } = _supabase.storage
                             .from('product-images')
                             .getPublicUrl(fileName);
                         imageUrl = urlData.publicUrl;
+
+                        // Cleanup: Delete old image from storage if it exists and is different
+                        if (oldImageUrl && oldImageUrl.includes('supabase.co')) {
+                            const oldPath = oldImageUrl.split('/').pop();
+                            if (oldPath) {
+                                await _supabase.storage.from('product-images').remove([oldPath]);
+                                console.log('✅ Old profile image deleted:', oldPath);
+                            }
+                        }
+                        // Clear the file input so it doesn't re-upload on next click
+                        if (profilePicInput) profilePicInput.value = '';
                     }
                 } catch (err) {
                     console.error('Profile image upload error:', err);
@@ -1627,7 +1645,7 @@ function loadCKEditorLazy() {
 function initGlobalSearch() {
     const searchInput = document.getElementById('global-search');
     const resultsPanel = document.getElementById('global-search-results');
-    const searchIcon = document.getElementById('global-search-icon');
+    const loader = document.getElementById('global-search-loader');
     let searchTimer = null;
 
     if (!searchInput || !resultsPanel) return;
@@ -1638,10 +1656,12 @@ function initGlobalSearch() {
         if (query.length < 2) {
             resultsPanel.classList.add('hidden');
             resultsPanel.innerHTML = '';
+            if (loader) loader.classList.add('hidden');
             return;
         }
 
-        if (searchIcon) searchIcon.className = 'fas fa-spinner fa-spin absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-500 text-sm z-10 pointer-events-none';
+        // Show loading spinner on the right
+        if (loader) loader.classList.remove('hidden');
 
         clearTimeout(searchTimer);
         searchTimer = setTimeout(async () => {
@@ -1654,7 +1674,9 @@ function initGlobalSearch() {
                 }
 
                 const { data, error } = await supabaseQuery.limit(8);
-                if (searchIcon) searchIcon.className = 'fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm z-10 pointer-events-none';
+                
+                // Hide loading spinner
+                if (loader) loader.classList.add('hidden');
 
                 if (error) throw error;
 
@@ -1679,7 +1701,7 @@ function initGlobalSearch() {
                 resultsPanel.classList.remove('hidden');
             } catch (err) {
                 console.error('Search error:', err);
-                if (searchIcon) searchIcon.className = 'fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm z-10 pointer-events-none';
+                if (loader) loader.classList.add('hidden');
             }
         }, 400);
     });
@@ -1701,3 +1723,173 @@ function initGlobalSearch() {
 initGlobalSearch();
 
 
+// ─── Numeric Input Restriction ──────────────────────────────────────────
+function restrictToNumbers(elementId) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+
+    // Prevent non-numeric characters on keypress
+    el.addEventListener('keypress', (e) => {
+        if (!/[0-9]/.test(e.key)) {
+            e.preventDefault();
+        }
+    });
+
+    // Clean up pasted content or mobile input
+    el.addEventListener('input', (e) => {
+        const originalValue = el.value;
+        const cleanedValue = originalValue.replace(/[^0-9]/g, '');
+        if (originalValue !== cleanedValue) {
+            el.value = cleanedValue;
+        }
+    });
+}
+
+// Re-initialize numeric restrictions after routing
+function initNumericFields() {
+    const numericFields = [
+        'order-mobile', 
+        'order-alternative', 
+        'discount', 
+        'shipping', 
+        'advance', 
+        'subtotal'
+    ];
+    numericFields.forEach(id => restrictToNumbers(id));
+}
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', initNumericFields);
+initNumericFields();
+
+// ─── Image Compression Utility ──────────────────────────────────────────
+/**
+ * Compresses an image file and returns a Blob
+ * @param {File} file - The original image file
+ * @param {Object} options - maxWidth, maxHeight, quality
+ * @returns {Promise<Blob>}
+ */
+async function compressImage(file, { maxWidth = 1200, maxHeight = 1200, quality = 0.7 } = {}) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                // Calculate aspect ratio and new dimensions
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height *= maxWidth / width;
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width *= maxHeight / height;
+                        height = maxHeight;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                canvas.toBlob((blob) => {
+                    if (blob) resolve(blob);
+                    else reject(new Error('Canvas to Blob failed'));
+                }, 'image/jpeg', quality);
+            };
+            img.onerror = (err) => reject(err);
+        };
+        reader.onerror = (err) => reject(err);
+    });
+}
+
+
+// ─── Fraud Check & Success Rate Analysis ────────────────────────────────
+async function performFraudCheck(phone) {
+    const fraudSection = document.getElementById('fraud-check-section');
+    if (!fraudSection) return;
+
+    // Show section
+    fraudSection.classList.remove('hidden');
+
+    try {
+        // Fetch stats from Supabase
+        const { data: orders, error } = await _supabase
+            .from('orders')
+            .select('status')
+            .eq('phone', phone);
+
+        if (error) throw error;
+
+        const total = orders.length;
+        const success = orders.filter(o => ['Completed', 'Delivered'].includes(o.status)).length;
+        const failed = orders.filter(o => ['Canceled', 'Failed'].includes(o.status)).length;
+        const successRate = total > 0 ? Math.round((success / total) * 100) : 0;
+
+        // Update UI
+        const totalEl = document.getElementById('fraud-total');
+        const successEl = document.getElementById('fraud-success');
+        const failedEl = document.getElementById('fraud-failed');
+        const percentText = document.getElementById('fraud-percent-text');
+        const scoreText = document.getElementById('fraud-score-text');
+        
+        if (totalEl) totalEl.innerText = total;
+        if (successEl) successEl.innerText = success;
+        if (failedEl) failedEl.innerText = failed;
+        if (percentText) percentText.innerText = successRate + '%';
+        if (scoreText) scoreText.innerText = successRate + '%';
+        
+        const bar = document.getElementById('fraud-score-bar');
+        const circle = document.getElementById('fraud-circle-path');
+        const msg = document.getElementById('fraud-insight-msg');
+        const tag = document.getElementById('fraud-tag');
+
+        if (bar) bar.style.width = successRate + '%';
+        if (circle) circle.setAttribute('stroke-dasharray', `${successRate}, 100`);
+
+        // Color Logic & Messaging
+        if (total === 0) {
+            if (circle) circle.setAttribute('stroke', '#6366f1');
+            if (bar) bar.className = 'bg-indigo-500 h-full transition-all duration-1000';
+            if (msg) msg.innerText = "New customer found. No previous order history detected in your database.";
+            if (tag) tag.classList.add('hidden');
+        } else if (successRate >= 80) {
+            if (circle) circle.setAttribute('stroke', '#22c55e');
+            if (bar) bar.className = 'bg-green-500 h-full transition-all duration-1000';
+            if (msg) msg.innerText = "Excellent customer! High delivery success rate detected from internal history.";
+            if (tag) {
+                tag.innerText = "Safe Customer";
+                tag.className = "inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter bg-green-100 text-green-700";
+                tag.classList.remove('hidden');
+            }
+        } else if (successRate >= 50) {
+            if (circle) circle.setAttribute('stroke', '#f59e0b');
+            if (bar) bar.className = 'bg-yellow-500 h-full transition-all duration-1000';
+            if (msg) msg.innerText = "Average customer. Some canceled orders in the past. Proceed with verification.";
+            if (tag) {
+                tag.innerText = "Moderate Risk";
+                tag.className = "inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter bg-yellow-100 text-yellow-700";
+                tag.classList.remove('hidden');
+            }
+        } else {
+            if (circle) circle.setAttribute('stroke', '#ef4444');
+            if (bar) bar.className = 'bg-red-500 h-full transition-all duration-1000';
+            if (msg) msg.innerText = "High risk customer! Low delivery rate detected. Cash on delivery not recommended.";
+            if (tag) {
+                tag.innerText = "Fraud Alert";
+                tag.className = "inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter bg-red-100 text-red-700";
+                tag.classList.remove('hidden');
+            }
+        }
+
+    } catch (err) {
+        console.error('Fraud check error:', err);
+    }
+}

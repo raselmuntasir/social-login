@@ -21,7 +21,7 @@ const createOrderHTML = `
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-700 mb-1">Alternative Number</label>
-                <input type="text" class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-purple-500">
+                <input type="text" id="order-alternative" class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-purple-500">
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-700 mb-1">Name*</label>
@@ -98,6 +98,79 @@ const createOrderHTML = `
         </div>
     </div>
 </div>
+
+<!-- Courier Success Rate & Fraud Check (Dynamic) -->
+<div id="fraud-check-section" class="hidden bg-white rounded-lg shadow-sm border border-gray-200 mb-6 overflow-hidden">
+    <div class="px-4 py-3 border-b border-gray-200 bg-gray-50/50 flex items-center justify-between">
+        <h2 class="text-gray-800 font-medium text-sm flex items-center gap-2">
+            <i class="fas fa-shield-alt text-purple-600"></i>
+            Courier Success Rate & Fraud Check
+        </h2>
+        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Internal Data Analysis</span>
+    </div>
+    <div class="p-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+            <!-- Stats Column -->
+            <div class="space-y-6">
+                <div>
+                    <div class="flex justify-between text-xs font-bold text-gray-500 mb-1.5 uppercase tracking-wider">
+                        <span>Internal Score</span>
+                        <span id="fraud-score-text" class="text-purple-600">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                        <div id="fraud-score-bar" class="bg-purple-600 h-full transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="bg-gray-50 p-3 rounded-lg border border-gray-100 text-center">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase">Total</p>
+                        <p id="fraud-total" class="text-lg font-black text-gray-700">0</p>
+                    </div>
+                    <div class="bg-green-50 p-3 rounded-lg border border-green-100 text-center">
+                        <p class="text-[10px] font-bold text-green-600 uppercase">Success</p>
+                        <p id="fraud-success" class="text-lg font-black text-green-700">0</p>
+                    </div>
+                    <div class="bg-red-50 p-3 rounded-lg border border-red-100 text-center">
+                        <p class="text-[10px] font-bold text-red-600 uppercase">Failed</p>
+                        <p id="fraud-failed" class="text-lg font-black text-red-700">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visualization Column -->
+            <div class="flex flex-col items-center justify-center">
+                <div class="relative w-32 h-32">
+                    <!-- SVG Circular Chart -->
+                    <svg viewBox="0 0 36 36" class="w-full h-full transform -rotate-90">
+                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#f3f4f6" stroke-width="3" />
+                        <path id="fraud-circle-path" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#22c55e" stroke-width="3" stroke-dasharray="0, 100" class="transition-all duration-1000" />
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <span id="fraud-percent-text" class="text-xl font-black text-gray-800">0%</span>
+                        <span class="text-[8px] font-bold text-gray-400 uppercase">Success</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Column -->
+            <div class="bg-indigo-50/50 rounded-xl p-4 border border-indigo-100">
+                <h4 class="text-[11px] font-black text-indigo-900 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <i class="fas fa-info-circle"></i> Insight Analysis
+                </h4>
+                <div class="space-y-3">
+                    <div id="fraud-insight-msg" class="text-[12px] text-indigo-700 leading-relaxed font-medium">
+                        Enter a mobile number to see the customer's delivery success rate from your previous orders.
+                    </div>
+                    <div id="fraud-tag" class="hidden inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter">
+                        Safe Customer
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-10">
     <!-- Listed Products -->
