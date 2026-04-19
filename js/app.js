@@ -689,6 +689,78 @@ function initCourierSettings() {
 
 function initOrderForm() {
     const submitBtn = document.getElementById('submit-order');
+
+    // ─── Customer Auto-fill on Mobile Number ────────────────────────────
+    const mobileInput = document.getElementById('order-mobile');
+    let autoFillTimer = null;
+
+    if (mobileInput) {
+        mobileInput.addEventListener('input', () => {
+            const phone = mobileInput.value.trim();
+            const badge = document.getElementById('customer-autofill-badge');
+            const msg   = document.getElementById('customer-autofill-msg');
+
+            // Reset badge if too short
+            if (phone.length < 8) {
+                if (badge) badge.classList.add('hidden');
+                return;
+            }
+
+            // Debounce: wait 500ms after user stops typing
+            clearTimeout(autoFillTimer);
+            autoFillTimer = setTimeout(async () => {
+                try {
+                    const { data: customer } = await _supabase
+                        .from('customers')
+                        .select('*')
+                        .eq('phone', phone)
+                        .single();
+
+                    if (customer) {
+                        // Fill fields
+                        const nameEl    = document.getElementById('order-name');
+                        const emailEl   = document.getElementById('order-email');
+                        const addressEl = document.getElementById('order-address');
+                        const totalEl   = document.getElementById('cust-total-orders');
+                        const doneEl    = document.getElementById('cust-completed-orders');
+
+                        if (nameEl    && customer.name)    nameEl.value    = customer.name;
+                        if (emailEl   && customer.email)   emailEl.value   = customer.email;
+                        if (addressEl && customer.address) addressEl.value = customer.address;
+                        if (totalEl)  totalEl.value  = customer.total_orders   || 0;
+
+                        // Count completed orders from orders table
+                        const { count: completedCount } = await _supabase
+                            .from('orders')
+                            .select('id', { count: 'exact', head: true })
+                            .eq('phone', phone)
+                            .in('status', ['Completed', 'Delivered']);
+                        if (doneEl) doneEl.value = completedCount || 0;
+
+                        // Show badge
+                        if (badge && msg) {
+                            msg.textContent = `✅ Returning Customer — ${customer.total_orders || 0} orders`;
+                            badge.classList.remove('hidden');
+                        }
+                    } else {
+                        // New customer
+                        if (badge && msg) {
+                            msg.textContent = '🆕 New Customer';
+                            badge.classList.remove('hidden');
+                        }
+                        // Clear stats
+                        const totalEl = document.getElementById('cust-total-orders');
+                        const doneEl  = document.getElementById('cust-completed-orders');
+                        if (totalEl) totalEl.value = 0;
+                        if (doneEl)  doneEl.value  = 0;
+                    }
+                } catch (err) {
+                    console.warn('Customer lookup error:', err);
+                }
+            }, 500);
+        });
+    }
+
     if (!submitBtn) return;
 
     submitBtn.addEventListener('click', async () => {
@@ -730,7 +802,7 @@ function initOrderForm() {
 
                 if (existingCustomer) {
                     await _supabase.from('customers').update({
-                        name: orderData.name, // update name if changed
+                        name: orderData.name,
                         address: orderData.address,
                         total_orders: (existingCustomer.total_orders || 0) + 1,
                         total_amount: (parseFloat(existingCustomer.total_amount) || 0) + orderData.amount
@@ -1525,13 +1597,11 @@ function loadCKEditorLazy() {
     };
 
     if (_ckEditorLoaded) {
-        // Already loaded — just init
         initEditor();
         return;
     }
 
     if (_ckEditorLoading) {
-        // Script is still downloading — wait for it
         const interval = setInterval(() => {
             if (typeof CKEDITOR !== 'undefined') {
                 clearInterval(interval);
@@ -1542,7 +1612,6 @@ function loadCKEditorLazy() {
         return;
     }
 
-    // First time — inject the script tag
     _ckEditorLoading = true;
     const script = document.createElement('script');
     script.src = 'https://cdn.ckeditor.com/4.22.1/full/ckeditor.js';
@@ -1553,3 +1622,82 @@ function loadCKEditorLazy() {
     };
     document.head.appendChild(script);
 }
+
+// ─── Global Header Search ───────────────────────────────────────────────
+function initGlobalSearch() {
+    const searchInput = document.getElementById('global-search');
+    const resultsPanel = document.getElementById('global-search-results');
+    const searchIcon = document.getElementById('global-search-icon');
+    let searchTimer = null;
+
+    if (!searchInput || !resultsPanel) return;
+
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.trim();
+
+        if (query.length < 2) {
+            resultsPanel.classList.add('hidden');
+            resultsPanel.innerHTML = '';
+            return;
+        }
+
+        if (searchIcon) searchIcon.className = 'fas fa-spinner fa-spin absolute left-4 top-1/2 transform -translate-y-1/2 text-purple-500 text-sm z-10 pointer-events-none';
+
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(async () => {
+            try {
+                let supabaseQuery = _supabase.from('orders').select('*');
+                if (!isNaN(query)) {
+                    supabaseQuery = supabaseQuery.or(`id.eq.${parseInt(query) || 0},phone.ilike.%${query}%`);
+                } else {
+                    supabaseQuery = supabaseQuery.or(`name.ilike.%${query}%,status.ilike.%${query}%`);
+                }
+
+                const { data, error } = await supabaseQuery.limit(8);
+                if (searchIcon) searchIcon.className = 'fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm z-10 pointer-events-none';
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    resultsPanel.innerHTML = '<div class="p-4 text-center text-sm text-gray-500 italic">No result found!</div>';
+                } else {
+                    resultsPanel.innerHTML = data.map(order => `
+                        <a href="#/all-orders" class="flex items-center justify-between px-4 py-3 hover:bg-purple-50 transition-colors border-b border-gray-50 last:border-0 group">
+                            <div class="flex flex-col">
+                                <span class="text-[13px] font-bold text-gray-800 group-hover:text-purple-700">#${order.id} - ${order.name || 'No Name'}</span>
+                                <span class="text-[11px] text-gray-500">${order.phone || 'No Phone'}</span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider 
+                                ${order.status === 'Completed' ? 'bg-green-100 text-green-700' : 
+                                  order.status === 'Canceled' ? 'bg-red-100 text-red-700' : 
+                                  'bg-purple-100 text-purple-700'}">
+                                ${order.status}
+                            </span>
+                        </a>
+                    `).join('');
+                }
+                resultsPanel.classList.remove('hidden');
+            } catch (err) {
+                console.error('Search error:', err);
+                if (searchIcon) searchIcon.className = 'fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm z-10 pointer-events-none';
+            }
+        }, 400);
+    });
+
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            resultsPanel.classList.add('hidden');
+            searchInput.blur();
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        const wrapper = document.getElementById('global-search-wrapper');
+        if (wrapper && !wrapper.contains(e.target)) {
+            resultsPanel.classList.add('hidden');
+        }
+    });
+}
+initGlobalSearch();
+
+

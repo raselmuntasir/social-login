@@ -9,10 +9,14 @@ const createOrderHTML = `
             <div>
                 <label class="block text-xs font-bold text-gray-700 mb-1">Mobile Number*</label>
                 <div class="flex">
-                    <input type="text" id="order-mobile" class="w-full border border-gray-300 rounded-l px-3 py-1.5 text-sm focus:outline-none focus:border-purple-500">
+                    <input type="text" id="order-mobile" placeholder="017XXXXXXXX" class="w-full border border-gray-300 rounded-l px-3 py-1.5 text-sm focus:outline-none focus:border-purple-500">
                     <button class="bg-teal-500 hover:bg-teal-600 text-white px-2 py-1.5 transition-colors"><i class="fab fa-whatsapp"></i></button>
                     <button class="bg-purple-700 hover:bg-purple-800 text-white px-2 py-1.5 transition-colors"><i class="fas fa-phone-alt"></i></button>
                     <button class="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1.5 rounded-r transition-colors"><i class="fas fa-copy"></i></button>
+                </div>
+                <div id="customer-autofill-badge" class="hidden mt-1 flex items-center gap-1.5 text-[11px] font-semibold text-teal-700 bg-teal-50 border border-teal-200 rounded px-2 py-1">
+                    <i class="fas fa-user-check text-teal-500"></i>
+                    <span id="customer-autofill-msg">Returning Customer</span>
                 </div>
             </div>
             <div>
@@ -47,11 +51,11 @@ const createOrderHTML = `
         <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div>
                 <label class="block text-xs font-bold text-gray-700 mb-1">Total Orders</label>
-                <input type="text" value="0" readonly class="w-full border border-gray-200 bg-gray-100 rounded px-3 py-1.5 text-sm text-gray-500 cursor-not-allowed">
+                <input type="text" id="cust-total-orders" value="0" readonly class="w-full border border-gray-200 bg-gray-100 rounded px-3 py-1.5 text-sm text-gray-500 cursor-not-allowed">
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-700 mb-1">Completed/Delivered</label>
-                <input type="text" value="0" readonly class="w-full border border-gray-200 bg-gray-100 rounded px-3 py-1.5 text-sm text-gray-500 cursor-not-allowed">
+                <input type="text" id="cust-completed-orders" value="0" readonly class="w-full border border-gray-200 bg-gray-100 rounded px-3 py-1.5 text-sm text-gray-500 cursor-not-allowed">
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-700 mb-1">Order Source</label>

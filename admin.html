@@ -360,9 +360,13 @@
         <header class="h-[64px] bg-brand-header flex items-center justify-between px-6 z-10 text-white shrink-0 border-b border-purple-800 shadow-none">
             
             <!-- Search -->
-            <div class="flex-1 max-w-sm relative">
-                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
-                <input type="text" id="global-search" placeholder="Search Order ID or Mobile..." class="w-full bg-white text-gray-800 border border-purple-300 rounded-full py-2 pl-11 pr-4 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all placeholder-gray-400 text-sm shadow-inner">
+            <div class="flex-1 max-w-sm relative" id="global-search-wrapper">
+                <i id="global-search-icon" class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm z-10 pointer-events-none"></i>
+                <input type="text" id="global-search" placeholder="Search Order ID or Mobile..." autocomplete="off"
+                    class="w-full bg-white text-gray-800 border border-purple-300 rounded-full py-2 pl-11 pr-4 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all placeholder-gray-400 text-sm shadow-inner">
+                <!-- Search Results Dropdown -->
+                <div id="global-search-results" class="hidden absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-[200] max-h-80 overflow-y-auto">
+                </div>
             </div>
 
             <!-- Header Right -->
