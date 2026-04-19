@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top One - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Flatpickr (Date Picker) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <!-- CKEditor 4 (Full Package) -->
+    <script src="https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .sidebar-scroll::-webkit-scrollbar { width: 4px; }
+        .sidebar-scroll::-webkit-scrollbar-thumb { background-color: #4b5563; border-radius: 4px; }
+        
+        /* Custom Colors based on the screenshot */
+        .bg-brand-sidebar { background-color: #2a2a2a; }
+        .bg-brand-header { background-color: #551578; }
+        .bg-brand-search { background-color: #410f5e; }
+        .text-brand-orange { color: #f26822; }
+        .bg-brand-teal { background-color: #00a884; }
+        .bg-card-purple { background-color: #551578; }
+        .bg-card-teal { background-color: #108e89; }
+        .bg-card-yellow { background-color: #eee077; }
+        .bg-card-orange { background-color: #f5b97d; }
+        .bg-card-dark { background-color: #333333; }
+
+        /* Sidebar Toggle Classes */
+        .sidebar-transition { transition: all 0.3s ease; }
+        .sidebar-collapsed { width: 70px !important; }
+        .sidebar-collapsed span, 
+        .sidebar-collapsed .logo-text, 
+        .sidebar-collapsed .chevron-icon,
+        .sidebar-collapsed .account-header { 
+            display: none !important; 
+        }
+        .sidebar-collapsed .nav-item {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+        .sidebar-collapsed .nav-link {
+            padding-left: 0;
+            padding-right: 0;
+            justify-content: center;
+        }
+        .sidebar-collapsed .nav-icon {
+            margin-right: 0 !important;
+            width: 100%;
+            font-size: 1.2rem;
+        }
+        .sidebar-collapsed .submenu {
+            display: none !important; /* Always hide submenus when collapsed */
+        }
+    </style>
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('sidebar-collapsed');
+        }
+    </script>
+    <!-- Custom Tooltip CSS -->
+    <style>
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #1f2937;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 50;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 10px;
+            line-height: 1.4;
+            font-weight: normal;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #1f2937 transparent transparent transparent;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Hide number input spinners */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden text-gray-800">
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-[240px] bg-brand-sidebar text-gray-300 flex flex-col h-full z-20 flex-shrink-0 sidebar-transition overflow-hidden border-r border-gray-800">
+        <!-- Logo Area (Fixed Height Header) -->
+        <div class="h-[64px] flex items-center px-4 bg-brand-header border-b border-purple-800 border-r border-purple-900/50 shrink-0 shadow-none">
+            <button onclick="toggleSidebar()" class="text-white hover:text-white mr-3 shrink-0">
+                <i class="fas fa-bars text-lg"></i>
+            </button>
+            <div class="flex items-center text-cyan-400 font-bold text-xl tracking-tight logo-text truncate">
+                <i class="fas fa-shopping-bag mr-2"></i> Top One
+            </div>
+        </div>
+
+        <!-- Navigation (Scrollable Area) -->
+        <nav class="flex-1 py-4 text-sm font-medium overflow-y-auto sidebar-scroll">
+            <ul class="space-y-1 px-2">
+                <li>
+                    <a href="#/dashboard" id="link-dashboard" class="flex items-center px-3 py-2.5 text-brand-orange bg-black/20 rounded-md">
+                        <i id="icon-dashboard" class="fas fa-home w-7 text-center"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="document.getElementById('submenu-orders').classList.toggle('hidden'); document.getElementById('icon-orders').classList.toggle('rotate-90'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                        <div class="flex items-center">
+                            <i class="fas fa-clipboard-list w-7 text-center"></i>
+                            <span>Orders</span>
+                        </div>
+                        <i id="icon-orders" class="fas fa-chevron-right text-xs opacity-50 transition-transform duration-200 chevron-icon"></i>
+                    </a>
+                    <ul id="submenu-orders" class="hidden mt-1 space-y-0.5">
+                        <li><a href="#/create-order" id="link-create-new" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Create New</a></li>
+                        <li><a href="#/all-orders" id="link-all-orders" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">All Orders</a></li>
+                        <li><a href="#/status/Pending" id="link-pending" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Pending</a></li>
+                        <li><a href="#/status/Confirmed" id="link-confirmed" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Confirmed</a></li>
+                        <li><a href="#/status/Failed Orders" id="link-failed-orders" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Failed Orders</a></li>
+                        <li><a href="#/status/Processing" id="link-processing" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Processing</a></li>
+                        <li><a href="#/status/Hold" id="link-hold" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Hold</a></li>
+                        <li><a href="#/status/Hold Followup" id="link-hold-followup" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Hold Followup</a></li>
+                        <li><a href="#/status/In Courier" id="link-in-courier" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">In Courier</a></li>
+                        <li><a href="#/status/COD Changed" id="link-cod-changed" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">COD Changed</a></li>
+                        <li><a href="#/status/Delivered" id="link-delivered" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Delivered</a></li>
+                        <li><a href="#/status/Completed" id="link-completed" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Completed</a></li>
+                        <li><a href="#/status/Canceled" id="link-canceled" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Canceled</a></li>
+                        <li><a href="#/status/Pending Return" id="link-pending-return" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Pending Return</a></li>
+                        <li><a href="#/status/Returned" id="link-returned" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Returned</a></li>
+                        <li><a href="#/status/Damage" id="link-damage" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Damage</a></li>
+                        <li><a href="#/status/Hand Delivery" id="link-hand-delivery" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Hand Delivery</a></li>
+                        <li><a href="#/status/Hand Delivery Completed" id="link-hand-delivery-completed" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Hand Delivery Completed</a></li>
+                        <li><a href="#/status/Others" id="link-others" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Others</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" onclick="document.getElementById('submenu-more').classList.toggle('hidden'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                        <div class="flex items-center">
+                            <i class="fas fa-plus-circle w-7 text-center"></i>
+                            <span>More Actions</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                    </a>
+                    <ul id="submenu-more" class="hidden mt-1 space-y-0.5">
+                        <li><a href="#/return-collection" id="link-return-collection" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Return Collection</a></li>
+                        <li><a href="#/courier-payment" id="link-courier-payment" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Courier Payment Validate</a></li>
+                        <li><a href="#/bulk-print" id="link-bulk-print" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Bulk Print</a></li>
+                        <li><a href="#/send-courier" id="link-send-courier" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Send Courier by Barcode</a></li>
+                        <li><a href="#/payments" id="link-payments" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Payments</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#/pre-orders" id="link-pre-orders" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                        <i class="fas fa-file-invoice w-7 text-center"></i>
+                        <span>Pre Orders/Lead</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                        <i class="fas fa-desktop w-7 text-center"></i>
+                        <span>POS</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#/customers" id="link-customers" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                        <i class="fas fa-users w-7 text-center"></i>
+                        <span>Customers</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                        <i class="fas fa-paper-plane w-7 text-center"></i>
+                        <span>Steadfast Notifications</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                        <i class="fas fa-calendar-check w-7 text-center"></i>
+                        <span>Followups</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" id="link-inventory" onclick="document.getElementById('submenu-inventory').classList.toggle('hidden'); document.getElementById('icon-inventory').classList.toggle('rotate-90'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                        <div class="flex items-center">
+                            <i class="fas fa-boxes w-7 text-center"></i>
+                            <span>Inventory</span>
+                        </div>
+                        <i id="icon-inventory" class="fas fa-chevron-right text-xs opacity-50 transition-transform duration-200 chevron-icon"></i>
+                    </a>
+                    <ul id="submenu-inventory" class="hidden mt-1 space-y-0.5">
+                        <li><a href="#/products" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Product</a></li>
+                        <li><a href="#/suppliers" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Suppliers</a></li>
+                        <li><a href="#/purchase" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Purchase</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Purchase Returns</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Manufacture</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Mixer</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Stock Adjustment</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                        <i class="fas fa-question-circle w-7 text-center"></i>
+                        <span>Support Tickets</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                        <i class="fas fa-wallet w-7 text-center"></i>
+                        <span>Other Expense</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                        <i class="fas fa-money-bill-wave w-7 text-center"></i>
+                        <span>Other Incomes</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="document.getElementById('submenu-report').classList.toggle('hidden'); document.getElementById('icon-report').classList.toggle('rotate-90'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                        <div class="flex items-center">
+                            <i class="fas fa-chart-pie w-7 text-center"></i>
+                            <span>Report</span>
+                        </div>
+                        <i id="icon-report" class="fas fa-chevron-right text-xs opacity-50 transition-transform duration-200 chevron-icon"></i>
+                    </a>
+                    <ul id="submenu-report" class="hidden mt-1 space-y-0.5">
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Report Summary</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Repeat Customers</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Product</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">POS</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Product Daily Sales</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Top Return Products</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Top Sold Products</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Top Purchased Products</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Lowest Stock Products</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Login Histories</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Employee Activities</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Orders by Employee</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Up-Sales</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Exports</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                        <i class="fas fa-ticket-alt w-7 text-center"></i>
+                        <span>Coupons</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                        <i class="fas fa-trash-alt w-7 text-center"></i>
+                        <span>Recycle Bin</span>
+                    </a>
+                </li>
+
+                <!-- Account Section -->
+                <li class="px-3 pt-6 pb-2 text-[11px] font-bold text-gray-500 uppercase tracking-wider account-header">Account</li>
+                <li>
+                    <a href="#" onclick="document.getElementById('submenu-settings').classList.toggle('hidden'); document.getElementById('icon-settings').classList.toggle('rotate-90'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                        <div class="flex items-center">
+                            <i class="fas fa-cog w-7 text-center"></i>
+                            <span>Settings</span>
+                        </div>
+                        <i id="icon-settings" class="fas fa-chevron-right text-xs opacity-50 transition-transform duration-200 chevron-icon"></i>
+                    </a>
+                    <ul id="submenu-settings" class="hidden mt-1 space-y-0.5">
+                        <li><a href="#/settings/general" id="link-general-settings" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">General Settings</a></li>
+                        <li><a href="#/settings/website" id="link-website-settings" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Website/Landing Page</a></li>
+                        <li><a href="#/settings/courier" id="link-courier-settings" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Courier</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">SMS</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Email</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Import</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Product Categories</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Product Brands</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Product Attributes</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#/roles" id="link-roles" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white nav-link">
+                        <i class="fas fa-user-tag w-7 text-center nav-icon"></i>
+                        <span>Roles</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#/admins" id="link-admins" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white nav-link">
+                        <i class="fas fa-user-shield w-7 text-center nav-icon"></i>
+                        <span>Admins</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                        <i class="fas fa-credit-card w-7 text-center"></i>
+                        <span>Billing</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                        <i class="fas fa-times w-7 text-center"></i>
+                        <span>IP/Mobile Blocked</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                        <i class="fas fa-sitemap w-7 text-center"></i>
+                        <span>Affiliate</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                        <i class="fab fa-whatsapp w-7 text-center"></i>
+                        <span>Contact Support <i class="fas fa-external-link-alt text-[9px] ml-1 opacity-50"></i></span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden">
+        
+        <!-- Top Header (Fixed Height Header) -->
+        <header class="h-[64px] bg-brand-header flex items-center justify-between px-6 z-10 text-white shrink-0 border-b border-purple-800 shadow-none">
+            
+            <!-- Search -->
+            <div class="flex-1 max-w-sm relative">
+                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+                <input type="text" id="global-search" placeholder="Search Order ID or Mobile..." class="w-full bg-white text-gray-800 border border-purple-300 rounded-full py-2 pl-11 pr-4 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all placeholder-gray-400 text-sm shadow-inner">
+            </div>
+
+            <!-- Header Right -->
+            <div class="flex items-center space-x-4">
+                <button onclick="window.location.hash='#/create-order'" class="bg-brand-teal hover:bg-teal-600 px-4 py-2 rounded-full text-xs font-bold flex items-center transition-all shadow-sm active:scale-95">
+                    <i class="fas fa-plus mr-2"></i> Create Order
+                </button>
+                
+                <div class="flex items-center space-x-3">
+                    <button class="w-9 h-9 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all tooltip" title="Watch Tutorials">
+                        <i class="fas fa-play-circle text-lg"></i>
+                        <span class="tooltiptext">Video Tutorials</span>
+                    </button>
+                    <button class="w-9 h-9 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all" title="Toggle Dark Mode">
+                        <i class="fas fa-moon text-lg"></i>
+                    </button>
+                    <button class="w-9 h-9 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-all relative" title="Notifications">
+                        <i class="fas fa-bell text-lg"></i>
+                        <span class="absolute top-1.5 right-1.5 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-brand-header">3</span>
+                    </button>
+                </div>
+
+                <!-- User Profile -->
+                <div class="relative px-2">
+                    <div id="profile-trigger" onclick="toggleProfileDropdown(event)" class="flex items-center space-x-3 pl-4 ml-2 border-l border-white/20 cursor-pointer group">
+                        <div class="text-right hidden md:block">
+                            <p id="header-user-name" class="text-[13px] font-bold leading-none truncate max-w-[120px]">Top One Bazar</p>
+                            <p class="text-[10px] text-purple-200 mt-1">Super Admin</p>
+                        </div>
+                        <div class="w-9 h-9 rounded-full bg-white/20 border border-white/30 overflow-hidden flex items-center justify-center shadow-sm group-hover:border-white transition-all">
+                            <img id="header-user-img" src="" class="w-full h-full object-cover hidden">
+                            <i id="header-user-icon" class="fas fa-user text-white text-sm"></i>
+                        </div>
+                        <i class="fas fa-chevron-down text-[10px] text-white opacity-50 group-hover:opacity-100 transition-all"></i>
+                    </div>
+
+                    <!-- Profile Dropdown -->
+                    <div id="profile-dropdown" class="hidden absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-[100] transform transition-all duration-200">
+                        <div class="p-4 border-b border-gray-50 text-center">
+                            <p id="dropdown-user-name" class="text-sm font-bold text-gray-800">Ahammad Ulla</p>
+                        </div>
+                        <div class="px-4 py-2 border-b border-gray-50 flex items-center justify-center space-x-2">
+                            <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                            <span class="text-[11px] font-bold text-gray-500 tracking-wide uppercase">Active Employees</span>
+                        </div>
+                        <div class="p-1.5 cursor-default">
+                            <a href="#/profile" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-all font-medium text-[13px]">
+                                <i class="fas fa-user-circle text-lg opacity-80"></i>
+                                <span>Profile</span>
+                            </a>
+                            <a href="javascript:void(0)" onclick="alert('Logging out...')" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-gray-700 hover:bg-red-50 hover:text-red-700 transition-all font-medium text-[13px]">
+                                <i class="fas fa-sign-out-alt text-lg opacity-80"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-y-auto bg-gray-100 p-4 md:p-6 flex flex-col">
+            
+            <!-- Professional Trial Banner -->
+
+
+            <style>
+                @keyframes pulse-subtle {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.95; }
+                }
+                .animate-pulse-subtle {
+                    animation: pulse-subtle 3s infinite ease-in-out;
+                }
+            </style>
+
+            <!-- View Container -->
+            <!-- View Container -->
+            <div id="view-container" class="flex-1">
+                <!-- Views will be injected here via app.js -->
+            </div>
+
+            <!-- Global Footer -->
+            <div class="mt-auto pt-10 pb-6 border-t border-gray-100/50">
+                <div class="flex flex-col items-center gap-2">
+                    <p class="text-[11px] font-bold text-gray-400 tracking-widest uppercase">Top One Bazar © 2026</p>
+                    <div class="h-1 w-8 bg-purple-500/20 rounded-full"></div>
+                    <p class="text-[9px] text-gray-300 font-medium">All Right Reserved</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Define views as strings to avoid CORS issues locally -->
+    <script src="js/views/dashboard.js"></script>
+    <script src="js/views/product_list.js"></script>
+    <script src="js/views/create_product.js"></script>
+    <script src="js/views/create_order.js"></script>
+    <script src="js/views/all_orders.js"></script>
+    <script src="js/views/status_orders.js"></script>
+    <script src="js/views/purchase.js"></script>
+    <script src="js/views/suppliers.js"></script>
+    <script src="js/views/return_collection.js"></script>
+    <script src="js/views/courier_payment.js"></script>
+    <script src="js/views/bulk_print.js"></script>
+    <script src="js/views/send_courier.js"></script>
+    <script src="js/views/payments.js"></script>
+    <script src="js/views/pre_orders.js"></script>
+    <script src="js/views/customers.js"></script>
+    <script src="js/views/roles.js"></script>
+    <script src="js/views/admins.js"></script>
+        <script src="js/views/settings_tabs/tab_general.js"></script>
+    <script src="js/views/settings_tabs/tab_order.js"></script>
+    <script src="js/views/settings_tabs/tab_invoice.js"></script>
+    <script src="js/views/settings_tabs/tab_customer.js"></script>
+    <script src="js/views/settings_tabs/tab_others.js"></script>
+    <script src="js/views/settings_general.js"></script>
+    <script src="js/views/settings_website.js"></script>
+    <script src="js/views/settings_courier.js"></script>
+    <script src="js/views/profile.js"></script>
+
+    <!-- App Logic -->
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
