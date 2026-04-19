@@ -10,8 +10,23 @@ const profileHTML = `
         <!-- Profile Picture Header Card -->
         <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-8 mb-8 flex flex-col items-center text-center">
             <div class="relative group">
-                <div class="w-40 h-40 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-50 flex items-center justify-center relative">
-                    <img id="profile-pic-preview" src="https://via.placeholder.com/160?text=User" alt="Profile" class="w-full h-full object-cover">
+                <div class="w-40 h-40 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gradient-to-br from-purple-100 to-indigo-100 flex items-center justify-center relative">
+                    <!-- Default SVG Avatar (shown when no photo) -->
+                    <div id="profile-pic-default" class="w-full h-full flex items-center justify-center">
+                        <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                            <rect width="160" height="160" fill="url(#avatarGrad)"/>
+                            <defs>
+                                <linearGradient id="avatarGrad" x1="0" y1="0" x2="160" y2="160" gradientUnits="userSpaceOnUse">
+                                    <stop stop-color="#7c3aed"/>
+                                    <stop offset="1" stop-color="#4f46e5"/>
+                                </linearGradient>
+                            </defs>
+                            <circle cx="80" cy="62" r="30" fill="rgba(255,255,255,0.35)"/>
+                            <ellipse cx="80" cy="145" rx="52" ry="38" fill="rgba(255,255,255,0.25)"/>
+                        </svg>
+                    </div>
+                    <!-- Uploaded Photo -->
+                    <img id="profile-pic-preview" src="" alt="Profile" class="w-full h-full object-cover absolute inset-0 hidden">
                     <!-- Hover Overlay -->
                     <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <button onclick="document.getElementById('profile-pic-input').click()" class="bg-white/20 hover:bg-white/30 text-white p-3 rounded-full backdrop-blur-sm transition-all transform hover:scale-110">
@@ -23,7 +38,7 @@ const profileHTML = `
                 <div class="absolute bottom-2 right-2 w-6 h-6 bg-green-500 border-4 border-white rounded-full shadow-sm"></div>
             </div>
             
-            <h2 class="mt-4 text-2xl font-bold text-gray-800">MD Rasel</h2>
+            <h2 id="profile-display-name" class="mt-4 text-2xl font-bold text-gray-800">Top One Bazar</h2>
             <p class="text-gray-500 text-sm font-medium">Super Admin • Top One Bazar</p>
             
             <input type="file" id="profile-pic-input" class="hidden" accept="image/*">

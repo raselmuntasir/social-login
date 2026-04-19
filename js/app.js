@@ -1,6 +1,10 @@
 // Active sidebar link tracking
 let _activeStatusLinkId = null;
 
+// ─── Performance: Cache profile so we only hit Supabase ONCE ───
+let _profileCache = null;
+let _profileFetchPromise = null;
+
 // Steadfast Courier API Configuration
 let STEADFAST_API_KEY = '';
 let STEADFAST_SECRET_KEY = '';
@@ -46,8 +50,8 @@ async function handleRouting() {
     const hash = window.location.hash || '#/dashboard';
     const container = document.getElementById('view-container');
     
-    // Load/Refresh Global Profile Info (Header/Dropdown)
-    await loadGlobalUserProfile();
+    // ─── Non-blocking: profile loads in background, doesn't delay page switch ───
+    loadGlobalUserProfile(); // No await — fire and forget
     
     // Reset sidebar first
     resetSidebarLinks();
@@ -77,18 +81,8 @@ async function handleRouting() {
         highlightLink('link-inventory', false);
         initProductForm();
         
-        // Initialize CKEditor
-        if (typeof CKEDITOR !== 'undefined') {
-            if (CKEDITOR.instances['product-description']) {
-                CKEDITOR.instances['product-description'].destroy(true);
-            }
-            CKEDITOR.config.versionCheck = false; // Disable the security warning
-            CKEDITOR.replace('product-description', {
-                height: 300,
-                removeButtons: 'PasteFromWord',
-                removePlugins: 'exportpdf'
-            });
-        }
+        // Lazy-load CKEditor only when needed (saves ~2MB on all other pages)
+        loadCKEditorLazy();
     } else if (hash === '#/purchase') {
         container.innerHTML = purchaseHTML;
         highlightLink('link-inventory', false);
@@ -1273,33 +1267,49 @@ window.addEventListener('click', function(e) {
 });
 
 // Global Profile Sync (Header/Dropdown)
+// Uses in-memory cache — only fetches from Supabase once per session
 async function loadGlobalUserProfile() {
     try {
-        const settings = await AppAPI.getSettings();
-        
-        const name = settings['admin_name'] || 'Top One Bazar';
-        const imageUrl = settings['admin_image'];
-
-        const headerName = document.getElementById('header-user-name');
-        const dropdownName = document.getElementById('dropdown-user-name');
-        const headerImg = document.getElementById('header-user-img');
-        const headerIcon = document.getElementById('header-user-icon');
-
-        if (headerName) headerName.innerText = name;
-        if (dropdownName) dropdownName.innerText = name;
-
-        if (headerImg && headerIcon) {
-            if (imageUrl) {
-                headerImg.src = imageUrl;
-                headerImg.classList.remove('hidden');
-                headerIcon.classList.add('hidden');
-            } else {
-                headerImg.classList.add('hidden');
-                headerIcon.classList.remove('hidden');
-            }
+        // If already cached, apply immediately without any network call
+        if (_profileCache) {
+            applyProfileToUI(_profileCache);
+            return;
         }
+
+        // If a fetch is already in-flight, reuse the same promise
+        if (!_profileFetchPromise) {
+            _profileFetchPromise = AppAPI.getSettings();
+        }
+
+        const settings = await _profileFetchPromise;
+        _profileCache = settings; // Save to cache
+        applyProfileToUI(settings);
     } catch (error) {
         console.error('Error loading global profile:', error);
+    }
+}
+
+function applyProfileToUI(settings) {
+    const name = settings['admin_name'] || 'Top One Bazar';
+    const imageUrl = settings['admin_image'];
+
+    const headerName = document.getElementById('header-user-name');
+    const dropdownName = document.getElementById('dropdown-user-name');
+    const headerImg = document.getElementById('header-user-img');
+    const headerIcon = document.getElementById('header-user-icon');
+
+    if (headerName) headerName.innerText = name;
+    if (dropdownName) dropdownName.innerText = name;
+
+    if (headerImg && headerIcon) {
+        if (imageUrl) {
+            headerImg.src = imageUrl;
+            headerImg.classList.remove('hidden');
+            headerIcon.classList.add('hidden');
+        } else {
+            headerImg.classList.add('hidden');
+            headerIcon.classList.remove('hidden');
+        }
     }
 }
 
@@ -1314,13 +1324,25 @@ async function initProfilePage() {
     try {
         const settings = await AppAPI.getSettings();
         
+        const adminName = settings['admin_name'] || 'Top One Bazar';
         if (settings['admin_name']) document.getElementById('profile-name').value = settings['admin_name'];
         if (settings['admin_email']) document.getElementById('profile-email').value = settings['admin_email'];
         if (settings['admin_mobile']) document.getElementById('profile-mobile').value = settings['admin_mobile'];
         if (settings['admin_address']) document.getElementById('profile-address').value = settings['admin_address'];
 
+        // Set display name in the header card
+        const displayName = document.getElementById('profile-display-name');
+        if (displayName) displayName.innerText = adminName;
+
+        // Show profile picture if available, otherwise show default SVG avatar
+        const picDefault = document.getElementById('profile-pic-default');
         if (settings['admin_image']) {
             profilePicPreview.src = settings['admin_image'];
+            profilePicPreview.classList.remove('hidden');
+            if (picDefault) picDefault.classList.add('hidden');
+        } else {
+            profilePicPreview.classList.add('hidden');
+            if (picDefault) picDefault.classList.remove('hidden');
         }
     } catch (error) {
         console.error('Error loading profile settings:', error);
@@ -1334,6 +1356,9 @@ async function initProfilePage() {
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     profilePicPreview.src = event.target.result;
+                    profilePicPreview.classList.remove('hidden');
+                    const picDefault = document.getElementById('profile-pic-default');
+                    if (picDefault) picDefault.classList.add('hidden');
                 }
                 reader.readAsDataURL(file);
             }
@@ -1382,6 +1407,8 @@ async function initProfilePage() {
 
             try {
                 await AppAPI.updateMultipleSettings(profileData);
+                _profileCache = null;       // Bust cache so next load re-fetches
+                _profileFetchPromise = null;
                 await loadGlobalUserProfile(); // Sync Header/Dropdown
                 alert('Profile updated successfully!');
             } catch (error) {
@@ -1416,18 +1443,113 @@ async function initProfilePage() {
     }
 }
 
-window.removeProfilePic = function() {
+window.removeProfilePic = async function() {
     const previewImg = document.getElementById('profile-pic-preview');
+    const picDefault = document.getElementById('profile-pic-default');
     const fileInput = document.getElementById('profile-pic-input');
-    
-    if (previewImg) {
-        previewImg.src = 'https://via.placeholder.com/160?text=User';
+    const removeBtn = document.querySelector('[onclick="window.removeProfilePic()"]');
+
+    // Show loading state
+    if (removeBtn) {
+        removeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Removing...';
+        removeBtn.disabled = true;
     }
-    if (fileInput) {
-        fileInput.value = '';
+
+    try {
+        // 1. Get current image URL from Supabase settings
+        const currentImageUrl = previewImg?.src || '';
+
+        // 2. Delete file from Supabase Storage (if it's a Supabase hosted URL)
+        if (currentImageUrl && currentImageUrl.includes('supabase.co/storage')) {
+            // Extract file path from URL: .../product-images/filename.ext
+            const urlParts = currentImageUrl.split('/product-images/');
+            if (urlParts.length > 1) {
+                const filePath = urlParts[1].split('?')[0]; // remove any query params
+                const { error: storageError } = await _supabase.storage
+                    .from('product-images')
+                    .remove([filePath]);
+                if (storageError) {
+                    console.warn('Storage delete warning:', storageError.message);
+                } else {
+                    console.log('✅ File deleted from Supabase Storage:', filePath);
+                }
+            }
+        }
+
+        // 3. Clear admin_image in settings table
+        await AppAPI.updateSetting('admin_image', '');
+        console.log('✅ admin_image cleared from settings');
+
+        // 4. Bust profile cache so header reflects change
+        _profileCache = null;
+        _profileFetchPromise = null;
+        loadGlobalUserProfile();
+
+        // 5. Update UI — hide photo, show SVG avatar
+        if (previewImg) {
+            previewImg.src = '';
+            previewImg.classList.add('hidden');
+        }
+        if (picDefault) picDefault.classList.remove('hidden');
+        if (fileInput) fileInput.value = '';
+
+    } catch (err) {
+        console.error('Error removing profile picture:', err);
+        alert('ছবি রিমুভ করতে সমস্যা হয়েছে। আবার চেষ্টা করুন।');
+    } finally {
+        if (removeBtn) {
+            removeBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Remove';
+            removeBtn.disabled = false;
+        }
     }
 };
 
+// ─── Lazy CKEditor Loader ───────────────────────────────────────────────
+// Loads CKEditor script only once on demand (first visit to Create Product page)
+let _ckEditorLoaded = false;
+let _ckEditorLoading = false;
 
+function loadCKEditorLazy() {
+    const initEditor = () => {
+        if (typeof CKEDITOR !== 'undefined') {
+            if (CKEDITOR.instances['product-description']) {
+                CKEDITOR.instances['product-description'].destroy(true);
+            }
+            CKEDITOR.config.versionCheck = false;
+            CKEDITOR.replace('product-description', {
+                height: 300,
+                removeButtons: 'PasteFromWord',
+                removePlugins: 'exportpdf'
+            });
+        }
+    };
 
+    if (_ckEditorLoaded) {
+        // Already loaded — just init
+        initEditor();
+        return;
+    }
 
+    if (_ckEditorLoading) {
+        // Script is still downloading — wait for it
+        const interval = setInterval(() => {
+            if (typeof CKEDITOR !== 'undefined') {
+                clearInterval(interval);
+                _ckEditorLoaded = true;
+                initEditor();
+            }
+        }, 100);
+        return;
+    }
+
+    // First time — inject the script tag
+    _ckEditorLoading = true;
+    const script = document.createElement('script');
+    script.src = 'https://cdn.ckeditor.com/4.22.1/full/ckeditor.js';
+    script.onload = () => {
+        _ckEditorLoaded = true;
+        _ckEditorLoading = false;
+        initEditor();
+    };
+    document.head.appendChild(script);
+}
