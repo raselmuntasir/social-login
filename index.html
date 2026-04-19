@@ -1,486 +1,734 @@
 <!DOCTYPE html>
-<html lang="bn" class="scroll-smooth">
-
+<html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Top One Bazar | N607 Portable Turbo Fan</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
-    <style>
-        :root {
-            --brand-navy: #0a2351;
-            --brand-green: #48b24c;
-            --brand-orange: #ff9800;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>N607 Portable Turbo Fan — পকেট ফ্যান</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Baloo+Da+2:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body {
-            font-family: 'Hind Siliguri', sans-serif;
-            background-color: #f8fafc;
-            color: #1e293b;
-        }
+  :root {
+    --bg: #0a0f1e;
+    --bg2: #111827;
+    --bg3: #1a2235;
+    --accent: #00d4ff;
+    --accent2: #0099cc;
+    --warm: #ff6b35;
+    --warm2: #e55a2b;
+    --text: #f0f6ff;
+    --muted: #8fa3bf;
+    --card-bg: rgba(255,255,255,0.04);
+    --card-border: rgba(0,212,255,0.15);
+    --price-color: #00d4ff;
+    --old-price: #8fa3bf;
+    --radius: 16px;
+    --radius-sm: 10px;
 
-        .bg-navy {
-            background-color: var(--brand-navy);
-        }
+    /* Old Form Colors */
+    --brand-navy: #0a2351;
+    --brand-green: #48b24c;
+    --brand-orange: #ff9800;
+  }
 
-        .bg-green {
-            background-color: var(--brand-green);
-        }
+  /* Old Form Classes */
+  .bg-navy { background-color: var(--brand-navy); }
+  .bg-green { background-color: var(--brand-green); }
+  .bg-orange { background-color: var(--brand-orange); }
+  .text-navy { color: var(--brand-navy); }
+  .text-green { color: var(--brand-green); }
+  .border-green { border-color: var(--brand-green); }
+  .shadow-premium { box-shadow: 0 20px 50px -12px rgba(10, 35, 81, 0.15); }
+  .loader {
+      width: 24px; height: 24px;
+      border: 3px solid var(--brand-navy); border-bottom-color: transparent;
+      border-radius: 50%; display: inline-block; box-sizing: border-box;
+      animation: rotation 1s linear infinite;
+  }
+  @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .bg-orange {
-            background-color: var(--brand-orange);
-        }
+  html { scroll-behavior: smooth; }
 
-        .text-navy {
-            color: var(--brand-navy);
-        }
+  body {
+    font-family: 'Hind Siliguri', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-        .text-green {
-            color: var(--brand-green);
-        }
+  /* ---- HEADER NAV ---- */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(10,15,30,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,212,255,0.1);
+    padding: 14px 5%;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo {
+    font-family: 'Baloo Da 2', sans-serif;
+    font-size: 22px; font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+  .nav-badge {
+    font-size: 11px;
+    background: var(--warm);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
 
-        .border-green {
-            border-color: var(--brand-green);
-        }
+  /* ---- HERO ---- */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 100px 5% 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute; bottom: -100px; left: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(255,107,53,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
 
-        .glass {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
+  .hero-inner {
+    max-width: 1100px; width: 100%;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 60px; align-items: center;
+  }
 
-        .shadow-premium {
-            box-shadow: 0 20px 50px -12px rgba(10, 35, 81, 0.15);
-        }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.3);
+    border-radius: 30px;
+    padding: 6px 16px;
+    font-size: 13px; color: var(--accent);
+    font-weight: 600; letter-spacing: 0.5px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+  .hero-tag span { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: blink 1.5s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-        @keyframes bounce-subtle {
+  .hero h1 {
+    font-family: 'Baloo Da 2', sans-serif;
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    color: #fff;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
 
-            0%,
-            100% {
-                transform: translateY(0);
-            }
+  .hero-sub {
+    font-size: 17px; color: var(--muted);
+    line-height: 1.7; margin-bottom: 32px;
+  }
 
-            50% {
-                transform: translateY(-10px);
-            }
-        }
+  .price-block {
+    display: flex; align-items: baseline; gap: 12px;
+    margin-bottom: 36px;
+  }
+  .price-new {
+    font-family: 'Baloo Da 2', sans-serif;
+    font-size: 44px; font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .price-old {
+    font-size: 22px; color: var(--old-price);
+    text-decoration: line-through;
+  }
+  .price-save {
+    background: var(--warm);
+    color: #fff;
+    font-size: 13px; font-weight: 700;
+    padding: 4px 10px; border-radius: 20px;
+  }
 
-        .animate-float {
-            animation: bounce-subtle 4s ease-in-out infinite;
-        }
+  .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
 
-        .loader {
-            width: 24px;
-            height: 24px;
-            border: 3px solid #FFF;
-            border-bottom-color: transparent;
-            border-radius: 50%;
-            display: inline-block;
-            box-sizing: border-box;
-            animation: rotation 1s linear infinite;
-        }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #0a0f1e;
+    font-family: 'Hind Siliguri', sans-serif;
+    font-size: 17px; font-weight: 700;
+    padding: 14px 34px;
+    border: none; border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(0,212,255,0.35); }
+  .btn-primary:active { transform: translateY(0); }
 
-        @keyframes rotation {
-            0% {
-                transform: rotate(0deg);
-            }
+  .btn-secondary {
+    background: transparent;
+    border: 1.5px solid rgba(0,212,255,0.4);
+    color: var(--accent);
+    font-family: 'Hind Siliguri', sans-serif;
+    font-size: 17px; font-weight: 600;
+    padding: 13px 28px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-secondary:hover { background: rgba(0,212,255,0.08); border-color: var(--accent); }
 
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-    </style>
+  /* fan visual */
+  .hero-visual {
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    height: 400px;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0px); }
+    50% { transform: translateY(-14px); }
+  }
+
+  /* glow rings */
+  .glow-ring {
+    position: absolute; border-radius: 50%;
+    border: 1px solid rgba(0,212,255,0.1);
+    pointer-events: none;
+    animation: pulse 3s ease-in-out infinite;
+  }
+  .glow-ring:nth-child(1) { width: 320px; height: 320px; animation-delay: 0s; }
+  .glow-ring:nth-child(2) { width: 440px; height: 440px; animation-delay: 1s; }
+  .glow-ring:nth-child(3) { width: 540px; height: 540px; animation-delay: 2s; }
+  @keyframes pulse { 0%,100%{opacity:0.4; transform:scale(1)} 50%{opacity:0.1; transform:scale(1.02)} }
+
+  /* ---- PAIN POINTS ---- */
+  .pain-section {
+    padding: 80px 5%;
+    background: var(--bg2);
+  }
+  .section-center { max-width: 1100px; margin: 0 auto; }
+  .section-tag {
+    text-align: center;
+    font-size: 13px; font-weight: 600;
+    color: var(--warm); letter-spacing: 1.5px; text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Baloo Da 2', sans-serif;
+    font-size: clamp(26px, 4vw, 40px);
+    font-weight: 800; text-align: center;
+    margin-bottom: 50px; color: #fff;
+    line-height: 1.25;
+  }
+  .section-title span { color: var(--accent); }
+
+  .pain-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .pain-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 28px;
+    position: relative; overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .pain-card:hover { transform: translateY(-4px); border-color: rgba(0,212,255,0.35); }
+  .pain-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0; transition: opacity 0.3s;
+  }
+  .pain-card:hover::before { opacity: 1; }
+  .pain-emoji { font-size: 36px; margin-bottom: 14px; display: block; }
+  .pain-card h3 {
+    font-family: 'Baloo Da 2', sans-serif;
+    font-size: 20px; font-weight: 700;
+    color: #fff; margin-bottom: 10px;
+  }
+  .pain-card p { font-size: 15px; color: var(--muted); line-height: 1.7; }
+
+  /* ---- FEATURES ---- */
+  .features-section {
+    padding: 80px 5%;
+    background: var(--bg);
+  }
+  .features-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+    margin-top: 0;
+  }
+  .feature-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: var(--radius);
+    padding: 26px 22px;
+    transition: transform 0.2s, background 0.2s, border-color 0.2s;
+    display: flex; align-items: flex-start; gap: 16px;
+  }
+  .feature-card:hover {
+    transform: translateY(-3px);
+    background: rgba(0,212,255,0.04);
+    border-color: rgba(0,212,255,0.2);
+  }
+  .feature-icon {
+    width: 48px; height: 48px; flex-shrink: 0;
+    border-radius: 12px;
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .feature-text h4 {
+    font-family: 'Baloo Da 2', sans-serif;
+    font-size: 17px; font-weight: 700;
+    color: #fff; margin-bottom: 5px;
+  }
+  .feature-text p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+  .feature-text .spec { color: var(--accent); font-weight: 600; font-size: 15px; }
+
+  /* ---- STATS BAR ---- */
+  .stats-section {
+    padding: 50px 5%;
+    background: linear-gradient(135deg, rgba(0,212,255,0.08) 0%, rgba(255,107,53,0.05) 100%);
+    border-top: 1px solid rgba(0,212,255,0.1);
+    border-bottom: 1px solid rgba(0,212,255,0.1);
+  }
+  .stats-grid {
+    max-width: 1100px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 20px; text-align: center;
+  }
+  .stat-item {}
+  .stat-num {
+    font-family: 'Baloo Da 2', sans-serif;
+    font-size: 38px; font-weight: 800;
+    color: var(--accent); line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-label { font-size: 14px; color: var(--muted); }
+
+  /* ---- BOX CONTENTS ---- */
+  .box-section {
+    padding: 80px 5%;
+    background: var(--bg2);
+  }
+  .box-items {
+    display: flex; gap: 24px; justify-content: center; flex-wrap: wrap;
+    margin-top: 10px;
+  }
+  .box-item {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 30px 36px;
+    text-align: center;
+    min-width: 160px;
+    transition: transform 0.2s;
+  }
+  .box-item:hover { transform: translateY(-4px); }
+  .box-item-icon { font-size: 40px; margin-bottom: 12px; display: block; }
+  .box-item p { font-size: 15px; color: var(--muted); font-weight: 600; }
+
+  /* ---- FOOTER ---- */
+  footer {
+    background: var(--bg2);
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 30px 5%;
+    text-align: center;
+    color: var(--muted); font-size: 14px;
+  }
+
+  /* ---- RESPONSIVE ---- */
+  @media(max-width: 768px) {
+    .hero-inner { grid-template-columns: 1fr; text-align: center; gap: 40px; }
+    .hero-btns { justify-content: center; }
+    .price-block { justify-content: center; }
+    .hero-tag { justify-content: center; }
+    .hero-visual { order: -1; height: 300px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .glow-ring:nth-child(1) { width: 250px; height: 250px; }
+    .glow-ring:nth-child(2) { width: 350px; height: 350px; }
+    .glow-ring:nth-child(3) { display: none; }
+  }
+  
+  /* Order Section Overrides for Dark Theme Compatibility */
+  #order label {
+      color: #334155;
+  }
+  #order .text-slate-500 {
+      color: #64748b;
+  }
+  #order p {
+      color: #334155;
+  }
+</style>
 </head>
+<body>
 
-<body class="overflow-x-hidden">
+<!-- NAV -->
+<nav>
+  <div class="flex items-center gap-3">
+    <img src="images/logo.png" alt="Logo" class="h-8 w-auto">
+    <div class="nav-logo">N607 Fan</div>
+  </div>
+  <div class="nav-badge">🔥 সীমিত অফার</div>
+</nav>
 
-    <!-- Sticky Header -->
-    <header class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-slate-100 shadow-sm">
-        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <img src="logo.png" alt="Top One Bazar" class="h-10 w-auto">
-                <span class="text-xl font-bold text-navy tracking-tight">Top One Bazar</span>
-            </div>
-            <a href="#order"
-                class="bg-orange text-white px-5 py-2 rounded-full font-bold text-sm hover:scale-105 transition-all shadow-lg shadow-orange/20">অর্ডার
-                করুন</a>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="hero-tag">
+        <span></span>
+        New 2024 Product
+      </div>
+      <h1>পকেটে রাখুন,<br><em>যেখানে খুশি</em><br>ঠান্ডা বাতাস নিন।</h1>
+      <p class="hero-sub">N607 Portable Turbo Fan — গরমের দিনে আপনার সবচেয়ে বিশ্বস্ত সঙ্গী। লোডশেডিং হোক বা অফিস, সবখানে আপনার আরাম নিশ্চিত।</p>
+      <div class="price-block">
+        <span class="price-new">৳790</span>
+        <span class="price-old">৳1,200</span>
+        <span class="price-save">৩৪% ছাড়</span>
+      </div>
+      <div class="hero-btns">
+        <a href="#order" class="btn-primary">এখনই অর্ডার করুন 🛒</a>
+        <a href="#features" class="btn-secondary">ফিচার দেখুন</a>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="glow-ring"></div>
+      <div class="glow-ring"></div>
+      <div class="glow-ring"></div>
+      <div style="position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;">
+          <img src="images/fan-1.png" alt="N607 Fan" style="position: absolute; width: 220px; z-index: 10; animation: float 4s ease-in-out infinite;">
+          <img src="images/fan-2.png" alt="N607 Fan Background" style="position: absolute; width: 140px; z-index: 5; top: 0%; left: 0%; transform: rotate(-15deg); filter: blur(3px); opacity: 0.8; animation: float 5s ease-in-out infinite reverse;">
+          <img src="images/fan-3.png" alt="N607 Fan Background" style="position: absolute; width: 160px; z-index: 5; bottom: 0%; right: 0%; transform: rotate(15deg); filter: blur(2px); opacity: 0.9; animation: float 4.5s ease-in-out infinite 1s;">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats-section">
+  <div class="stats-grid">
+    <div class="stat-item">
+      <div class="stat-num">13,550</div>
+      <div class="stat-label">RPM টার্বো স্পিড</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">12h</div>
+      <div class="stat-label">পর্যন্ত ব্যাটারি ব্যাকআপ</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">5</div>
+      <div class="stat-label">স্পিড লেভেল</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">1800</div>
+      <div class="stat-label">mAh ব্যাটারি</div>
+    </div>
+  </div>
+</section>
+
+<!-- PAIN POINTS -->
+<section class="pain-section">
+  <div class="section-center">
+    <div class="section-tag">আপনার সমস্যার সমাধান</div>
+    <h2 class="section-title">এই <span>৩টি সমস্যা</span> থেকে<br>বাঁচতে পারবেন এখনই</h2>
+    <div class="pain-grid">
+      <div class="pain-card">
+        <span class="pain-emoji">😰</span>
+        <h3>লোডশেডিং</h3>
+        <p>হঠাৎ বিদ্যুৎ চলে গেলেও আপনার চারপাশ থাকবে ঠান্ডা ও আরামদায়ক। ১৮০০mAh ব্যাটারিতে ১২ ঘণ্টা পর্যন্ত চলে。</p>
+      </div>
+      <div class="pain-card">
+        <span class="pain-emoji">🥵</span>
+        <h3>অফিসে গরম</h3>
+        <p>অফিসের ডেস্ক বা রাস্তায় দীর্ঘক্ষণ ঘাম থেকে বাঁচতে এটিই সেরা সমাধান। চুপচাপ চলে, কাজে মনোযোগ নষ্ট হয় না।</p>
+      </div>
+      <div class="pain-card">
+        <span class="pain-emoji">😓</span>
+        <h3>ট্রাভেলে অস্বস্তি</h3>
+        <p>ভ্রমণের সময় পকেটে বা ব্যাগে নিয়ে ঘুরুন, যেখানেই যান বাতাস থাকবে সাথে। মাত্র ৭৯০ টাকায় আরামের নিশ্চয়তা।</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section" id="features">
+  <div class="section-center">
+    <div class="section-tag">অবিশ্বাস্য সব ফিচার</div>
+    <h2 class="section-title">কেন N607 <span>সেরা?</span></h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🔋</div>
+        <div class="feature-text">
+          <h4>শক্তিশালী ব্যাটারি</h4>
+          <p class="spec">1800mAh Battery</p>
+          <p>৫ থেকে ১২ ঘণ্টা পর্যন্ত ব্যাকআপ পাবেন।</p>
         </div>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="relative pt-28 pb-16 md:pt-40 md:pb-24 overflow-hidden bg-gradient-to-br from-white to-slate-50">
-        <div class="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
-            <div class="text-center md:text-left order-2 md:order-1">
-                <div
-                    class="inline-block px-4 py-1 bg-green/10 text-green rounded-full text-xs font-bold mb-6 tracking-wider">
-                    PREMIUM QUALITY FAN</div>
-                <h1 class="text-4xl md:text-6xl font-bold text-navy leading-tight mb-6">
-                    গরমে স্বস্তি এখন <span class="text-green">হাতের মুঠোয়!</span>
-                </h1>
-                <p class="text-slate-600 text-lg md:text-xl mb-8 font-medium">
-                    N607 Portable Turbo Fan – পকেটে রাখুন, যেখানে খুশি ঠান্ডা বাতাস নিন।
-                </p>
-
-                <div class="flex items-center justify-center md:justify-start gap-4 mb-10">
-                    <span class="text-4xl font-black text-navy">৳790</span>
-                    <span class="text-xl text-slate-400 line-through">৳1200</span>
-                    <span class="bg-red-500 text-white px-3 py-1 rounded-lg text-xs font-bold italic animate-pulse">Save
-                        ৳410!</span>
-                </div>
-
-                <a href="#order"
-                    class="inline-block w-full md:w-auto bg-orange text-white px-10 py-5 rounded-2xl font-bold text-xl hover:scale-105 transition-all shadow-2xl shadow-orange/40 text-center">
-                    এখনই অর্ডার করুন
-                </a>
-            </div>
-            <div class="order-1 md:order-2 flex justify-center relative">
-                <div class="absolute inset-0 bg-green/20 blur-[100px] rounded-full -z-10 animate-pulse"></div>
-                <img src="hero.png" alt="N607 Turbo Fan"
-                    class="w-full max-w-sm md:max-w-md animate-float drop-shadow-2xl">
-            </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💨</div>
+        <div class="feature-text">
+          <h4>টার্বো স্পিড</h4>
+          <p class="spec">13,550 RPM</p>
+          <p>অতি-শক্তিশালী বাতাস, তবুও শব্দ কম।</p>
         </div>
-    </section>
-
-    <!-- Pain Point Section -->
-    <section class="py-20 bg-white">
-        <div class="container mx-auto px-4">
-            <div class="grid md:grid-cols-3 gap-8">
-                <div
-                    class="p-8 rounded-3xl bg-slate-50 text-center border border-slate-100 hover:shadow-xl transition-all">
-                    <div class="text-5xl mb-6">😰</div>
-                    <h3 class="text-xl font-bold text-navy mb-3">লোডশেডিং</h3>
-                    <p class="text-slate-500 text-sm">হঠাৎ বিদ্যুৎ চলে গেলেও আপনার চারপাশ থাকবে ঠান্ডা ও আরামদায়ক।</p>
-                </div>
-                <div
-                    class="p-8 rounded-3xl bg-slate-50 text-center border border-slate-100 hover:shadow-xl transition-all">
-                    <div class="text-5xl mb-6">🥵</div>
-                    <h3 class="text-xl font-bold text-navy mb-3">অফিসে গরম</h3>
-                    <p class="text-slate-500 text-sm">অফিসের ডেস্ক বা রাস্তায় দীর্ঘক্ষণ ঘাম থেকে বাঁচতে এটিই সেরা
-                        সমাধান।</p>
-                </div>
-                <div
-                    class="p-8 rounded-3xl bg-slate-50 text-center border border-slate-100 hover:shadow-xl transition-all">
-                    <div class="text-5xl mb-6">😓</div>
-                    <h3 class="text-xl font-bold text-navy mb-3">ট্রাভেলে অস্বস্তি</h3>
-                    <p class="text-slate-500 text-sm">ভ্রমণের সময় পকেটে বা ব্যাগে নিয়ে ঘুরুন, যেখানেই যান বাতাস থাকবে
-                        সাথে।</p>
-                </div>
-            </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">5️⃣</div>
+        <div class="feature-text">
+          <h4>৫ স্পিড লেভেল</h4>
+          <p class="spec">Customizable Airflow</p>
+          <p>নিজের মতো বাতাসের গতি নির্বাচন করুন।</p>
         </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="py-24 bg-slate-50">
-        <div class="container mx-auto px-4 text-center">
-            <h2 class="text-3xl md:text-5xl font-bold text-navy mb-16">অবিশ্বাস্য সব ফিচার্স</h2>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-10">
-                <div
-                    class="bg-white p-8 rounded-[2.5rem] shadow-premium hover:border-green border-2 border-transparent transition-all">
-                    <div class="text-4xl mb-6">🔋</div>
-                    <h4 class="font-bold text-navy mb-2">1800mAh Battery</h4>
-                    <p class="text-slate-500 text-xs">5 to 12 hours backup</p>
-                </div>
-                <div
-                    class="bg-white p-8 rounded-[2.5rem] shadow-premium hover:border-green border-2 border-transparent transition-all">
-                    <div class="text-4xl mb-6">💨</div>
-                    <h4 class="font-bold text-navy mb-2">13,550 RPM</h4>
-                    <p class="text-slate-500 text-xs">Turbo Speed Fan</p>
-                </div>
-                <div
-                    class="bg-white p-8 rounded-[2.5rem] shadow-premium hover:border-green border-2 border-transparent transition-all">
-                    <div class="text-4xl mb-6">5️⃣</div>
-                    <h4 class="font-bold text-navy mb-2">5 Speed Levels</h4>
-                    <p class="text-slate-500 text-xs">Customizable Airflow</p>
-                </div>
-                <div
-                    class="bg-white p-8 rounded-[2.5rem] shadow-premium hover:border-green border-2 border-transparent transition-all">
-                    <div class="text-4xl mb-6">📊</div>
-                    <h4 class="font-bold text-navy mb-2">Digital Display</h4>
-                    <h4 class="font-bold text-navy mb-2">Digital Display</h4>
-                    <p class="text-slate-500 text-xs">See speed & battery</p>
-                </div>
-                <div
-                    class="bg-white p-8 rounded-[2.5rem] shadow-premium hover:border-green border-2 border-transparent transition-all">
-                    <div class="text-4xl mb-6">⚡</div>
-                    <h4 class="font-bold text-navy mb-2">Type-C Fast</h4>
-                    <p class="text-slate-500 text-xs">Quick charge support</p>
-                </div>
-                <div
-                    class="bg-white p-8 rounded-[2.5rem] shadow-premium hover:border-green border-2 border-transparent transition-all">
-                    <div class="text-4xl mb-6">🎒</div>
-                    <h4 class="font-bold text-navy mb-2">Travel Friendly</h4>
-                    <p class="text-slate-500 text-xs">Lightweight design</p>
-                </div>
-            </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <div class="feature-text">
+          <h4>ডিজিটাল ডিসপ্লে</h4>
+          <p class="spec">Digital Display</p>
+          <p>স্পিড ও ব্যাটারি লেভেল সহজে দেখুন।</p>
         </div>
-    </section>
-
-    <!-- What's In The Box -->
-    <section class="py-24 bg-white">
-        <div class="container mx-auto px-4 max-w-4xl">
-            <div class="bg-navy rounded-[3rem] p-12 text-white overflow-hidden relative">
-                <div class="absolute top-0 right-0 w-64 h-64 bg-green/20 blur-[80px] -mr-32 -mt-32"></div>
-                <h2 class="text-3xl font-bold mb-10 text-center">বক্সের ভেতরে যা যা থাকছে</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="text-center p-6 bg-white/5 rounded-2xl border border-white/10">
-                        <div class="text-4xl mb-4">🌀</div>
-                        <p class="font-bold">N607 Fan</p>
-                    </div>
-                    <div class="text-center p-6 bg-white/5 rounded-2xl border border-white/10">
-                        <div class="text-4xl mb-4">🔌</div>
-                        <p class="font-bold">Type-C Cable</p>
-                    </div>
-                    <div class="text-center p-6 bg-white/5 rounded-2xl border border-white/10">
-                        <div class="text-4xl mb-4">🎗</div>
-                        <p class="font-bold">Neck Strap</p>
-                    </div>
-                </div>
-            </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-text">
+          <h4>দ্রুত চার্জিং</h4>
+          <p class="spec">Type-C Fast Charge</p>
+          <p>সহজলভ্য USB-C কেবলে দ্রুত চার্জ হয়।</p>
         </div>
-    </section>
-
-    <!-- Social Proof -->
-    <section class="py-24 bg-slate-50">
-        <div class="container mx-auto px-4">
-            <div class="flex flex-col md:flex-row justify-between items-center mb-16 gap-8">
-                <div class="text-center md:text-left">
-                    <h2 class="text-3xl font-bold text-navy mb-2">কাস্টমারদের মতামত</h2>
-                    <p class="text-slate-500 font-bold">500+ Happy Customers ★★★★★</p>
-                </div>
-                <div class="flex gap-4">
-                    <div
-                        class="bg-white px-6 py-3 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-2">
-                        <span class="text-green text-xl">🚚</span>
-                        <span class="text-xs font-bold text-navy">Fast Delivery</span>
-                    </div>
-                </div>
-            </div>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
-                    <div class="text-yellow-400 mb-4">★★★★★</div>
-                    <p class="text-slate-600 mb-6 italic">"ফ্যানের স্পিড অনেক ভালো। টাইপ-সি চার্জিং থাকায় খুব দ্রুত
-                        চার্জ হয়। ডেলিভারিও ২ দিনের মধ্যে পেয়েছি।"</p>
-                    <div class="font-bold text-navy">- রাসেল আহমেদ, ঢাকা</div>
-                </div>
-                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
-                    <div class="text-yellow-400 mb-4">★★★★★</div>
-                    <p class="text-slate-600 mb-6 italic">"ডিজিটাল ডিসপ্লে ফিচারটা জোস! কত পারসেন্ট চার্জ আছে সেটা দেখে
-                        খুব সুবিধা হয়। হাইলি রেকমেন্ডেড।"</p>
-                    <div class="font-bold text-navy">- তানিয়া সুলতানা, খুলনা</div>
-                </div>
-                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
-                    <div class="text-yellow-400 mb-4">★★★★★</div>
-                    <p class="text-slate-600 mb-6 italic">"পকেটে নিয়ে ঘুরতে সুবিধা। লোডশেডিংয়ের সময় আমার প্রধান ভরসা এই
-                        টার্বো ফ্যানটা।"</p>
-                    <div class="font-bold text-navy">- হাসান মাহমুদ, চট্টগ্রাম</div>
-                </div>
-            </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎒</div>
+        <div class="feature-text">
+          <h4>ট্রাভেল ফ্রেন্ডলি</h4>
+          <p class="spec">Lightweight Design</p>
+          <p>পকেট বা ব্যাগে রাখুন, যেকোনো জায়গায় ব্যবহার করুন।</p>
         </div>
-    </section>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <!-- Urgency Section -->
-    <section class="py-20 bg-green/5">
-        <div class="container mx-auto px-4 text-center max-w-2xl">
-            <div class="bg-white p-12 rounded-[3.5rem] shadow-premium border-2 border-green/20">
-                <div class="text-red-500 font-bold text-sm uppercase tracking-widest mb-6 animate-pulse">সীমিত সময়ের
-                    অফার!</div>
-                <div class="flex justify-center gap-4 mb-10" id="timer">
-                    <div class="w-20 h-20 bg-navy rounded-2xl flex flex-col justify-center items-center text-white">
-                        <span class="text-2xl font-bold" id="days">02</span>
-                        <span class="text-[10px] uppercase font-bold text-slate-400">Days</span>
-                    </div>
-                    <div class="w-20 h-20 bg-navy rounded-2xl flex flex-col justify-center items-center text-white">
-                        <span class="text-2xl font-bold" id="hours">12</span>
-                        <span class="text-[10px] uppercase font-bold text-slate-400">Hours</span>
-                    </div>
-                    <div class="w-20 h-20 bg-navy rounded-2xl flex flex-col justify-center items-center text-white">
-                        <span class="text-2xl font-bold" id="mins">45</span>
-                        <span class="text-[10px] uppercase font-bold text-slate-400">Mins</span>
-                    </div>
-                </div>
-            </div>
+<!-- BOX CONTENTS -->
+<section class="box-section">
+  <div class="section-center">
+    <div class="section-tag">প্যাকেজে যা পাচ্ছেন</div>
+    <h2 class="section-title">বক্সের ভেতরে <span>যা যা থাকছে</span></h2>
+    <div class="box-items">
+      <div class="box-item">
+        <span class="box-item-icon">🌀</span>
+        <p>N607 Fan</p>
+      </div>
+      <div class="box-item">
+        <span class="box-item-icon">🔌</span>
+        <p>Type-C Cable</p>
+      </div>
+      <div class="box-item">
+        <span class="box-item-icon">🎗</span>
+        <p>Neck Strap</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Order Section -->
+<section id="order" style="padding: 80px 5%; background: var(--bg);">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <div class="section-tag">অর্ডার করুন</div>
+    <h2 class="section-title">এখনই নিয়ে নিন <span>N607 Turbo Fan</span></h2>
+
+    <div style="background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 24px; overflow: hidden; position: relative;">
+      <!-- Loader -->
+      <div id="formLoader" style="display:none; position:absolute; inset:0; z-index:50; background:rgba(10,15,30,0.88); backdrop-filter:blur(8px); align-items:center; justify-content:center; flex-direction:column; gap:16px;">
+        <div style="width:48px;height:48px;border:3px solid var(--accent);border-bottom-color:transparent;border-radius:50%;animation:rotation 1s linear infinite;"></div>
+        <span style="color:var(--accent); font-size:14px; font-weight:600;">অর্ডার প্রক্রিয়া হচ্ছে...</span>
+      </div>
+
+      <!-- Success Modal -->
+      <div id="successModal" style="display:none; position:absolute; inset:0; z-index:50; background:var(--bg2); flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:40px;">
+        <div style="width:80px;height:80px;border-radius:50%;background:rgba(0,212,255,0.12);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;margin-bottom:24px;">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
         </div>
-    </section>
+        <h2 style="font-family:'Baloo Da 2',sans-serif;font-size:28px;font-weight:800;color:#fff;margin-bottom:12px;">অর্ডার সফল হয়েছে!</h2>
+        <p style="color:var(--muted);font-size:16px;line-height:1.7;max-width:380px;margin-bottom:32px;">ধন্যবাদ! আমাদের প্রতিনিধি খুব শীঘ্রই আপনার নাম্বারে কল করে অর্ডারটি কনফার্ম করবেন।</p>
+        <button onclick="location.reload()" class="btn-primary">আবার দেখুন</button>
+      </div>
 
-    <!-- Order Section (Advanced Checkout) -->
-    <section id="order" class="py-24 bg-slate-50">
-        <div class="container mx-auto px-4 max-w-6xl">
-            <div class="bg-orange p-4 rounded-t-3xl text-center">
-                <h2 class="text-xl md:text-2xl font-bold text-white">অর্ডার করতে নিচের ফর্মটি সম্পূর্ণ পূরণ করুন।</h2>
+      <form id="orderForm" style="display:grid; grid-template-columns:1fr 1fr; gap:0;">
+
+        <!-- Left: Billing -->
+        <div style="padding:40px; border-right:1px solid rgba(0,212,255,0.12);">
+          <h3 style="font-family:'Baloo Da 2',sans-serif;font-size:20px;font-weight:800;color:#fff;margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid rgba(0,212,255,0.15);">
+            🧾 আপনার তথ্য দিন
+          </h3>
+          <div style="display:flex;flex-direction:column;gap:20px;">
+
+            <div>
+              <label style="display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;letter-spacing:0.8px;text-transform:uppercase;">আপনার নাম *</label>
+              <input type="text" id="name" required placeholder="পুরো নাম লিখুন" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(0,212,255,0.2);border-radius:12px;padding:13px 16px;color:#fff;font-size:15px;font-family:'Hind Siliguri',sans-serif;outline:none;transition:border-color 0.2s;box-sizing:border-box;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='rgba(0,212,255,0.2)'">
             </div>
 
-            <form id="orderForm"
-                class="bg-white p-6 md:p-12 rounded-b-3xl shadow-premium grid md:grid-cols-12 gap-12 relative overflow-hidden">
-                <!-- Loader -->
-                <div id="formLoader"
-                    class="absolute inset-0 z-50 bg-white/80 backdrop-blur-sm hidden items-center justify-center">
-                    <span class="loader border-navy"></span>
-                </div>
+            <div>
+              <label style="display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;letter-spacing:0.8px;text-transform:uppercase;">ফোন নাম্বার *</label>
+              <input type="tel" id="phone" required placeholder="017XXXXXXXX" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(0,212,255,0.2);border-radius:12px;padding:13px 16px;color:#fff;font-size:15px;font-family:'Hind Siliguri',sans-serif;outline:none;transition:border-color 0.2s;box-sizing:border-box;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='rgba(0,212,255,0.2)'">
+            </div>
 
-                <!-- Success State -->
-                <div id="successModal"
-                    class="absolute inset-0 z-50 bg-white hidden flex-col items-center justify-center text-center p-8">
-                    <div
-                        class="w-24 h-24 bg-green rounded-full flex items-center justify-center text-white text-4xl mb-6 shadow-xl shadow-green/20">
-                        ✓</div>
-                    <h2 class="text-3xl font-bold text-navy mb-4">অর্ডার সফল হয়েছে!</h2>
-                    <p class="text-slate-500 mb-8 font-medium">ধন্যবাদ! আমাদের প্রতিনিধি খুব শীঘ্রই আপনার নাম্বারে কল
-                        করে অর্ডারটি কনফার্ম করবেন।</p>
-                    <button type="button" onclick="location.reload()"
-                        class="bg-navy text-white px-10 py-4 rounded-2xl font-bold hover:scale-105 transition-all">ফিরে
-                        যান</button>
-                </div>
+            <div>
+              <label style="display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;letter-spacing:0.8px;text-transform:uppercase;">সম্পূর্ণ ঠিকানা *</label>
+              <textarea id="address" required rows="3" placeholder="বাসা নং, রোড নং, এলাকা, থানা" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(0,212,255,0.2);border-radius:12px;padding:13px 16px;color:#fff;font-size:15px;font-family:'Hind Siliguri',sans-serif;outline:none;transition:border-color 0.2s;resize:none;box-sizing:border-box;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='rgba(0,212,255,0.2)'"></textarea>
+            </div>
 
-                <!-- Left: Billing Details -->
-                <div class="md:col-span-7 space-y-8">
-                    <h3 class="text-xl font-bold text-navy border-b pb-4">Billing details</h3>
+            <div>
+              <label style="display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;letter-spacing:0.8px;text-transform:uppercase;">জেলা নির্বাচন করুন *</label>
+              <select id="district" required onchange="onDistrictChange()" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(0,212,255,0.2);border-radius:12px;padding:13px 16px;color:#fff;font-size:15px;font-family:'Hind Siliguri',sans-serif;outline:none;transition:border-color 0.2s;box-sizing:border-box;cursor:pointer;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='rgba(0,212,255,0.2)'">
+                <option value="" style="background:#111827;color:#fff;">লোড হচ্ছে...</option>
+              </select>
+            </div>
 
-                    <div class="space-y-6">
-                        <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">আপনার নাম <span
-                                    class="text-red-500">*</span></label>
-                            <input type="text" id="name" required placeholder="পুরো নাম লিখুন"
-                                class="w-full border-slate-200 rounded-xl px-4 py-3 focus:border-green outline-none transition-all bg-slate-50">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">আপনার ফোন নাম্বার <span
-                                    class="text-red-500">*</span></label>
-                            <input type="tel" id="phone" required placeholder="017XXXXXXXX"
-                                class="w-full border-slate-200 rounded-xl px-4 py-3 focus:border-green outline-none transition-all bg-slate-50">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">আপনার সম্পূর্ণ ঠিকানা <span
-                                    class="text-red-500">*</span></label>
-                            <textarea id="address" required rows="2" placeholder="বাসা নং, রোড নং, এলাকা ও থানা"
-                                class="w-full border-slate-200 rounded-xl px-4 py-3 focus:border-green outline-none transition-all bg-slate-50 resize-none"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">জেলা নির্বাচন করুন <span
-                                    class="text-red-500">*</span></label>
-                            <select id="district" required onchange="onDistrictChange()"
-                                class="w-full border-slate-200 rounded-xl px-4 py-3 focus:border-green outline-none transition-all bg-slate-50 font-bold">
-                                <option value="">লোড হচ্ছে...</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-2">থানা/উপজেলা (ম্যানুয়ালি লিখুন)
-                                <span class="text-red-500">*</span></label>
-                            <input type="text" id="police_station" required
-                                placeholder="আপনার থানা বা উপজেলার নাম লিখুন"
-                                class="w-full border-slate-200 rounded-xl px-4 py-3 focus:border-green outline-none transition-all bg-white font-bold">
-                        </div>
-                    </div>
-
-                    <div class="space-y-4">
-                        <h4 class="font-bold text-navy">Shipping</h4>
-                        <div
-                            class="flex justify-between items-center p-4 bg-slate-50 rounded-xl border border-slate-100">
-                            <span id="shippingText" class="text-sm font-medium">ঢাকা সিটি কর্পোরেশন:</span>
-                            <span class="font-bold">৳<span id="shippingCost">70</span></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right: Product & Summary -->
-                <div class="md:col-span-5 space-y-8">
-                    <h3 class="text-xl font-bold text-navy border-b pb-4">Your Products</h3>
-
-                    <!-- Product Selection (Dynamic Quantity) -->
-                    <div class="space-y-6">
-                        <div
-                            class="flex items-center gap-4 p-5 rounded-2xl border-2 border-green bg-green/5 transition-all">
-                            <img src="hero.png" class="h-20 w-20 object-contain rounded-xl bg-white p-2 shadow-sm"
-                                alt="N607">
-                            <div class="flex-1">
-                                <p class="font-bold text-navy text-sm mb-3">N607 Portable Turbo Fan</p>
-                                <div class="flex items-center gap-6">
-                                    <!-- Quantity Selector -->
-                                    <div
-                                        class="flex items-center bg-white border border-slate-200 rounded-lg overflow-hidden h-10">
-                                        <button type="button" onclick="changeQty(-1)"
-                                            class="px-3 hover:bg-slate-50 border-r border-slate-200 font-bold text-slate-600">-</button>
-                                        <input type="number" id="manual_qty" value="1" readonly
-                                            class="w-10 text-center font-bold text-navy outline-none bg-transparent pointer-events-none">
-                                        <button type="button" onclick="changeQty(1)"
-                                            class="px-3 hover:bg-slate-50 border-l border-slate-200 font-bold text-slate-600">+</button>
-                                    </div>
-                                    <p class="text-xl font-black text-navy">৳<span id="unitPriceDisplay">790</span></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Order Summary Table -->
-                    <div class="space-y-4 pt-4">
-                        <h4 class="font-bold text-navy">Your order</h4>
-                        <div class="border rounded-2xl overflow-hidden text-sm">
-                            <div class="flex justify-between p-4 border-b bg-slate-50 font-bold">
-                                <span>Product</span>
-                                <span>Subtotal</span>
-                            </div>
-                            <div class="flex justify-between p-4 border-b">
-                                <span class="text-slate-500">N607 Turbo Fan × <span id="summaryQty">1</span></span>
-                                <span class="font-bold">৳<span id="summarySubtotal">790</span></span>
-                            </div>
-                            <div class="flex justify-between p-4 border-b">
-                                <span class="text-slate-500">Shipping</span>
-                                <span class="font-bold">৳<span id="summaryShipping">70</span></span>
-                            </div>
-                            <div class="flex justify-between p-4 bg-navy text-white font-black text-lg">
-                                <span>Total</span>
-                                <span>৳<span id="summaryTotal">860</span></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Payment Methods (Only COD) -->
-                    <div class="space-y-4">
-                        <div class="flex items-center gap-3 p-5 bg-green/5 border border-green/20 rounded-2xl">
-                            <div class="w-10 h-10 bg-green/20 rounded-full flex items-center justify-center text-green">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 13l4 4L19 7"></path>
-                                </svg>
-                            </div>
-                            <div class="flex-1">
-                                <p class="font-bold text-navy text-sm">Cash on delivery</p>
-                                <p class="text-[10px] text-slate-500 uppercase font-black tracking-widest">পণ্য হাতে
-                                    পেয়ে টাকা পরিশোধ করুন</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button type="submit"
-                        class="w-full bg-navy text-white py-6 rounded-2xl font-black text-xl shadow-2xl shadow-navy/20 hover:scale-[1.02] transition-all">
-                        Place Order ৳<span id="btnTotal">860</span>
-                    </button>
-                </div>
-            </form>
+            <!-- Shipping Info -->
+            <div style="background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.2);border-radius:12px;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <p style="font-size:11px;color:var(--muted);font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:4px;">ডেলিভারি চার্জ</p>
+                <span id="shippingText" style="font-size:14px;color:var(--text);">ঢাকা সিটি কর্পোরেশন:</span>
+              </div>
+              <span style="font-size:22px;font-weight:800;color:var(--accent);">৳<span id="shippingCost">70</span></span>
+            </div>
+          </div>
         </div>
-    </section>
 
-    <!-- Footer -->
-    <footer class="py-20 bg-white border-t border-slate-100 text-center">
-        <div class="container mx-auto px-4">
-            <div class="flex items-center justify-center gap-2 mb-6">
-                <img src="logo.png" alt="Top One Bazar" class="h-10 w-auto">
-                <span class="text-2xl font-bold text-navy tracking-tight">Top One Bazar</span>
-            </div>
-            <p class="text-slate-500 font-bold italic mb-8 max-w-sm mx-auto leading-relaxed">"বিশ্বাসযোগ্য পণ্য, দ্রুত
-                ডেলিভারি"</p>
+        <!-- Right: Product & Order Summary -->
+        <div style="padding:40px;">
+          <h3 style="font-family:'Baloo Da 2',sans-serif;font-size:20px;font-weight:800;color:#fff;margin-bottom:28px;padding-bottom:16px;border-bottom:1px solid rgba(0,212,255,0.15);">
+            🛒 আপনার অর্ডার
+          </h3>
 
-            <div class="flex flex-col gap-2 text-slate-400 text-xs font-bold uppercase tracking-widest">
-                <span>Contact: 01314147868</span>
-                <span>© 2026 TOP ONE BAZAR | ALL RIGHTS RESERVED</span>
+          <!-- Product Card -->
+          <div style="background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.2);border-radius:16px;padding:20px;display:flex;align-items:center;gap:16px;margin-bottom:24px;">
+            <img src="images/fan-1.png" alt="N607" style="width:72px;height:72px;object-fit:contain;background:rgba(255,255,255,0.05);border-radius:12px;padding:8px;flex-shrink:0;">
+            <div style="flex:1;">
+              <p style="font-weight:700;color:#fff;font-size:14px;margin-bottom:10px;">N607 Portable Turbo Fan</p>
+              <div style="display:flex;align-items:center;gap:16px;">
+                <div style="display:flex;align-items:center;border:1px solid rgba(0,212,255,0.3);border-radius:10px;overflow:hidden;">
+                  <button type="button" onclick="changeQty(-1)" style="padding:7px 14px;background:rgba(0,212,255,0.08);border:none;color:var(--accent);font-size:18px;font-weight:700;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(0,212,255,0.2)'" onmouseout="this.style.background='rgba(0,212,255,0.08)'">−</button>
+                  <input type="number" id="manual_qty" value="1" readonly style="width:40px;text-align:center;background:transparent;border:none;color:#fff;font-size:16px;font-weight:700;outline:none;pointer-events:none;">
+                  <button type="button" onclick="changeQty(1)" style="padding:7px 14px;background:rgba(0,212,255,0.08);border:none;color:var(--accent);font-size:18px;font-weight:700;cursor:pointer;transition:background 0.2s;" onmouseover="this.style.background='rgba(0,212,255,0.2)'" onmouseout="this.style.background='rgba(0,212,255,0.08)'">+</button>
+                </div>
+                <span style="font-size:20px;font-weight:800;color:var(--accent);">৳<span id="unitPriceDisplay">790</span></span>
+              </div>
             </div>
+          </div>
+
+          <!-- Summary Table -->
+          <div style="border:1px solid rgba(0,212,255,0.15);border-radius:16px;overflow:hidden;margin-bottom:24px;font-size:14px;">
+            <div style="display:flex;justify-content:space-between;padding:12px 18px;background:rgba(255,255,255,0.03);font-weight:700;color:var(--muted);font-size:11px;letter-spacing:1px;text-transform:uppercase;">
+              <span>প্রোডাক্ট</span><span>মোট</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:12px 18px;border-top:1px solid rgba(0,212,255,0.08);">
+              <span style="color:var(--muted);">N607 Turbo Fan × <span id="summaryQty">1</span></span>
+              <span style="font-weight:700;color:#fff;">৳<span id="summarySubtotal">790</span></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:12px 18px;border-top:1px solid rgba(0,212,255,0.08);">
+              <span style="color:var(--muted);">ডেলিভারি চার্জ</span>
+              <span style="font-weight:700;color:#fff;">৳<span id="summaryShipping">70</span></span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:16px 18px;border-top:1px solid rgba(0,212,255,0.2);background:linear-gradient(135deg,rgba(0,212,255,0.12),rgba(0,153,204,0.08));">
+              <span style="font-weight:800;color:#fff;font-size:16px;">মোট পরিমাণ</span>
+              <span style="font-weight:800;color:var(--accent);font-size:20px;">৳<span id="summaryTotal">860</span></span>
+            </div>
+          </div>
+
+          <!-- COD Badge -->
+          <div style="display:flex;align-items:center;gap:12px;background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.2);border-radius:12px;padding:14px 16px;margin-bottom:24px;">
+            <div style="width:36px;height:36px;border-radius:50%;background:rgba(0,212,255,0.12);border:1px solid rgba(0,212,255,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+            </div>
+            <div>
+              <p style="font-weight:700;color:#fff;font-size:14px;">ক্যাশ অন ডেলিভারি</p>
+              <p style="font-size:11px;color:var(--muted);margin-top:2px;">পণ্য হাতে পেয়ে টাকা পরিশোধ করুন</p>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" style="width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0a0f1e;font-family:'Hind Siliguri',sans-serif;font-size:19px;font-weight:800;padding:18px 32px;border:none;border-radius:50px;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 16px 40px rgba(0,212,255,0.4)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='none'">
+            🛒 অর্ডার করুন — ৳<span id="btnTotal">860</span>
+          </button>
+          <p style="text-align:center;font-size:12px;color:var(--muted);margin-top:12px;">✅ ক্যাশ অন ডেলিভারি &nbsp;|&nbsp; 🚚 দ্রুত ডেলিভারি</p>
         </div>
-    </footer>
+      </form>
+    </div>
+  </div>
+  <style>
+    @media(max-width:768px){
+      #orderForm { grid-template-columns:1fr !important; }
+      #orderForm > div:first-child { border-right:none !important; border-bottom:1px solid rgba(0,212,255,0.12); }
+      #orderForm > div { padding:28px 20px !important; }
+    }
+  </style>
+</section>
 
-    <script>
-        // Supabase Initialization
+<!-- FOOTER -->
+<footer>
+  <div class="flex items-center justify-center gap-2 mb-4">
+    <img src="images/logo.png" alt="Top One Bazar" class="h-8 w-auto">
+    <span class="text-xl font-bold text-white tracking-tight">Top One Bazar</span>
+  </div>
+  <p>© 2026 TOP ONE BAZAR  ·  সকল অধিকার সংরক্ষিত</p>
+</footer>
+
+<script>
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    });
+  });
+
+  // Scroll reveal animation
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.pain-card, .feature-card, .box-item, .stat-item').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(24px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(el);
+  });
+</script>
+<script>
+// Supabase Initialization
         const SUPABASE_URL = 'https://cmdculyngchoxcnzaypt.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNtZGN1bHluZ2Nob3hjbnpheXB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MjU3NDQsImV4cCI6MjA5MjAwMTc0NH0.gCks8rNvyQ9hV8vR3oVkrEN5WaLGuN0aja6SK-gY7g0';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -490,88 +738,48 @@
         let STEADFAST_SECRET_KEY = '';
         const STEADFAST_BASE_URL = 'https://portal.packzy.com/api/v1';
 
-        let allPoliceStations = [];
-
         async function fetchSteadfastData() {
-            try {
-                // First, fetch keys from Supabase Settings table
-                const { data: settings, error: sError } = await _supabase.from('settings').select('*');
-                if (!sError && settings) {
-                    settings.forEach(item => {
-                        if (item.key === 'steadfast_api_key') STEADFAST_API_KEY = item.value;
-                        if (item.key === 'steadfast_secret_key') STEADFAST_SECRET_KEY = item.value;
-                    });
-                }
-
-                if (!STEADFAST_API_KEY || !STEADFAST_SECRET_KEY) {
-                    console.warn("Steadfast Keys not found in Settings table.");
-                    return;
-                }
-
-                const response = await fetch(`${STEADFAST_BASE_URL}/police_stations`, {
-                    method: 'GET',
-                    headers: {
-                        'Api-Key': STEADFAST_API_KEY,
-                        'Secret-Key': STEADFAST_SECRET_KEY,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                const data = await response.json();
-                if (data && data.data) {
-                    allPoliceStations = data.data;
-                    populateDistricts();
-                }
-            } catch (err) {
-                console.error("Steadfast API Error:", err);
-                const districtDropdown = document.getElementById('district');
-                if (districtDropdown) districtDropdown.innerHTML = '<option value="">Error (ম্যানুয়ালি লিখুন)</option>';
-            }
-        }
-
-        async function fetchSteadfastData() {
-            try {
-                populateDistricts(); // Initial load with fallback
-
-                const { data: settings, error: sError } = await _supabase.from('settings').select('*');
-                if (!sError && settings) {
-                    settings.forEach(item => {
-                        if (item.key === 'steadfast_api_key') STEADFAST_API_KEY = item.value;
-                        if (item.key === 'steadfast_secret_key') STEADFAST_SECRET_KEY = item.value;
-                    });
-                }
-
-                if (!STEADFAST_API_KEY || !STEADFAST_SECRET_KEY) return;
-
-                const response = await fetch(`${STEADFAST_BASE_URL}/police_stations`, {
-                    method: 'GET',
-                    headers: {
-                        'Api-Key': STEADFAST_API_KEY,
-                        'Secret-Key': STEADFAST_SECRET_KEY,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                const data = await response.json();
-                if (data && data.data) {
-                    allPoliceStations = data.data;
-                    populateDistricts(); // Reload dropdown with live API data
-                    console.log("Steadfast Data Loaded.");
-                }
-            } catch (err) {
-                console.error("Steadfast API Error:", err);
-            }
-        }
-
-        function populateDistricts() {
             const districtDropdown = document.getElementById('district');
             if (!districtDropdown) return;
 
-            let items = [];
-            if (allPoliceStations && allPoliceStations.length > 0) {
-                items = [...new Set(allPoliceStations.map(st => st.name))].sort();
+            // Full Bangladesh 64 Districts list - always shows immediately
+            const ALL_DISTRICTS = [
+                "Bagerhat","Bandarban","Barguna","Barishal","Bhola","Bogura","Brahmanbaria",
+                "Chandpur","Chapai Nawabganj","Chattogram","Chuadanga","Cox's Bazar","Cumilla",
+                "Dhaka","Dhaka City","Dinajpur","Faridpur","Feni","Gaibandha","Gazipur",
+                "Gopalganj","Habiganj","Jamalpur","Jashore","Jhalokati","Jhenaidah","Joypurhat",
+                "Khagrachhari","Khulna","Kishoreganj","Kurigram","Kushtia","Lakshmipur",
+                "Lalmonirhat","Madaripur","Magura","Manikganj","Meherpur","Moulvibazar",
+                "Munshiganj","Mymensingh","Naogaon","Narail","Narayanganj","Narsingdi",
+                "Natore","Netrokona","Nilphamari","Noakhali","Pabna","Panchagarh",
+                "Patuakhali","Pirojpur","Rajbari","Rajshahi","Rangamati","Rangpur",
+                "Satkhira","Shariatpur","Sherpur","Sirajganj","Sunamganj","Sylhet",
+                "Tangail","Thakurgaon"
+            ];
+
+            function populateDropdown(areas) {
+                districtDropdown.innerHTML =
+                    '<option value="" style="background:#111827;color:#fff;">জেলা বা এরিয়া নির্বাচন করুন</option>' +
+                    areas.map(function(area) {
+                        return '<option value="' + area + '" style="background:#111827;color:#fff;">' + area + '</option>';
+                    }).join('');
             }
 
-            districtDropdown.innerHTML = '<option value="">জেলা বা এরিয়া নির্বাচন করুন</option>' +
-                items.map(d => `<option value="${d}">${d}</option>`).join('');
+            // Step 1: Show full district list immediately
+            populateDropdown(ALL_DISTRICTS);
+
+            // Step 2: Try to load from Supabase districts table (may have more areas from Steadfast)
+            try {
+                const { data: dbDistricts, error: dbError } = await _supabase
+                    .from('districts').select('name').order('name');
+
+                if (!dbError && dbDistricts && dbDistricts.length > 0) {
+                    console.log('Districts updated from Supabase cache:', dbDistricts.length);
+                    populateDropdown(dbDistricts.map(function(d) { return d.name; }));
+                }
+            } catch (err) {
+                console.log('Supabase districts load skipped, using default list.');
+            }
         }
 
         function onDistrictChange() {
@@ -634,9 +842,12 @@
                 const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
 
-                document.getElementById('days').innerText = days.toString().padStart(2, '0');
-                document.getElementById('hours').innerText = hours.toString().padStart(2, '0');
-                document.getElementById('mins').innerText = minutes.toString().padStart(2, '0');
+                const daysEl = document.getElementById('days');
+                if (daysEl) {
+                    daysEl.innerText = days.toString().padStart(2, '0');
+                    document.getElementById('hours').innerText = hours.toString().padStart(2, '0');
+                    document.getElementById('mins').innerText = minutes.toString().padStart(2, '0');
+                }
             }
             setInterval(tick, 1000);
             tick();
@@ -668,23 +879,51 @@
             const payload = {
                 name: document.getElementById('name').value,
                 phone: document.getElementById('phone').value,
-                address: document.getElementById('address').value + ", " + document.getElementById('police_station').value + " (" + district + ")",
-                quantity: qty,
-                color: 'Mint Green',
+                address: document.getElementById('address').value + " (" + district + ")",
+                customer_name: document.getElementById('name').value,
+                customer_phone: document.getElementById('phone').value,
+                amount: subtotal + shipping,
+                product_name: `N607 Portable Turbo Fan (${qty})`,
                 status: 'Pending',
-                total_price: subtotal + shipping
+                created_at: new Date().toISOString()
             };
 
             const { data, error } = await _supabase
                 .from('orders')
                 .insert([payload]);
 
+            if (!error && payload.phone) {
+                const { data: existingCustomer } = await _supabase
+                    .from('customers')
+                    .select('*')
+                    .eq('phone', payload.phone)
+                    .single();
+
+                if (existingCustomer) {
+                    await _supabase.from('customers').update({
+                        name: payload.name,
+                        address: payload.address,
+                        total_orders: (existingCustomer.total_orders || 0) + 1,
+                        total_amount: (parseFloat(existingCustomer.total_amount) || 0) + payload.amount
+                    }).eq('id', existingCustomer.id);
+                } else {
+                    await _supabase.from('customers').insert([{
+                        name: payload.name,
+                        phone: payload.phone,
+                        address: payload.address,
+                        total_orders: 1,
+                        total_amount: payload.amount,
+                        status: 'Active'
+                    }]);
+                }
+            }
+
             loader.style.display = 'none';
             if (error) {
                 alert('দুঃখিত! অর্ডার সম্পন্ন হয়নি। আবার চেষ্টা করুন।');
                 console.error(error);
             } else {
-                successModal.classList.remove('hidden');
+                successModal.style.display = 'flex';
                 form.reset();
             }
         });
@@ -694,5 +933,4 @@
         fetchSteadfastData();
     </script>
 </body>
-
 </html>
