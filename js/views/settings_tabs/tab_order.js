@@ -1,4 +1,5 @@
-const tabOrderHTML = `\n<!-- ORDER CONTENT -->
+const tabOrderHTML = `
+<!-- ORDER CONTENT -->
             <div id="content-order" class="general-tab-content hidden">
                 <div class="space-y-6">
                     <!-- Currency -->
@@ -256,4 +257,5 @@ const tabOrderHTML = `\n<!-- ORDER CONTENT -->
                         </div>
                     </div>
                 </div>
-            </div>\n`;\n
+            </div>
+`;

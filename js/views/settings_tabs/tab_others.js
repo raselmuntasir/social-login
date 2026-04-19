@@ -1,4 +1,5 @@
-const tabOthersHTML = `\n<!-- OTHERS CONTENT -->
+const tabOthersHTML = `
+<!-- OTHERS CONTENT -->
             <div id="content-others" class="general-tab-content hidden">
                 <div class="space-y-6">
                     <!-- Open WhatsApp In -->
@@ -33,4 +34,5 @@ const tabOthersHTML = `\n<!-- OTHERS CONTENT -->
                         </select>
                     </div>
                 </div>
-            </div>\n`;\n
+            </div>
+`;

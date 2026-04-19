@@ -1,4 +1,5 @@
-const tabCustomerHTML = `\n<!-- CUSTOMER CONTENT -->
+const tabCustomerHTML = `
+<!-- CUSTOMER CONTENT -->
             <div id="content-customer" class="general-tab-content hidden">
                 <div class="space-y-6">
                     <!-- Statuses -->
@@ -22,4 +23,5 @@ const tabCustomerHTML = `\n<!-- CUSTOMER CONTENT -->
                         <p class="text-sm text-gray-800 font-bold mt-1">NB: <span class="font-normal text-gray-600">You can add multiple by Comma(,)</span></p>
                     </div>
                 </div>
-            </div>\n`;\n
+            </div>
+`;

@@ -1,4 +1,5 @@
-const tabInvoiceHTML = `\n<!-- INVOICE CONTENT -->
+const tabInvoiceHTML = `
+<!-- INVOICE CONTENT -->
             <div id="content-invoice" class="general-tab-content hidden">
                 <div class="space-y-6">
                     <!-- Print Double Invoice -->
@@ -156,7 +157,9 @@ const tabInvoiceHTML = `\n<!-- INVOICE CONTENT -->
                         <h3 class="text-lg font-medium text-gray-800">Invoice Styles</h3>
                     </div>
 
-                    <!-- Invoice Styles Grid -->\n                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">\n                        <!-- Custom Style -->
+                    <!-- Invoice Styles Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        <!-- Custom Style -->
                         <div class="border border-gray-200 rounded overflow-hidden shadow-sm flex flex-col bg-white">
                             <div class="h-40 bg-white p-2"></div>
                             <div class="bg-[#343a40] p-2 flex justify-between items-center mt-auto">
@@ -594,4 +597,5 @@ const tabInvoiceHTML = `\n<!-- INVOICE CONTENT -->
                         </div>
                     </div>
                 </div>
-            </div>\n`;\n
+            </div>
+`;

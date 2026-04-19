@@ -1,4 +1,5 @@
-const tabGeneralHTML = `\n<!-- GENERAL INFO CONTENT -->
+const tabGeneralHTML = `
+<!-- GENERAL INFO CONTENT -->
             <div id="content-general" class="general-tab-content block">
                 <div class="flex flex-col lg:flex-row gap-10">
                     <!-- Form Fields -->
@@ -49,4 +50,5 @@ const tabGeneralHTML = `\n<!-- GENERAL INFO CONTENT -->
                         </div>
                     </div>
                 </div>
-            </div>\n`;\n
+            </div>
+`;
