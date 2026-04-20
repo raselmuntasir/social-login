@@ -239,10 +239,11 @@ const SUPABASE_URL = 'https://cmdculyngchoxcnzaypt.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNtZGN1bHluZ2Nob3hjbnpheXB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MjU3NDQsImV4cCI6MjA5MjAwMTc0NH0.gCks8rNvyQ9hV8vR3oVkrEN5WaLGuN0aja6SK-gY7g0';
 
 /** 
- * FRAUD CHECKER CONFIGURATION (Direct Google Proxy)
- * Speed: Faster (No Render server delay)
+ * FRAUD CHECKER CONFIGURATION
+ * Local Dev: http://localhost:5000
+ * Production: https://soc-9ocu.onrender.com
  */
-const FRAUD_API_URL = 'https://script.google.com/macros/s/AKfycbyfcLUJ3Ax0aD7xzaoYUsPMj9jE4OVOftY-x4b7qy2OijAqGDhTZXAJpVIkUfRRIqg7/exec';
+const FRAUD_API_URL = 'https://soc-9ocu.onrender.com';
 
 // Initialize with extra headers to prevent 406 errors
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
@@ -1847,11 +1848,11 @@ async function performFraudCheck(phone) {
         const internalSuccess = internalOrders.filter(o => ['Completed', 'Delivered'].includes(o.status)).length;
         const internalFailed = internalOrders.filter(o => ['Canceled', 'Failed', 'Returned'].includes(o.status)).length;
 
-        // 2. Fetch external stats using the direct Google Proxy
+        // 2. Fetch external stats using the dedicated Fraud API Server
         let externalData = { total: 0, success: 0, cancel: 0, couriers: [] };
         try {
-            console.log('Fetching fraud data from direct Google Proxy...');
-            const funcRes = await fetch(`${FRAUD_API_URL}?phone=${phone}`);
+            console.log('Fetching fraud data from dedicated server:', FRAUD_API_URL);
+            const funcRes = await fetch(`${FRAUD_API_URL}/api/check/${phone}`);
             
             if (funcRes.ok) {
                 const funcData = await funcRes.json();
