@@ -1,7 +1,13 @@
 {
   "dependencies": {
     "@supabase/supabase-js": "^2.103.3",
+    "axios": "^1.15.1",
+    "axios-cookiejar-support": "^6.0.5",
+    "cheerio": "^1.2.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
     "node-fetch": "^2.7.0",
-    "pg": "^8.20.0"
+    "pg": "^8.20.0",
+    "tough-cookie": "^6.0.1"
   }
 }

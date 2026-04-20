@@ -237,7 +237,20 @@ function showOrdersByStatus(status) {
 // Supabase Initialization
 const SUPABASE_URL = 'https://cmdculyngchoxcnzaypt.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNtZGN1bHluZ2Nob3hjbnpheXB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MjU3NDQsImV4cCI6MjA5MjAwMTc0NH0.gCks8rNvyQ9hV8vR3oVkrEN5WaLGuN0aja6SK-gY7g0';
-const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+/** 
+ * FRAUD CHECKER CONFIGURATION
+ * Local Dev: http://localhost:5000
+ * Production: https://your-app-name.onrender.com (Change this after hosting)
+ */
+const FRAUD_API_URL = 'http://localhost:5000';
+
+// Initialize with extra headers to prevent 406 errors
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+    global: {
+        headers: { 'Accept': 'application/json' }
+    }
+});
 
 async function fetchOrders() {
     try {
@@ -708,48 +721,60 @@ function initOrderForm() {
 
             debounceTimer = setTimeout(async () => {
                 try {
-                    const { data: customer } = await _supabase
-                        .from('customers')
-                        .select('*')
-                        .eq('phone', phone)
-                        .single();
-
-                    if (customer) {
-                        const nameEl    = document.getElementById('order-name');
-                        const emailEl   = document.getElementById('order-email');
-                        const addressEl = document.getElementById('order-address');
-                        const totalEl   = document.getElementById('cust-total-orders');
-                        const doneEl    = document.getElementById('cust-completed-orders');
-
-                        if (nameEl && customer.name) nameEl.value = customer.name;
-                        if (emailEl && customer.email) emailEl.value = customer.email;
-                        if (addressEl && customer.address) addressEl.value = customer.address;
-                        if (totalEl) totalEl.value = customer.total_orders || 0;
-
-                        const { count: completedCount } = await _supabase
-                            .from('orders')
-                            .select('id', { count: 'exact', head: true })
-                            .eq('phone', phone)
-                            .in('status', ['Completed', 'Delivered']);
-                        
-                        if (doneEl) doneEl.value = completedCount || 0;
-
-                        if (badge && msg) {
-                            msg.textContent = `✅ Returning Customer — ${customer.total_orders || 0} orders`;
-                            badge.classList.remove('hidden');
+                    // Use direct fetch to bypass library-specific 406 errors
+                    const custRes = await fetch(`${SUPABASE_URL}/rest/v1/customers?phone=eq.${phone}&select=*`, {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Accept': 'application/json'
                         }
-                    } else {
-                        if (badge && msg) {
-                            msg.textContent = '🆕 New Customer';
-                            badge.classList.remove('hidden');
+                    });
+                    
+                    if (custRes.ok) {
+                        const customers = await custRes.json();
+                        const customer = customers[0];
+
+                        if (customer) {
+                            const nameEl    = document.getElementById('order-name');
+                            const emailEl   = document.getElementById('order-email');
+                            const addressEl = document.getElementById('order-address');
+                            const totalEl   = document.getElementById('cust-total-orders');
+                            const doneEl    = document.getElementById('cust-completed-orders');
+
+                            if (nameEl && customer.name) nameEl.value = customer.name;
+                            if (emailEl && customer.email) emailEl.value = customer.email;
+                            if (addressEl && customer.address) addressEl.value = customer.address;
+                            if (totalEl) totalEl.value = customer.total_orders || 0;
+
+                            // Fetch completed count using fetch
+                            const orderRes = await fetch(`${SUPABASE_URL}/rest/v1/orders?phone=eq.${phone}&status=in.(Completed,Delivered)&select=count`, {
+                                headers: { 
+                                    'apikey': SUPABASE_KEY, 
+                                    'Authorization': `Bearer ${SUPABASE_KEY}`, 
+                                    'Prefer': 'count=exact' 
+                                }
+                            });
+                            const completedCount = orderRes.headers.get('content-range')?.split('/')[1] || 0;
+                            
+                            if (doneEl) doneEl.value = completedCount;
+
+                            if (badge && msg) {
+                                msg.textContent = `✅ Returning Customer — ${customer.total_orders || 0} orders`;
+                                badge.classList.remove('hidden');
+                            }
+                        } else {
+                            if (badge && msg) {
+                                msg.textContent = '🆕 New Customer';
+                                badge.classList.remove('hidden');
+                            }
+                            const totalEl = document.getElementById('cust-total-orders');
+                            const doneEl  = document.getElementById('cust-completed-orders');
+                            if (totalEl) totalEl.value = 0;
+                            if (doneEl)  doneEl.value  = 0;
                         }
-                        const totalEl = document.getElementById('cust-total-orders');
-                        const doneEl  = document.getElementById('cust-completed-orders');
-                        if (totalEl) totalEl.value = 0;
-                        if (doneEl)  doneEl.value  = 0;
                     }
 
-                    // Trigger Fraud Check / Success Rate Visualization
+                    // Trigger Fraud Check
                     performFraudCheck(phone);
                 } catch (err) {
                     console.warn('Customer lookup error:', err);
@@ -785,36 +810,19 @@ function initOrderForm() {
         submitBtn.disabled = true;
 
         try {
-            // 1. Insert the order
-            const { error } = await _supabase.from('orders').insert([orderData]);
-            if (error) throw error;
+            // 1. Insert the order using native fetch
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/orders`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify(orderData)
+            });
             
-            // 2. Handle Customer Save/Update
-            if (orderData.phone) {
-                const { data: existingCustomer } = await _supabase
-                    .from('customers')
-                    .select('*')
-                    .eq('phone', orderData.phone)
-                    .single();
-
-                if (existingCustomer) {
-                    await _supabase.from('customers').update({
-                        name: orderData.name,
-                        address: orderData.address,
-                        total_orders: (existingCustomer.total_orders || 0) + 1,
-                        total_amount: (parseFloat(existingCustomer.total_amount) || 0) + orderData.amount
-                    }).eq('id', existingCustomer.id);
-                } else {
-                    await _supabase.from('customers').insert([{
-                        name: orderData.name,
-                        phone: orderData.phone,
-                        address: orderData.address,
-                        total_orders: 1,
-                        total_amount: orderData.amount,
-                        status: 'Active'
-                    }]);
-                }
-            }
+            if (!res.ok) throw new Error('Order submission failed');
 
             alert('Order created successfully!');
             window.location.hash = '#/all-orders';
@@ -1816,24 +1824,58 @@ async function performFraudCheck(phone) {
     const fraudSection = document.getElementById('fraud-check-section');
     if (!fraudSection) return;
 
-    // Show section
+    // Show section and reset UI to loading state
     fraudSection.classList.remove('hidden');
+    const msg = document.getElementById('fraud-insight-msg');
+    if (msg) msg.innerHTML = '<div class="flex items-center gap-2 text-indigo-600 font-bold"><i class="fas fa-circle-notch fa-spin"></i> Analyzing global delivery history...</div>';
+
+    // Clear previous breakdown if any
+    const oldBreakdown = document.getElementById('courier-breakdown-details');
+    if (oldBreakdown) oldBreakdown.innerHTML = '';
 
     try {
-        // Fetch stats from Supabase
-        const { data: orders, error } = await _supabase
-            .from('orders')
-            .select('status')
-            .eq('phone', phone);
+        // 1. Fetch internal stats using direct fetch (to fix 406 error)
+        const internalRes = await fetch(`${SUPABASE_URL}/rest/v1/orders?phone=eq.${phone}&select=status`, {
+            headers: { 
+                'apikey': SUPABASE_KEY, 
+                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                'Accept': 'application/json'
+            }
+        });
+        const internalOrders = internalRes.ok ? await internalRes.json() : [];
 
-        if (error) throw error;
+        const internalTotal = internalOrders.length;
+        const internalSuccess = internalOrders.filter(o => ['Completed', 'Delivered'].includes(o.status)).length;
+        const internalFailed = internalOrders.filter(o => ['Canceled', 'Failed', 'Returned'].includes(o.status)).length;
 
-        const total = orders.length;
-        const success = orders.filter(o => ['Completed', 'Delivered'].includes(o.status)).length;
-        const failed = orders.filter(o => ['Canceled', 'Failed'].includes(o.status)).length;
+        // 2. Fetch external stats using the dedicated Fraud API Server
+        let externalData = { total: 0, success: 0, cancel: 0, couriers: [] };
+        try {
+            console.log('Fetching fraud data from dedicated server:', FRAUD_API_URL);
+            const funcRes = await fetch(`${FRAUD_API_URL}/api/check/${phone}`);
+            
+            if (funcRes.ok) {
+                const funcData = await funcRes.json();
+                if (funcData && !funcData.error) {
+                    externalData = funcData;
+                    console.log('Fraud Data Received:', externalData);
+                } else {
+                    console.warn('Scraper API error:', funcData.error);
+                }
+            } else {
+                console.error('Fraud API call failed with status:', funcRes.status);
+            }
+        } catch (e) {
+            console.error('Fraud API connection failed. Is the server running?', e);
+        }
+
+        // 3. Aggregate Data
+        const total = internalTotal + (externalData.total || 0);
+        const success = internalSuccess + (externalData.success || 0);
+        const failed = internalFailed + (externalData.cancel || 0);
         const successRate = total > 0 ? Math.round((success / total) * 100) : 0;
 
-        // Update UI
+        // 4. Update Main UI
         const totalEl = document.getElementById('fraud-total');
         const successEl = document.getElementById('fraud-success');
         const failedEl = document.getElementById('fraud-failed');
@@ -1848,48 +1890,125 @@ async function performFraudCheck(phone) {
         
         const bar = document.getElementById('fraud-score-bar');
         const circle = document.getElementById('fraud-circle-path');
-        const msg = document.getElementById('fraud-insight-msg');
         const tag = document.getElementById('fraud-tag');
 
         if (bar) bar.style.width = successRate + '%';
         if (circle) circle.setAttribute('stroke-dasharray', `${successRate}, 100`);
 
-        // Color Logic & Messaging
+        // 5. Build Insight Message & Risk Tags
+        let riskColor = '#6366f1';
+        let riskText = 'New Customer';
+        let insight = '';
+
         if (total === 0) {
-            if (circle) circle.setAttribute('stroke', '#6366f1');
-            if (bar) bar.className = 'bg-indigo-500 h-full transition-all duration-1000';
-            if (msg) msg.innerText = "New customer found. No previous order history detected in your database.";
+            insight = "No previous order history detected in your database or external courier networks.";
             if (tag) tag.classList.add('hidden');
         } else if (successRate >= 80) {
-            if (circle) circle.setAttribute('stroke', '#22c55e');
+            riskColor = '#22c55e';
+            riskText = 'Safe Customer';
+            insight = `Excellent reliability! This customer has a ${successRate}% delivery success rate across ${total} orders.`;
             if (bar) bar.className = 'bg-green-500 h-full transition-all duration-1000';
-            if (msg) msg.innerText = "Excellent customer! High delivery success rate detected from internal history.";
-            if (tag) {
-                tag.innerText = "Safe Customer";
-                tag.className = "inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter bg-green-100 text-green-700";
-                tag.classList.remove('hidden');
-            }
         } else if (successRate >= 50) {
-            if (circle) circle.setAttribute('stroke', '#f59e0b');
+            riskColor = '#f59e0b';
+            riskText = 'Moderate Risk';
+            insight = `Average reliability. ${failed} orders were canceled/returned in the past. Proceed with verification.`;
             if (bar) bar.className = 'bg-yellow-500 h-full transition-all duration-1000';
-            if (msg) msg.innerText = "Average customer. Some canceled orders in the past. Proceed with verification.";
-            if (tag) {
-                tag.innerText = "Moderate Risk";
-                tag.className = "inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter bg-yellow-100 text-yellow-700";
-                tag.classList.remove('hidden');
-            }
         } else {
-            if (circle) circle.setAttribute('stroke', '#ef4444');
+            riskColor = '#ef4444';
+            riskText = 'High Risk Alert';
+            insight = `Warning! Extremely low delivery rate (${successRate}%). Highly recommend advance payment.`;
             if (bar) bar.className = 'bg-red-500 h-full transition-all duration-1000';
-            if (msg) msg.innerText = "High risk customer! Low delivery rate detected. Cash on delivery not recommended.";
-            if (tag) {
-                tag.innerText = "Fraud Alert";
-                tag.className = "inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter bg-red-100 text-red-700";
-                tag.classList.remove('hidden');
+        }
+
+        if (circle) circle.setAttribute('stroke', riskColor);
+        if (msg) msg.innerText = insight;
+        
+        if (tag && total > 0) {
+            tag.innerText = riskText;
+            tag.className = `inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter ${
+                successRate >= 80 ? 'bg-green-100 text-green-700' : 
+                successRate >= 50 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+            }`;
+            tag.classList.remove('hidden');
+        }
+
+        // 6. Enhanced Courier Breakdown Grid (Merging Internal & External)
+        const allCouriers = [];
+
+        // Add Internal Shop Data if exists
+        if (internalTotal > 0) {
+            allCouriers.push({
+                name: "Your Shop History",
+                total: internalTotal,
+                success: internalSuccess,
+                cancel: internalFailed,
+                isInternal: true
+            });
+        }
+
+        // Add External Courier Data
+        if (externalData.couriers && externalData.couriers.length > 0) {
+            externalData.couriers.forEach(c => allCouriers.push(c));
+        }
+
+        if (allCouriers.length > 0) {
+            const footer = fraudSection.querySelector('.p-6');
+            let breakdownDiv = document.getElementById('courier-breakdown-details');
+            
+            if (!breakdownDiv) {
+                breakdownDiv = document.createElement('div');
+                breakdownDiv.id = 'courier-breakdown-details';
+                breakdownDiv.className = 'mt-8 pt-6 border-t border-gray-100';
+                footer.appendChild(breakdownDiv);
             }
+
+            const cardsHTML = allCouriers.map(c => {
+                const rate = Math.round((c.success / c.total) * 100);
+                const colorClass = rate >= 80 ? 'text-green-600' : rate >= 50 ? 'text-yellow-600' : 'text-red-600';
+                const bgClass = rate >= 80 ? 'bg-green-50' : rate >= 50 ? 'bg-yellow-50' : 'bg-red-50';
+                const borderClass = c.isInternal ? 'border-purple-300 ring-1 ring-purple-100' : 'border-gray-100';
+
+                return `
+                    <div class="bg-white p-3 rounded-xl border ${borderClass} shadow-sm flex flex-col justify-between hover:border-purple-200 transition-colors group">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-[10px] font-black ${c.isInternal ? 'text-purple-600' : 'text-gray-400'} uppercase tracking-tighter truncate w-24 group-hover:text-purple-600">
+                                ${c.isInternal ? '<i class="fas fa-store mr-1"></i>' : ''}${c.name}
+                            </span>
+                            <span class="text-[9px] font-bold ${bgClass} ${colorClass} px-1.5 py-0.5 rounded shadow-sm">${rate}%</span>
+                        </div>
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <p class="text-[8px] font-bold text-gray-400 uppercase leading-none mb-1">Total Parcels</p>
+                                <p class="text-sm font-black text-gray-700 leading-none">${c.total}</p>
+                            </div>
+                            <div class="flex gap-2">
+                                <div class="text-right">
+                                    <p class="text-[8px] font-bold text-green-400 uppercase leading-none mb-1">Success</p>
+                                    <p class="text-[11px] font-bold text-green-600 leading-none">${c.success}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-[8px] font-bold text-red-400 uppercase leading-none mb-1">Cancel</p>
+                                    <p class="text-[11px] font-bold text-red-600 leading-none">${c.cancel}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            breakdownDiv.innerHTML = `
+                <h3 class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <i class="fas fa-chart-pie"></i> Delivery Success Breakdown
+                </h3>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    ${cardsHTML}
+                </div>
+            `;
         }
 
     } catch (err) {
         console.error('Fraud check error:', err);
+        if (msg) msg.innerHTML = '<span class="text-red-500 font-bold">Error: API Server not connected. Please run server.js</span>';
     }
 }
+
