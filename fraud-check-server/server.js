@@ -91,7 +91,7 @@ async function scrapeEliteMart(phone) {
         return { total, success, cancel, couriers, timestamp: new Date().toISOString() };
     } catch (error) {
         console.error(`Error for ${phone}:`, error.message);
-        return null;
+        throw new Error(`Scraping failed: ${error.message}`);
     }
 }
 
@@ -103,13 +103,21 @@ app.get('/api/check/:phone', async (req, res) => {
     const { phone } = req.params;
     console.log(`Checking history for: ${phone}`);
     
-    const data = await scrapeEliteMart(phone);
-    
-    if (!data) {
-        return res.status(500).json({ error: 'Failed to retrieve data from courier networks' });
+    try {
+        const data = await scrapeEliteMart(phone);
+        if (!data) {
+            return res.status(500).json({ 
+                error: 'Failed to retrieve data from courier networks',
+                tip: 'EliteMart might be blocking the request or the service is temporarily down.'
+            });
+        }
+        res.json(data);
+    } catch (err) {
+        res.status(500).json({ 
+            error: 'Server Error', 
+            message: err.message 
+        });
     }
-
-    res.json(data);
 });
 
 const PORT = process.env.PORT || 5000;
