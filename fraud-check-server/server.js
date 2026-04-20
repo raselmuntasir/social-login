@@ -12,41 +12,23 @@ app.use(cors());
 app.use(express.json());
 
 /**
- * Global Scraper Logic for EliteMart
- * Aggregates delivery data from external courier networks
+ * Global Scraper Logic via Google Apps Script Proxy
+ * Bypasses IP blocks by routing through Google's trusted network
  */
 async function scrapeEliteMart(phone) {
     try {
-        const jar = new CookieJar();
-        const client = wrapper(axios.create({
-            jar,
-            withCredentials: true,
-            timeout: 15000,
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-            }
-        }));
-
-        // 1. Get Initial Page to capture CSRF
-        const initialRes = await client.get('https://elitemart.com.bd/fraud-check');
-        const $initial = cheerio.load(initialRes.data);
-        const csrfToken = $initial('input[name="_token"]').val();
-
-        if (!csrfToken) throw new Error('CSRF Token not found');
-
-        // 2. Perform Post Request with the Phone Number
-        const params = new URLSearchParams();
-        params.append('_token', csrfToken);
-        params.append('phone', phone);
-
-        const response = await client.post('https://elitemart.com.bd/fraud-check', params.toString(), {
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Origin': 'https://elitemart.com.bd',
-                'Referer': 'https://elitemart.com.bd/fraud-check',
-            }
+        const GOOGLE_PROXY_URL = 'https://script.google.com/macros/s/AKfycbw8hj5FvqdriT3t-doKKDwzinK4Rv8OFubjYQEDjY02p-PK8t_qIYaEy6KhXwcRrOx7Gw/exec';
+        
+        console.log(`Routing through Google Proxy for: ${phone}`);
+        
+        // Fetch HTML via Google Proxy
+        const response = await axios.get(`${GOOGLE_PROXY_URL}?phone=${phone}`, {
+            timeout: 30000 // Google Script might take a few seconds
         });
+
+        if (response.data.startsWith('Error:')) {
+            throw new Error(response.data);
+        }
 
         const $ = cheerio.load(response.data);
         const couriers = [];
@@ -90,8 +72,8 @@ async function scrapeEliteMart(phone) {
 
         return { total, success, cancel, couriers, timestamp: new Date().toISOString() };
     } catch (error) {
-        console.error(`Error for ${phone}:`, error.message);
-        throw new Error(`Scraping failed: ${error.message}`);
+        console.error(`Proxy Error for ${phone}:`, error.message);
+        throw new Error(`Proxy Scraping failed: ${error.message}`);
     }
 }
 
