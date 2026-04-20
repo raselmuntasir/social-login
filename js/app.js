@@ -241,9 +241,9 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 /** 
  * FRAUD CHECKER CONFIGURATION
  * Local Dev: http://localhost:5000
- * Production: https://your-app-name.onrender.com (Change this after hosting)
+ * Production: https://soc-9ocu.onrender.com
  */
-const FRAUD_API_URL = 'http://localhost:5000';
+const FRAUD_API_URL = 'https://soc-9ocu.onrender.com';
 
 // Initialize with extra headers to prevent 406 errors
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
