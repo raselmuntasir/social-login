@@ -17,7 +17,7 @@ app.use(express.json());
  */
 async function scrapeEliteMart(phone) {
     try {
-        const GOOGLE_PROXY_URL = 'https://script.google.com/macros/s/AKfycbIv72deO0SBRXNpwUG9Vti-jNV81l8wbg4yvMVMAF8fpLH7o22erD7kzxW9vPb6v9uMA/exec';
+        const GOOGLE_PROXY_URL = 'https://script.google.com/macros/s/AKfycbzAu65FSq1VlCQBBxGIWk_cxpjD7q9Xsk4ynoySjR-D-Co_ctO8WnYzMoljzm5OYdIHvQ/exec';
         
         console.log(`Routing through Google Proxy for: ${phone}`);
         
