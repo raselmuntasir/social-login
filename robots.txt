@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /fraud-check-server/
+
+Sitemap: https://www.toponebazar.qzz.io/sitemap.xml
