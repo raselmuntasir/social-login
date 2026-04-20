@@ -121,6 +121,48 @@
     </style>
 </head>
 <body class="flex h-screen overflow-hidden text-gray-800">
+    <!-- Admin Login Overlay -->
+    <div id="adminLoginOverlay" class="fixed inset-0 z-[9999] bg-gray-900/95 flex items-center justify-center transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center transform transition-all">
+            <div class="w-16 h-16 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
+                <i class="fa-solid fa-shield-halved text-2xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2 font-['Baloo_Da_2']">অ্যাডমিন প্যানেল</h2>
+            <p class="text-gray-500 text-sm mb-6">অ্যাক্সেস পেতে পাসওয়ার্ড দিন</p>
+            <div class="space-y-4">
+                <input type="password" id="adminPassword" placeholder="••••••••" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-center text-xl tracking-widest focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
+                <p id="loginError" class="text-red-500 text-xs hidden font-medium">❌ পাসওয়ার্ড ভুল হয়েছে!</p>
+                <button onclick="checkAdminPassword()" class="w-full bg-purple-700 hover:bg-purple-800 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-md">
+                    লগইন করুন
+                </button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function checkAdminPassword() {
+            const pwd = document.getElementById('adminPassword').value;
+            const err = document.getElementById('loginError');
+            // Default password is set to: 123456
+            if(pwd === '123456') {
+                const overlay = document.getElementById('adminLoginOverlay');
+                overlay.style.opacity = '0';
+                setTimeout(() => overlay.style.display = 'none', 300);
+                sessionStorage.setItem('admin_auth', 'true');
+            } else {
+                err.classList.remove('hidden');
+                document.getElementById('adminPassword').value = '';
+            }
+        }
+        
+        window.addEventListener('DOMContentLoaded', () => {
+            if(sessionStorage.getItem('admin_auth') === 'true') {
+                document.getElementById('adminLoginOverlay').style.display = 'none';
+            }
+            document.getElementById('adminPassword').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') { checkAdminPassword(); }
+            });
+        });
+    </script>
 
     <!-- Sidebar -->
     <aside id="sidebar" class="w-[240px] bg-brand-sidebar text-gray-300 flex flex-col h-full z-20 flex-shrink-0 sidebar-transition overflow-hidden border-r border-gray-800">
