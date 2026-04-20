@@ -61,7 +61,6 @@ async function handleRouting() {
         highlightLink('link-dashboard');
         const dbIcon = document.getElementById('icon-dashboard');
         if (dbIcon) dbIcon.className = 'fas fa-home w-7 text-center';
-        fetchOrders();
     } else if (hash === '#/profile') {
         container.innerHTML = profileHTML;
         initProfilePage();
@@ -141,7 +140,11 @@ async function handleRouting() {
     } else if (hash.startsWith('#/status/')) {
         const status = decodeURIComponent(hash.replace('#/status/', ''));
         showOrdersByStatus(status);
+        setTimeout(initBulkActions, 200); // Initialize bulk actions for status view
     }
+
+    // Always refresh counts for sidebar badges
+    fetchOrders();
 }
 
 // Helper to highlight sidebar links
@@ -301,6 +304,17 @@ function updateDashboardStats(orders) {
         const el = document.getElementById(id);
         if (el) el.innerText = value;
     }
+
+    // --- Sidebar Badges ---
+    const sidebarPending = document.getElementById('sidebar-pending-count');
+    if (sidebarPending) {
+        sidebarPending.innerText = stats.pending;
+        if (stats.pending > 0) {
+            sidebarPending.classList.remove('hidden');
+        } else {
+            sidebarPending.classList.add('hidden');
+        }
+    }
 }
 
 async function fetchLowStockProducts() {
@@ -345,21 +359,236 @@ async function fetchOrdersByStatus(status) {
         return;
     }
 
-    const table = document.getElementById('orders-table-body');
+    const table = document.getElementById('statusOrderTable');
     if (table) {
-        table.innerHTML = data.map((order, idx) => `
-            <tr class="hover:bg-gray-50 border-b border-gray-100 transition-colors">
-                <td class="px-4 py-3">${idx + 1}</td>
-                <td class="px-4 py-3">${new Date(order.created_at).toLocaleDateString()}</td>
-                <td class="px-4 py-3 font-medium">${order.customer_name}<br><span class="text-gray-500 text-[10px]">${order.customer_phone}</span></td>
-                <td class="px-4 py-3">${order.product_name}</td>
-                <td class="px-4 py-3">${order.amount} TK</td>
-                <td class="px-4 py-3">
-                    <span class="px-2 py-0.5 rounded-full text-[10px] bg-purple-100 text-purple-700 font-medium">${order.status}</span>
+        table.innerHTML = data.map((order, idx) => {
+            const phone = order.phone || '';
+            const safeName = (order.name || '-').replace(/'/g, "\\'");
+            const safeAddress = (order.address || '-').replace(/'/g, "\\'");
+            const dateStr = new Date(order.created_at).toLocaleDateString();
+            const timeStr = new Date(order.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const successRate = 99.12; 
+
+            // Format for clipboard copy
+            const copyContent = `${order.name || '-'}
+${order.address || '-'}
+${phone}
+----------------------
+${order.product_name || 'Manual Order'} - ${order.amount} Tk
+----------------------
+Shipping: ${order.shipping_charge || 150} Tk
+Total: ${order.amount} Tk
+Paid: ${order.advance_amount || 0} Tk
+Due: ${parseFloat(order.amount) - parseFloat(order.advance_amount || 0)} Tk`.replace(/'/g, "\\'").replace(/\n/g, "\\n");
+
+            return `
+            <tr class="hover:bg-slate-50 transition-colors group border-b border-slate-100">
+                <td class="px-6 py-4 text-center border-l-2 border-transparent group-hover:border-indigo-500">
+                    <div class="flex flex-col items-center gap-1">
+                        <button onclick="toggleOrderDetails(this, '${order.id}')" class="text-emerald-500 hover:scale-110 transition-transform">
+                            <i data-lucide="plus-circle" class="w-5 h-5 toggle-icon"></i>
+                        </button>
+                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium ${order.status === 'Pending' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'} w-fit">
+                            ${order.status}
+                        </span>
+                        <div class="text-[9px] text-slate-400 mt-0.5">SL: ${idx + 1}</div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 text-center">
+                    <input type="checkbox" class="status-row-check order-id-check w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" value="${order.id}">
+                </td>
+                <td class="px-6 py-4">
+                    <div class="flex items-center gap-2">
+                        <button onclick="copyToClipboard('${copyContent}')" class="p-1.5 hover:bg-white border border-transparent hover:border-slate-200 rounded transition-all text-slate-400 hover:text-indigo-600" title="Copy Info">
+                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+                        </button>
+                        <button class="p-1.5 bg-indigo-50 text-indigo-600 rounded hover:bg-indigo-100 transition-all">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="flex flex-col">
+                        <span class="text-indigo-600 font-bold hover:underline cursor-pointer">#${order.id.toString().slice(-6)}</span>
+                        <div class="mt-1 text-[11px] text-slate-700">
+                            <p class="flex items-center gap-1"><span class="text-slate-400">•</span> ${order.product_name || 'Manual Order'} - ${order.amount}Tk</p>
+                            <button class="text-[10px] text-indigo-500 font-medium mt-1 hover:text-indigo-700">View Stock</button>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="flex flex-col gap-1">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-slate-800">${order.name || '-'}</span>
+                            <i data-lucide="calendar" class="w-3 h-3 text-slate-400"></i>
+                        </div>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="bg-slate-100 px-2 py-0.5 rounded text-[10px] font-mono text-slate-600 tracking-wider">${phone}</span>
+                            <a href="https://wa.me/88${phone}" target="_blank" class="text-green-500 hover:scale-110 transition-transform"><i data-lucide="message-circle" class="w-3.5 h-3.5 fill-current"></i></a>
+                            <a href="tel:${phone}" class="text-indigo-500 hover:scale-110 transition-transform"><i data-lucide="phone" class="w-3.5 h-3.5 fill-current"></i></a>
+                        </div>
+                        <span class="text-[10px] text-slate-400 mt-1 flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> ${order.address || '-'}</span>
+                    </div>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="text-[11px] text-slate-600 space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-teal-600 font-semibold">C:</span>
+                            <span>${dateStr} - ${timeStr}</span>
+                        </div>
+                        <div class="pt-1 text-[10px] text-slate-500 italic">By: Admin</div>
+                    </div>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="w-40">
+                        <div class="flex justify-between text-[9px] font-bold text-slate-500 mb-1 uppercase">
+                            <span>To: 1</span>
+                            <span class="text-emerald-600">${successRate}%</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden flex">
+                            <div class="bg-emerald-500 h-full transition-all duration-500" style="width: ${successRate}%"></div>
+                            <div class="bg-rose-400 h-full" style="width: ${100 - successRate}%"></div>
+                        </div>
+                        <div class="flex justify-between text-[9px] mt-1 text-slate-400 uppercase">
+                            <span>${order.courier || 'No Courier'}</span>
+                        </div>
+                    </div>
                 </td>
             </tr>
-        `).join('') || '<tr><td colspan="6" class="p-4 text-center text-gray-500">No orders found</td></tr>';
+            <tr id="details-${order.id}" class="hidden bg-slate-50/50 border-b border-slate-100">
+                <td colspan="7" class="px-8 py-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="space-y-2">
+                            <h4 class="text-[11px] font-bold text-slate-400 uppercase">Summary:</h4>
+                            <div class="space-y-1 text-sm">
+                                <p class="flex justify-between"><span class="text-slate-600">Total:</span> <span class="font-bold text-slate-800">${order.amount}.00</span></p>
+                                <p class="flex justify-between"><span class="text-rose-500">Less:</span> <span class="font-bold text-rose-500">0.00</span></p>
+                                <p class="flex justify-between"><span class="text-emerald-600">Paid:</span> <span class="font-bold text-emerald-600">${order.advance_amount || 0}.00</span></p>
+                                <p class="flex justify-between pt-1 border-t border-slate-200"><span class="font-bold text-slate-800">Due:</span> <span class="font-bold text-indigo-600">${parseFloat(order.amount) - parseFloat(order.advance_amount || 0)}.00</span></p>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <h4 class="text-[11px] font-bold text-slate-400 uppercase">Employee:</h4>
+                            <p class="text-sm text-slate-700">Assigned: Admin</p>
+                        </div>
+                        <div class="space-y-2 col-span-2">
+                            <h4 class="text-[11px] font-bold text-slate-400 uppercase">Internal Notes:</h4>
+                            <p class="text-xs text-slate-500 italic">No notes found for this order.</p>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        `}).join('') || '<tr><td colspan="7" class="p-6 text-center text-slate-400 text-xs">No orders found</td></tr>';
+
+        // Re-initialize Lucide icons after rendering
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
     }
+}
+
+// Toggle Expandable Order Details Row
+function toggleOrderDetails(btn, orderId) {
+    const detailsRow = document.getElementById(`details-${orderId}`);
+    const icon = btn.querySelector('.toggle-icon');
+    
+    if (detailsRow.classList.contains('hidden')) {
+        detailsRow.classList.remove('hidden');
+        btn.classList.replace('text-emerald-500', 'text-rose-500');
+        icon.setAttribute('data-lucide', 'minus-circle');
+    } else {
+        detailsRow.classList.add('hidden');
+        btn.classList.replace('text-rose-500', 'text-emerald-500');
+        icon.setAttribute('data-lucide', 'plus-circle');
+    }
+    
+    if (window.lucide) {
+        window.lucide.createIcons();
+    }
+}
+
+// Utility to copy text to clipboard
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-4 right-4 bg-slate-800 text-white px-5 py-2.5 rounded-lg text-xs z-[300] shadow-2xl border border-white/10 flex items-center gap-2 animate-bounce';
+        toast.innerHTML = '<i class="fas fa-check-circle text-emerald-400"></i> কপি করা হয়েছে!';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2500);
+    });
+}
+
+function updateSelectedSummary() {
+    const selectedCheckboxes = document.querySelectorAll('.order-id-check:checked');
+    const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+    const summaryInfo = document.querySelectorAll('.status-entry-info');
+    
+    summaryInfo.forEach(el => {
+        if (selectedIds.length > 0) {
+            el.innerHTML = `<span class="bg-brand-orange/10 text-brand-orange px-2 py-1 rounded font-bold border border-brand-orange/20">${selectedIds.length} orders selected</span>`;
+        }
+    });
+}
+
+function initBulkActions() {
+    // Listen for checkbox changes to update summary
+    document.addEventListener('change', (e) => {
+        if (e.target.classList.contains('status-row-check') || e.target.id === 'selectAllStatus') {
+            setTimeout(updateSelectedSummary, 50);
+        }
+    });
+
+    // We use a more generic way to find the buttons since they are in a template
+    document.addEventListener('click', async (e) => {
+        const target = e.target.closest('button');
+        if (!target) return;
+
+        if (target.innerText.includes('Change Selected')) {
+            const selectedCheckboxes = document.querySelectorAll('.order-id-check:checked');
+            const selectedIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+            // Find the nearby select
+            const select = target.previousElementSibling;
+            const newStatus = select?.value;
+
+            if (selectedIds.length === 0) {
+                alert('Please select at least one order');
+                return;
+            }
+            if (!newStatus) {
+                alert('Please select a status');
+                return;
+            }
+
+            if (!confirm(`Are you sure you want to change ${selectedIds.length} orders to ${newStatus}?`)) return;
+
+            target.disabled = true;
+            const oldText = target.innerText;
+            target.innerText = 'Updating...';
+
+            try {
+                const { error } = await _supabase
+                    .from('orders')
+                    .update({ status: newStatus })
+                    .in('id', selectedIds);
+
+                if (error) throw error;
+
+                alert('Orders updated successfully!');
+                fetchOrders(); 
+                const hash = window.location.hash;
+                if (hash.startsWith('#/status/')) {
+                    const status = decodeURIComponent(hash.replace('#/status/', ''));
+                    showOrdersByStatus(status);
+                }
+            } catch (err) {
+                console.error('Bulk update error:', err);
+                alert('Failed to update orders');
+            } finally {
+                target.disabled = false;
+                target.innerText = oldText;
+            }
+        }
+    });
 }
 
 async function fetchAllOrders() {
@@ -380,7 +609,7 @@ async function fetchAllOrders() {
                 <td class="px-4 py-3">
                     <span class="px-2 py-0.5 rounded-full text-[10px] bg-purple-100 text-purple-700 font-medium">${order.status}</span>
                 </td>
-                <td class="px-2 py-3 text-center"><input type="checkbox"></td>
+                <td class="px-2 py-3 text-center"><input type="checkbox" class="order-row-check"></td>
                 <td class="px-4 py-3"><i class="fas fa-sticky-note text-gray-400"></i></td>
                 <td class="px-4 py-3 font-medium text-blue-600">#${order.id.toString().slice(-6)}</td>
                 <td class="px-4 py-3 font-medium">${order.name || '-'}<br><span class="text-gray-500 text-[10px]">${order.phone || '-'}</span></td>
@@ -581,6 +810,40 @@ async function fetchSteadfastDistricts() {
                 if (item.key === 'steadfast_secret_key') STEADFAST_SECRET_KEY = item.value;
             });
         }
+
+        if (!STEADFAST_API_KEY || !STEADFAST_SECRET_KEY) {
+            populateDropdown(fallbackDistricts, "Select District (Fallback)");
+            return;
+        }
+
+        const response = await fetch(`${STEADFAST_BASE_URL}/police_stations`, {
+            headers: { 'Api-Key': STEADFAST_API_KEY, 'Secret-Key': STEADFAST_SECRET_KEY }
+        });
+
+        if (!response.ok) throw new Error("API failed");
+
+        const result = await response.json();
+        if (result && result.data) {
+            const areas = [...new Set(result.data.map(item => item.name))].sort();
+            populateDropdown(areas);
+
+            // 3. Save to local DB for future use (Background sync)
+            console.log("Syncing API data to local cache...");
+            const insertData = areas.map(name => ({ name }));
+            _supabase.from('districts').upsert(insertData, { onConflict: 'name' }).then(({ error }) => {
+                if (error) console.error("Cache sync failed:", error);
+                else console.log("Local cache updated!");
+            });
+        } else {
+            populateDropdown(fallbackDistricts, "Select District (Fallback)");
+        }
+
+    } catch (err) {
+        console.error("Districts error:", err);
+        populateDropdown(fallbackDistricts, "Select District (Fallback)");
+    }
+}
+
 // Courier Settings Logic
 async function loadCourierSettings() {
     try {
@@ -668,38 +931,7 @@ function initCourierSettings() {
         }
     });
 }
-        if (!STEADFAST_API_KEY || !STEADFAST_SECRET_KEY) {
-            populateDropdown(fallbackDistricts, "Select District (Fallback)");
-            return;
-        }
 
-        const response = await fetch(`${STEADFAST_BASE_URL}/police_stations`, {
-            headers: { 'Api-Key': STEADFAST_API_KEY, 'Secret-Key': STEADFAST_SECRET_KEY }
-        });
-
-        if (!response.ok) throw new Error("API failed");
-
-        const result = await response.json();
-        if (result && result.data) {
-            const areas = [...new Set(result.data.map(item => item.name))].sort();
-            populateDropdown(areas);
-
-            // 3. Save to local DB for future use (Background sync)
-            console.log("Syncing API data to local cache...");
-            const insertData = areas.map(name => ({ name }));
-            _supabase.from('districts').upsert(insertData, { onConflict: 'name' }).then(({ error }) => {
-                if (error) console.error("Cache sync failed:", error);
-                else console.log("Local cache updated!");
-            });
-        } else {
-            populateDropdown(fallbackDistricts, "Select District (Fallback)");
-        }
-
-    } catch (err) {
-        console.error("Districts error:", err);
-        populateDropdown(fallbackDistricts, "Select District (Fallback)");
-    }
-}
 
 function initOrderForm() {
     const submitBtn = document.getElementById('submit-order');
@@ -825,7 +1057,8 @@ function initOrderForm() {
             if (!res.ok) throw new Error('Order submission failed');
 
             alert('Order created successfully!');
-            window.location.hash = '#/all-orders';
+            await fetchOrders(); // Refresh counts before redirecting
+            window.location.hash = '#/status/Pending';
         } catch (error) {
             console.error('Error creating order:', error);
             alert('Failed to create order.');

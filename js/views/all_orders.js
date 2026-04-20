@@ -270,10 +270,10 @@ const allOrdersHTML = `
 
             <div class="overflow-x-auto border border-gray-200 rounded">
                 <table class="w-full text-left text-[11px] whitespace-nowrap">
-                    <thead class="bg-white border-b border-gray-200 text-gray-800 font-bold">
+                    <thead class="bg-gray-50/80 border-b border-gray-200 text-gray-700 font-bold text-[11px] uppercase tracking-wider">
                         <tr>
                             <th class="px-4 py-3 border-r border-gray-200">Status</th>
-                            <th class="px-2 py-3 border-r border-gray-200 text-center"><input type="checkbox"><br>Select</th>
+                            <th class="px-2 py-3 border-r border-gray-200 text-center"><input type="checkbox" id="selectAllOrders" onchange="document.querySelectorAll('.order-row-check').forEach(c=>c.checked=this.checked)"><br>Select</th>
                             <th class="px-4 py-3 border-r border-gray-200">Notes</th>
                             <th class="px-4 py-3 border-r border-gray-200">
                                 <div class="flex items-center justify-between gap-3">Invoice ID <i class="fas fa-sort text-gray-300"></i></div>

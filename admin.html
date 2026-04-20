@@ -6,8 +6,10 @@
     <title>Top One - Admin Panel</title>
     <link rel="icon" type="image/png" href="images/logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Flatpickr (Date Picker) -->
@@ -15,7 +17,7 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <!-- CKEditor 4 is loaded lazily only on Create Product page -->
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        body { font-family: 'Inter', 'Hind Siliguri', sans-serif; background-color: #f3f4f6; }
         .sidebar-scroll::-webkit-scrollbar { width: 4px; }
         .sidebar-scroll::-webkit-scrollbar-thumb { background-color: #4b5563; border-radius: 4px; }
         
@@ -152,7 +154,12 @@
                     <ul id="submenu-orders" class="hidden mt-1 space-y-0.5">
                         <li><a href="#/create-order" id="link-create-new" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Create New</a></li>
                         <li><a href="#/all-orders" id="link-all-orders" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">All Orders</a></li>
-                        <li><a href="#/status/Pending" id="link-pending" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Pending</a></li>
+                        <li>
+                            <a href="#/status/Pending" id="link-pending" class="flex items-center justify-between pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">
+                                <span>Pending</span>
+                                <span id="sidebar-pending-count" class="hidden bg-yellow-500 text-black text-[10px] font-extrabold px-1.5 py-0.5 rounded shadow-sm min-w-[18px] text-center">0</span>
+                            </a>
+                        </li>
                         <li><a href="#/status/Confirmed" id="link-confirmed" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Confirmed</a></li>
                         <li><a href="#/status/Failed Orders" id="link-failed-orders" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Failed Orders</a></li>
                         <li><a href="#/status/Processing" id="link-processing" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Processing</a></li>
@@ -357,10 +364,10 @@
     <div class="flex-1 flex flex-col h-full overflow-hidden">
         
         <!-- Top Header (Fixed Height Header) -->
-        <header class="h-[64px] bg-brand-header flex items-center justify-between px-6 z-50 text-white shrink-0 border-b border-purple-800 shadow-none">
+        <header class="h-[64px] bg-brand-header flex items-center justify-between px-6 z-50 text-white shrink-0 border-b border-white/10 shadow-sm">
             
             <!-- Search -->
-            <div class="flex-1 max-w-sm relative" id="global-search-wrapper">
+            <div class="flex-1 max-w-xl relative" id="global-search-wrapper">
                 <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm z-10 pointer-events-none"></i>
                 <input type="text" id="global-search" placeholder="Search Order ID or Mobile..." autocomplete="off"
                     class="w-full bg-white text-gray-800 border border-purple-300 rounded-full py-2 pl-11 pr-10 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all placeholder-gray-400 text-sm shadow-inner">
@@ -376,9 +383,9 @@
             </div>
 
             <!-- Header Right -->
-            <div class="flex items-center space-x-4">
-                <button onclick="window.location.hash='#/create-order'" class="bg-brand-teal hover:bg-teal-600 px-4 py-2 rounded-full text-xs font-bold flex items-center transition-all shadow-sm active:scale-95">
-                    <i class="fas fa-plus mr-2"></i> Create Order
+            <div class="flex items-center space-x-5">
+                <button onclick="window.location.hash='#/create-order'" class="bg-brand-teal hover:bg-teal-600 px-5 py-2 rounded-full text-[13px] font-bold flex items-center transition-all shadow-md active:scale-95 group">
+                    <i class="fas fa-plus mr-2 group-hover:rotate-90 transition-transform"></i> Create Order
                 </button>
                 
                 <div class="flex items-center space-x-3">
