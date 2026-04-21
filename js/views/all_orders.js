@@ -6,7 +6,12 @@ const allOrdersHTML = `
             <h2 class="text-gray-800 font-medium text-sm">Filtering</h2>
             <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
         </button>
-        <div class="hidden p-4 border-t border-gray-100 space-y-5">
+        <div class="hidden p-4 border-t border-gray-100 space-y-6">
+            <!-- Search Field -->
+            <div class="relative max-w-lg">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                <input type="text" id="filter-search-text" placeholder="Search by Name, Phone, or Order ID..." class="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all">
+            </div>
 
             <!-- Row 1: Date filters -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">

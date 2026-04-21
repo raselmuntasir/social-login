@@ -461,6 +461,11 @@ async function fetchOrdersByStatus(status) {
         return;
     }
 
+    _renderStatusOrdersTable(data);
+}
+
+// Global function to render the status orders table
+window._renderStatusOrdersTable = function(data) {
     const table = document.getElementById('statusOrderTable');
     if (table) {
         table.innerHTML = data.map((order, idx) => {

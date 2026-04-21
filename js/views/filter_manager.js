@@ -246,6 +246,16 @@ function initOrderFilterSection(mode = 'all') {
     const statusEl = document.getElementById('filter-status');
     if (statusEl) statusEl.addEventListener('change', e => { f.orderStatus = e.target.value; });
 
+    const searchEl = document.getElementById('filter-search-text');
+    if (searchEl) {
+        searchEl.addEventListener('input', e => { 
+            f.searchText = e.target.value.toLowerCase();
+            // Use debounce if performance is an issue, but for now direct trigger
+            if (mode === 'all') applyAllOrdersFilter();
+            else applyStatusOrdersFilter();
+        });
+    }
+
     // 3. Apply Filter button
     const applyBtn = document.getElementById('btn-apply-filter');
     if (applyBtn) {
@@ -264,6 +274,8 @@ function initOrderFilterSection(mode = 'all') {
             if (tagEl) tagEl.value = '';
             const statusEl2 = document.getElementById('filter-status');
             if (statusEl2) statusEl2.value = '';
+            const searchEl2 = document.getElementById('filter-search-text');
+            if (searchEl2) searchEl2.value = '';
             if (mode === 'all') fetchAllOrders();
             else {
                 const status = decodeURIComponent(window.location.hash.replace('#/status/',''));
@@ -316,15 +328,18 @@ async function applyStatusOrdersFilter() {
         const { data, error } = await query;
         if (error) throw error;
 
-        // Use existing render in app.js
-        const table = document.getElementById('statusOrderTable');
-        if (table) {
-            if (data.length === 0) {
-                table.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-slate-400 text-xs italic">No orders found matching filters</td></tr>';
-            } else {
-                // Re-call the existing function which renders the rows
-                fetchOrdersByStatus(status);
-            }
+        let orders = data || [];
+        if (f.searchText) {
+            orders = orders.filter(o =>
+                (o.name  || '').toLowerCase().includes(f.searchText) ||
+                (o.phone || '').includes(f.searchText) ||
+                (o.id    || '').toString().includes(f.searchText)
+            );
+        }
+
+        // Use extracted render function in app.js
+        if (window._renderStatusOrdersTable) {
+            window._renderStatusOrdersTable(orders);
         }
     } catch (e) {
         console.error('Filter error:', e);

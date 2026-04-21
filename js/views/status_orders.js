@@ -12,7 +12,13 @@ const statusOrdersHTML = (statusLabel) => `
             </button>
         </div>
 
-        <div class="hidden p-6">
+        <div class="hidden p-6 space-y-8">
+            <!-- Search Field -->
+            <div class="relative max-w-lg">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" id="filter-search-text" placeholder="Search by Name, Phone, or Order ID..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+            </div>
+
             <!-- Filter Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 
