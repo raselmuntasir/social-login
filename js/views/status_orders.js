@@ -16,38 +16,29 @@ const statusOrdersHTML = (statusLabel) => `
             <!-- Filter Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 
-                <!-- Date Filters Group -->
+                <!-- Order Created At -->
                 <div class="space-y-1">
                     <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Order Created At</label>
-                    <select class="w-full bg-purple-700 text-white text-xs rounded-lg px-4 py-2.5 outline-none custom-select cursor-pointer shadow-sm">
-                        <option>Last 30 Days</option>
-                        <option>Today</option>
-                        <option>Yesterday</option>
-                        <option>Last 7 Days</option>
-                    </select>
-                    <p class="text-[9px] text-gray-500 mt-1">22-03-2026 to 20-04-2026</p>
+                    <div id="filter-created-at"></div>
                 </div>
 
+                <!-- Courier Submitted At -->
                 <div class="space-y-1">
                     <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Courier Submitted At</label>
-                    <select class="w-full bg-purple-700 text-white text-xs rounded-lg px-4 py-2.5 outline-none custom-select cursor-pointer shadow-sm">
-                        <option>All Time</option>
-                    </select>
+                    <div id="filter-courier-at"></div>
                 </div>
 
+                <!-- Status Added At -->
                 <div class="space-y-1">
                     <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Status Added At</label>
-                    <select class="w-full bg-purple-700 text-white text-xs rounded-lg px-4 py-2.5 outline-none custom-select cursor-pointer shadow-sm">
-                        <option>All Time</option>
-                    </select>
+                    <div id="filter-status-at"></div>
                     <p class="text-[9px] text-red-500 mt-1"><span class="font-bold text-gray-700">NB:</span> Max 90 days</p>
                 </div>
 
+                <!-- Note Added At -->
                 <div class="space-y-1">
                     <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Note Added At</label>
-                    <select class="w-full bg-purple-700 text-white text-xs rounded-lg px-4 py-2.5 outline-none custom-select cursor-pointer shadow-sm">
-                        <option>All Time</option>
-                    </select>
+                    <div id="filter-note-at"></div>
                 </div>
 
                 <!-- Row 2 -->
@@ -68,24 +59,15 @@ const statusOrdersHTML = (statusLabel) => `
 
                 <div class="space-y-1">
                     <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Order Source</label>
-                    <select class="w-full border border-gray-300 rounded-lg px-4 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-100 bg-white custom-select">
-                        <option>All Source</option>
-                        <option>Landing Page</option>
-                        <option>Mobile Call</option>
-                        <option>Messenger</option>
-                        <option>WhatsApp</option>
-                        <option>FB Group</option>
-                        <option>Bulk SMS</option>
-                        <option>Failed Orders</option>
-                        <option>Wordpress Website</option>
-                        <option>POS</option>
+                    <select id="filter-order-source" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-100 bg-white custom-select">
+                        <option value="">All Source</option>
                     </select>
                 </div>
 
                 <div class="space-y-1">
                     <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Order Tag</label>
-                    <select class="w-full border border-gray-300 rounded-lg px-4 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-100 bg-white custom-select">
-                        <option>All Tag</option>
+                    <select id="filter-order-tag" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-100 bg-white custom-select">
+                        <option value="">All Tag</option>
                         <option>No Tag</option>
                     </select>
                 </div>
@@ -246,13 +228,16 @@ const statusOrdersHTML = (statusLabel) => `
 
             <!-- Action Buttons -->
             <div class="flex flex-wrap gap-2 pt-4 border-t border-gray-100">
-                <button class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-2 shadow-sm">
+                <button id="btn-apply-filter" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-xs font-bold transition-colors flex items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-filter"></i> Apply Filter
+                </button>
+                <button id="btn-clear-filter" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-2 shadow-sm">
                     <i class="fa-solid fa-xmark"></i> Clear Filter
                 </button>
                 <button class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-2 shadow-sm">
                     <i class="fa-solid fa-list-check"></i> Order Items
                 </button>
-                <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-2 shadow-sm">
+                <button class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-2 shadow-sm">
                     <i class="fa-solid fa-layer-group"></i> Order Sources
                 </button>
                 <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-xs font-medium transition-colors flex items-center gap-2 shadow-sm">
@@ -365,7 +350,7 @@ const statusOrdersHTML = (statusLabel) => `
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-800 mb-2">Change Status*</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-brand-teal text-gray-600 bg-white mb-3">
+                    <select id="action-change-status" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-brand-teal text-gray-600 bg-white mb-3">
                         <option value="">Select Status</option>
                         <option>Pending</option><option>Confirmed</option><option>Processing</option>
                         <option>Hold</option><option>In Courier</option><option>Delivered</option>
@@ -375,7 +360,7 @@ const statusOrdersHTML = (statusLabel) => `
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-800 mb-2">Assign Tag*</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-brand-teal text-gray-600 bg-white mb-3">
+                    <select id="action-assign-tag" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-brand-teal text-gray-600 bg-white mb-3">
                         <option value="">Select Tag</option>
                     </select>
                     <button class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-1.5 rounded-full text-xs font-medium shadow-sm">Change Selected</button>

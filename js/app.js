@@ -173,7 +173,11 @@ async function handleRouting() {
         navigateTo(suppliersHTML);
     } else if (hash === '#/all-orders') {
         highlightLink('link-all-orders', true);
-        navigateTo(allOrdersHTML, fetchAllOrders);
+        navigateTo(allOrdersHTML, async () => {
+            try { await fetchAllOrders(); } catch(e) { console.error('fetchAllOrders error:', e); }
+            if (window.SettingsManager) window.SettingsManager.populateFilterDropdowns();
+            if (window.initOrderFilterSection) initOrderFilterSection('all');
+        });
     } else if (hash === '#/return-collection') {
         highlightLink('link-return-collection', true);
         navigateTo(returnCollectionHTML);
@@ -201,8 +205,12 @@ async function handleRouting() {
     } else if (hash.startsWith('#/status/')) {
         const status = decodeURIComponent(hash.replace('#/status/', ''));
         navigateTo(statusOrdersHTML(status), async () => {
-            await showOrdersByStatus(status);
-            initBulkActions();
+            try {
+                await showOrdersByStatus(status);
+                initBulkActions();
+            } catch(e) { console.error('showOrdersByStatus error:', e); }
+            if (window.SettingsManager) window.SettingsManager.populateFilterDropdowns();
+            if (window.initOrderFilterSection) initOrderFilterSection('status');
         });
     }
 
@@ -696,24 +704,27 @@ async function fetchAllOrders() {
         return;
     }
 
-    const table = document.getElementById('allOrderTable');
-    if (table) {
-        table.innerHTML = data.map((order, idx) => `
-            <tr class="hover:bg-gray-50 border-b border-gray-100 transition-colors text-[11px]">
-                <td class="px-4 py-3">
-                    <span class="px-2 py-0.5 rounded-full text-[10px] bg-purple-100 text-purple-700 font-medium">${order.status}</span>
-                </td>
-                <td class="px-2 py-3 text-center"><input type="checkbox" class="order-row-check"></td>
-                <td class="px-4 py-3"><i class="fas fa-sticky-note text-gray-400"></i></td>
-                <td class="px-4 py-3 font-medium text-blue-600">#${order.id.toString().slice(-6)}</td>
-                <td class="px-4 py-3 font-medium">${order.name || '-'}<br><span class="text-gray-500 text-[10px]">${order.phone || '-'}</span></td>
-                <td class="px-4 py-3">${new Date(order.created_at).toLocaleDateString()}</td>
-                <td class="px-4 py-3 truncate max-w-[150px]">${order.address || '-'}</td>
-                <td class="px-4 py-3">${order.courier || 'None'}</td>
-                <td class="px-4 py-3 font-bold text-gray-900">${order.amount} TK</td>
-                <td class="px-4 py-3 text-gray-500">Admin</td>
-            </tr>
-        `).join('') || '<tr><td colspan="10" class="p-4 text-center text-gray-500">No orders found</td></tr>';
+    // Use the shared render function (also used by filter)
+    if (window._renderAllOrdersTable) {
+        window._renderAllOrdersTable(data || []);
+    } else {
+        const table = document.getElementById('allOrderTable');
+        if (table) {
+            table.innerHTML = (data || []).map((order) => `
+                <tr class="hover:bg-gray-50 border-b border-gray-100 transition-colors text-[11px]">
+                    <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-[10px] bg-purple-100 text-purple-700 font-medium">${order.status}</span></td>
+                    <td class="px-2 py-3 text-center"><input type="checkbox" class="order-row-check"></td>
+                    <td class="px-4 py-3"><i class="fas fa-sticky-note text-gray-400"></i></td>
+                    <td class="px-4 py-3 font-medium text-blue-600">#${order.id.toString().slice(-6)}</td>
+                    <td class="px-4 py-3 font-medium">${order.name || '-'}<br><span class="text-gray-500 text-[10px]">${order.phone || '-'}</span></td>
+                    <td class="px-4 py-3">${new Date(order.created_at).toLocaleDateString()}</td>
+                    <td class="px-4 py-3 truncate max-w-[150px]">${order.address || '-'}</td>
+                    <td class="px-4 py-3">${order.courier || 'None'}</td>
+                    <td class="px-4 py-3 font-bold text-gray-900">${order.amount} TK</td>
+                    <td class="px-4 py-3 text-gray-500">Admin</td>
+                </tr>
+            `).join('') || '<tr><td colspan="10" class="p-4 text-center text-gray-500">No orders found</td></tr>';
+        }
     }
 }
 

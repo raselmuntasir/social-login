@@ -12,42 +12,20 @@ const allOrdersHTML = `
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-800 mb-1">Order Created At</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-purple-700 text-white font-medium">
-                        <option>Last 30 Days</option>
-                        <option>Today</option>
-                        <option>This Week</option>
-                        <option>This Month</option>
-                        <option>All Time</option>
-                    </select>
-                    <p class="text-[10px] text-gray-500 mt-1">20-03-2026 to 18-04-2026</p>
+                    <div id="filter-created-at"></div>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-800 mb-1">Courier Submitted At</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-purple-700 text-white font-medium">
-                        <option>All Time</option>
-                        <option>Today</option>
-                        <option>Last 7 Days</option>
-                        <option>Last 30 Days</option>
-                    </select>
+                    <div id="filter-courier-at"></div>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-800 mb-1">Status Added At</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-purple-700 text-white font-medium">
-                        <option>All Time</option>
-                        <option>Today</option>
-                        <option>Last 7 Days</option>
-                        <option>Last 30 Days</option>
-                    </select>
+                    <div id="filter-status-at"></div>
                     <p class="text-[10px] text-gray-500 mt-1">NB: Max 90 days</p>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-800 mb-1">Note Added At</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-purple-700 text-white font-medium">
-                        <option>All Time</option>
-                        <option>Today</option>
-                        <option>Last 7 Days</option>
-                        <option>Last 30 Days</option>
-                    </select>
+                    <div id="filter-note-at"></div>
                 </div>
             </div>
 
@@ -71,7 +49,9 @@ const allOrdersHTML = `
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-800 mb-1">Order Source</label>
-                    <input type="text" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500">
+                    <select id="filter-order-source" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
+                        <option value="">All Source</option>
+                    </select>
                 </div>
             </div>
 
@@ -79,7 +59,10 @@ const allOrdersHTML = `
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-800 mb-1">Order Tag</label>
-                    <input type="text" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500">
+                    <select id="filter-order-tag" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
+                        <option value="">All Tag</option>
+                        <option>No Tag</option>
+                    </select>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-800 mb-1">Courier</label>
@@ -199,7 +182,8 @@ const allOrdersHTML = `
 
             <!-- Filter Action Buttons Row -->
             <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-gray-100">
-                <button class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-1.5 rounded-full text-xs font-medium transition-colors shadow-sm flex items-center gap-1"><i class="fas fa-times"></i> Clear Filter</button>
+                <button id="btn-apply-filter" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-1.5 rounded-full text-xs font-bold transition-colors shadow-sm flex items-center gap-1"><i class="fas fa-filter"></i> Apply Filter</button>
+                <button id="btn-clear-filter" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-1.5 rounded-full text-xs font-medium transition-colors shadow-sm flex items-center gap-1"><i class="fas fa-times"></i> Clear Filter</button>
                 <button class="bg-teal-700 hover:bg-teal-800 text-white px-4 py-1.5 rounded-full text-xs font-medium transition-colors shadow-sm flex items-center gap-1"><i class="fas fa-print"></i> Order Items</button>
                 <button class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-1.5 rounded-full text-xs font-medium transition-colors shadow-sm flex items-center gap-1"><i class="fas fa-list"></i> Order Sources</button>
                 <button class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-1.5 rounded-full text-xs font-medium transition-colors shadow-sm flex items-center gap-1"><i class="fas fa-copy"></i> Duplicate Orders</button>
@@ -341,7 +325,7 @@ const allOrdersHTML = `
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-800 mb-2">Assign Tag*</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-brand-teal text-gray-600 bg-white mb-3">
+                    <select id="action-assign-tag" class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-brand-teal text-gray-600 bg-white mb-3">
                         <option value="">Select Tag</option>
                     </select>
                     <button class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-1.5 rounded-full text-xs font-medium transition-colors shadow-sm">Change Selected</button>

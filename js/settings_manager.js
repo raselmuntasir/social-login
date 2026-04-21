@@ -217,6 +217,59 @@ class SettingsManager {
         setTimeout(() => toast.remove(), 3000);
     }
 
+    // ─── POPULATE FILTER DROPDOWNS (All Orders + Status Orders pages) ────────
+    static async populateFilterDropdowns() {
+        if (!window.AppAPI) return;
+        try {
+            const s = await window.AppAPI.getSettings();
+            const sources  = s['order_sources']       || this.DEFAULTS.order_sources;
+            const tags     = s['order_tags']           || this.DEFAULTS.order_tags;
+            const additional = s['additional_statuses'] || '';
+
+            // Order Source filter
+            this._populateSelect('filter-order-source', sources, 'All Source');
+            // Always keep "All Source" as first option
+            const srcEl = document.getElementById('filter-order-source');
+            if (srcEl) srcEl.insertAdjacentHTML('afterbegin', '<option value="">All Source</option>');
+
+            // Order Tag filter
+            const tagEl = document.getElementById('filter-order-tag');
+            if (tagEl) {
+                tagEl.innerHTML = '<option value="">All Tag</option><option>No Tag</option>';
+                tags.split(',').map(v => v.trim()).filter(Boolean).forEach(tag => {
+                    const opt = document.createElement('option');
+                    opt.value = tag; opt.textContent = tag;
+                    tagEl.appendChild(opt);
+                });
+            }
+
+            // Assign Tag (action dropdown)
+            this._populateSelect('action-assign-tag', tags, 'Select Tag');
+
+            // Change Status (action dropdown) — default statuses + additional
+            const changeStatusEl = document.getElementById('action-change-status');
+            if (changeStatusEl) {
+                const defaultStatuses = ['Pending','Confirmed','Processing','Hold','Hold Followup','In Courier','Delivered','Completed','Canceled','Returned','Pending Return','Damage','Hand Delivery','Hand Delivery Completed','Others'];
+                changeStatusEl.innerHTML = '<option value="">Select Status</option>';
+                defaultStatuses.forEach(st => {
+                    const opt = document.createElement('option');
+                    opt.value = st; opt.textContent = st;
+                    changeStatusEl.appendChild(opt);
+                });
+                // Append additional statuses
+                additional.split(',').map(v => v.trim()).filter(Boolean).forEach(st => {
+                    const opt = document.createElement('option');
+                    opt.value = st; opt.textContent = st;
+                    opt.setAttribute('data-additional', '1');
+                    changeStatusEl.appendChild(opt);
+                });
+            }
+
+        } catch (err) {
+            console.error('[SettingsManager] populateFilterDropdowns error:', err);
+        }
+    }
+
     // ─── APPLY ADDITIONAL STATUSES ────────────────────────────────────────
     // 1. Appends to Order Status dropdown in Create Order
     // 2. Injects sidebar links dynamically
