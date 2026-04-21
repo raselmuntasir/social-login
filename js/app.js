@@ -177,6 +177,8 @@ async function handleRouting() {
             try { await fetchAllOrders(); } catch(e) { console.error('fetchAllOrders error:', e); }
             if (window.SettingsManager) window.SettingsManager.populateFilterDropdowns();
             if (window.initOrderFilterSection) initOrderFilterSection('all');
+            // Populate district filter using the SAME function as create order
+            fetchSteadfastDistricts('filter-order-district');
         });
     } else if (hash === '#/return-collection') {
         highlightLink('link-return-collection', true);
@@ -211,6 +213,8 @@ async function handleRouting() {
             } catch(e) { console.error('showOrdersByStatus error:', e); }
             if (window.SettingsManager) window.SettingsManager.populateFilterDropdowns();
             if (window.initOrderFilterSection) initOrderFilterSection('status');
+            // Populate district filter using the SAME function as create order
+            fetchSteadfastDistricts('filter-order-district');
         });
     }
 
@@ -886,8 +890,8 @@ function initOrderCalculations() {
     });
 }
 
-async function fetchSteadfastDistricts() {
-    const districtDropdown = document.getElementById('order-district');
+async function fetchSteadfastDistricts(targetId = 'order-district') {
+    const districtDropdown = document.getElementById(targetId);
     if (!districtDropdown) return;
 
     const fallbackDistricts = [
@@ -897,7 +901,8 @@ async function fetchSteadfastDistricts() {
     ].sort();
 
     const populateDropdown = (areas, label = "Select District/Area") => {
-        districtDropdown.innerHTML = `<option value="">${label}</option>` + 
+        const currentLabel = targetId.includes('filter') ? "All District" : label;
+        districtDropdown.innerHTML = `<option value="">${currentLabel}</option>` + 
             areas.map(area => `<option value="${area}">${area}</option>`).join('');
     };
 

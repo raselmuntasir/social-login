@@ -279,63 +279,8 @@ class SettingsManager {
                 });
             }
 
-            // District filter dropdown (newly added)
-            await this.populateDistricts('filter-order-district', 'All District');
-
         } catch (err) {
             console.error('[SettingsManager] populateFilterDropdowns error:', err);
-        }
-    }
-
-    // New helper to populate any district dropdown — Matches create_order logic
-    static async populateDistricts(targetId, label = 'Select District') {
-        const dropdown = document.getElementById(targetId);
-        if (!dropdown) return;
-
-        const fallbackDistricts = [
-            "Dhaka City", "Dhaka", "Chittagong", "Gazipur", "Narayanganj", "Sylhet", "Rajshahi", 
-            "Khulna", "Barisal", "Rangpur", "Mymensingh", "Comilla", "Brahmanbaria", 
-            "Noakhali", "Feni", "Chandpur", "Lakshmipur"
-        ].sort();
-
-        const populate = (areas, lbl = label) => {
-            dropdown.innerHTML = `<option value="">${lbl}</option>` + 
-                                areas.map(d => `<option value="${d}">${d}</option>`).join('');
-        };
-
-        try {
-            // 1. Try Supabase Cache
-            const { data, error } = await window._supabase.from('districts').select('name').order('name');
-            if (!error && data && data.length > 0) {
-                populate(data.map(d => d.name));
-                return;
-            }
-
-            // 2. Try API (Matches app.js logic)
-            const settings = await window.AppAPI.getSettings();
-            const apiKey = settings['steadfast_api_key'];
-            const secretKey = settings['steadfast_secret_key'];
-
-            if (apiKey && secretKey) {
-                const baseUrl = 'https://portal.packzy.com/api/v1';
-                const res = await fetch(`${baseUrl}/police_stations`, {
-                    headers: { 'Api-Key': apiKey, 'Secret-Key': secretKey }
-                });
-                const result = await res.json();
-                if (result && result.data) {
-                    // Match app.js logic: extract unique names from police_stations response
-                    const areas = [...new Set(result.data.map(item => item.name))].sort();
-                    populate(areas);
-                    // Sync cache
-                    window._supabase.from('districts').upsert(areas.map(name => ({ name })), { onConflict: 'name' }).then(() => {});
-                    return;
-                }
-            }
-
-            populate(fallbackDistricts);
-        } catch (e) {
-            console.error('[SettingsManager] populateDistricts error:', e);
-            populate(fallbackDistricts);
         }
     }
 
