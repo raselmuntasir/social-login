@@ -122,7 +122,7 @@ const allOrdersHTML = `
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-800 mb-1">District</label>
-                    <select id="filter-order-district" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
+                    <select id="filter-order-district" class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-purple-500 bg-white text-gray-700">
                         <option value="">All District</option>
                     </select>
                 </div>

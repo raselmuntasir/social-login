@@ -317,15 +317,17 @@ class SettingsManager {
             const secretKey = settings['steadfast_secret_key'];
 
             if (apiKey && secretKey) {
-                const res = await fetch('https://portal.steadfast.com.bd/api/v1/get_districts', {
+                const baseUrl = 'https://portal.packzy.com/api/v1';
+                const res = await fetch(`${baseUrl}/police_stations`, {
                     headers: { 'Api-Key': apiKey, 'Secret-Key': secretKey }
                 });
                 const result = await res.json();
                 if (result && result.data) {
-                    const areas = result.data.map(d => d.name || d).sort();
+                    // Match app.js logic: extract unique names from police_stations response
+                    const areas = [...new Set(result.data.map(item => item.name))].sort();
                     populate(areas);
                     // Sync cache
-                    window._supabase.from('districts').upsert(areas.map(name => ({ name })), { onConflict: 'name' });
+                    window._supabase.from('districts').upsert(areas.map(name => ({ name })), { onConflict: 'name' }).then(() => {});
                     return;
                 }
             }
