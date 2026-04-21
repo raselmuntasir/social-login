@@ -61,38 +61,18 @@ const createOrderHTML = `
                 <label class="block text-xs font-bold text-gray-700 mb-1">Order Source</label>
                 <select id="order-source" class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-purple-500 bg-white text-gray-500">
                     <option value="">Select Order Source</option>
-                    <option value="Landing Page">Landing Page</option>
-                    <option value="Mobile Call">Mobile Call</option>
-                    <option value="Messenger">Messenger</option>
-                    <option value="WhatsApp">WhatsApp</option>
-                    <option value="FB Group">FB Group</option>
-                    <option value="Bulk SMS">Bulk SMS</option>
-                    <option value="Failed Orders">Failed Orders</option>
-                    <option value="Wordpress Website">Wordpress Website</option>
                 </select>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-700 mb-1">Order Tag</label>
-                <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-purple-500 bg-white">
+                <select id="order-tag" class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-purple-500 bg-white">
                     <option value="">Select Order Tag</option>
-                    <option value="Urgent">Urgent</option>
-                    <option value="High Value">High Value</option>
-                    <option value="Fragile">Fragile</option>
-                    <option value="Pre-order">Pre-order</option>
-                    <option value="Gift">Gift</option>
-                    <option value="COD Verified">COD Verified</option>
                 </select>
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-700 mb-1">Customer Tag</label>
-                <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-purple-500 bg-white text-gray-500">
+                <select id="customer-tag" class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-purple-500 bg-white text-gray-500">
                     <option value="">Select Tag</option>
-                    <option value="New Customer">New Customer</option>
-                    <option value="VIP Customer">VIP Customer</option>
-                    <option value="Repeat Buyer">Repeat Buyer</option>
-                    <option value="Wholesaler">Wholesaler</option>
-                    <option value="Blacklisted">Blacklisted</option>
-                    <option value="Influencer">Influencer</option>
                 </select>
             </div>
         </div>

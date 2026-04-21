@@ -5,34 +5,25 @@ const tabOrderHTML = `
                     <!-- Currency -->
                     <div class="flex flex-col gap-1">
                         <label class="text-sm font-bold text-gray-800">Currency:</label>
-                        <input type="text" placeholder="Currency symbol" class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-purple-500 w-full md:w-1/3">
+                        <input type="text" id="settings-currency" placeholder="Currency symbol" class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-purple-500 w-full md:w-1/3">
                     </div>
 
                     <!-- Default Shipping Charge -->
                     <div class="flex flex-col gap-1">
                         <label class="text-sm font-bold text-gray-800">Default Shipping Charge:</label>
-                        <input type="text" placeholder="Shipping Charge" class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-purple-500 w-full md:w-2/3">
+                        <input type="text" id="settings-default-shipping" placeholder="Shipping Charge" class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-purple-500 w-full md:w-2/3">
                     </div>
 
                     <!-- Alert me when product quantity are less then -->
                     <div class="flex flex-col gap-1">
                         <label class="text-sm font-bold text-gray-800">Alert me when product quantity are less then</label>
-                        <input type="number" value="5" class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-purple-500 w-full md:w-2/3">
+                        <input type="number" id="settings-low-stock-alert" value="5" class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-purple-500 w-full md:w-2/3">
                     </div>
 
                     <!-- Order Sources -->
                     <div class="flex flex-col gap-1">
                         <label class="text-sm font-bold text-gray-800">Order Sources:</label>
-                        <div class="border border-gray-300 rounded p-2 flex flex-wrap gap-2 items-center w-full md:w-4/5">
-                            <span class="bg-[#17a2b8] text-white text-xs px-2 py-1 rounded flex items-center gap-1 font-medium">Landing Page <i class="fas fa-times cursor-pointer text-[10px]"></i></span>
-                            <span class="bg-[#17a2b8] text-white text-xs px-2 py-1 rounded flex items-center gap-1 font-medium">Mobile Call <i class="fas fa-times cursor-pointer text-[10px]"></i></span>
-                            <span class="bg-[#17a2b8] text-white text-xs px-2 py-1 rounded flex items-center gap-1 font-medium">Messenger <i class="fas fa-times cursor-pointer text-[10px]"></i></span>
-                            <span class="bg-[#17a2b8] text-white text-xs px-2 py-1 rounded flex items-center gap-1 font-medium">WhatsApp <i class="fas fa-times cursor-pointer text-[10px]"></i></span>
-                            <span class="bg-[#17a2b8] text-white text-xs px-2 py-1 rounded flex items-center gap-1 font-medium">FB Group <i class="fas fa-times cursor-pointer text-[10px]"></i></span>
-                            <span class="bg-[#17a2b8] text-white text-xs px-2 py-1 rounded flex items-center gap-1 font-medium">Bulk SMS <i class="fas fa-times cursor-pointer text-[10px]"></i></span>
-                            <span class="bg-[#17a2b8] text-white text-xs px-2 py-1 rounded flex items-center gap-1 font-medium">Failed Orders <i class="fas fa-times cursor-pointer text-[10px]"></i></span>
-                            <span class="bg-[#17a2b8] text-white text-xs px-2 py-1 rounded flex items-center gap-1 font-medium">Wordpress Website <i class="fas fa-times cursor-pointer text-[10px]"></i></span>
-                            <span class="bg-[#17a2b8] text-white text-xs px-2 py-1 rounded flex items-center gap-1 font-medium">POS <i class="fas fa-times cursor-pointer text-[10px]"></i></span>
+                        <div id="settings-order-sources-container" class="border border-gray-300 rounded p-2 flex flex-wrap gap-2 items-center w-full md:w-4/5">
                             <input type="text" placeholder="Add new Source" class="flex-1 min-w-[120px] outline-none text-sm text-gray-600 bg-transparent">
                         </div>
                         <p class="text-sm text-gray-800 font-bold mt-1">NB: <span class="font-normal text-gray-600">You can add multiple by Comma(,)</span></p>
@@ -41,7 +32,9 @@ const tabOrderHTML = `
                     <!-- Order Tags -->
                     <div class="flex flex-col gap-1">
                         <label class="text-sm font-bold text-gray-800">Order Tags:</label>
-                        <input type="text" placeholder="Add new Tag" class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-purple-500 w-full md:w-4/5">
+                        <div id="settings-order-tags-container" class="border border-gray-300 rounded p-2 flex flex-wrap gap-2 items-center w-full md:w-4/5">
+                            <input type="text" placeholder="Add new Tag" class="flex-1 min-w-[120px] outline-none text-sm text-gray-600 bg-transparent">
+                        </div>
                         <p class="text-sm text-gray-800 font-bold mt-1">NB: <span class="font-normal text-gray-600">You can add multiple by Comma(,)</span></p>
                     </div>
 
@@ -63,7 +56,9 @@ const tabOrderHTML = `
                     <!-- Additional Statuses -->
                     <div class="flex flex-col gap-1">
                         <label class="text-sm font-bold text-gray-800">Additional Statuses: <a href="#" class="text-blue-500 font-normal hover:underline">(Rearrange)</a></label>
-                        <input type="text" placeholder="Add new Status" class="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-purple-500 w-full md:w-4/5">
+                        <div id="settings-additional-statuses-container" class="border border-gray-300 rounded p-2 flex flex-wrap gap-2 items-center w-full md:w-4/5">
+                            <input type="text" placeholder="Add new Status" class="flex-1 min-w-[120px] outline-none text-sm text-gray-600 bg-transparent">
+                        </div>
                         <p class="text-sm text-gray-800 font-bold mt-1">NB: <span class="font-normal text-gray-600">You can add multiple by Comma(,)</span></p>
                     </div>
 

@@ -8,8 +8,17 @@ const API = {
     async getOrders() {
         const { data, error } = await _supabase
             .from('orders')
-            .select('*, name, phone, address, product_name, amount, status, created_at')
+            .select('id, name, phone, address, product_name, amount, status, created_at, purchase_price, shipping_charge, advance_amount, courier')
             .order('created_at', { ascending: false });
+        if (error) throw error;
+        return data;
+    },
+
+    // Lightweight: only fetch counts by status (for sidebar badges & dashboard stats)
+    async getOrderCountsByStatus() {
+        const { data, error } = await _supabase
+            .from('orders')
+            .select('status');
         if (error) throw error;
         return data;
     },
@@ -32,8 +41,10 @@ const API = {
         return data;
     },
 
-    // 2. Setting Operations (Key-Value pairs)
-    async getSettings() {
+    // 2. Setting Operations (Key-Value pairs) — cached
+    _settingsCache: null,
+    async getSettings(forceRefresh = false) {
+        if (!forceRefresh && this._settingsCache) return this._settingsCache;
         const { data, error } = await _supabase
             .from('settings')
             .select('*');
@@ -44,10 +55,12 @@ const API = {
         data.forEach(item => {
             settings[item.key] = item.value;
         });
+        this._settingsCache = settings;
         return settings;
     },
 
     async updateSetting(key, value) {
+        this._settingsCache = null; // Invalidate cache
         const { data, error } = await _supabase
             .from('settings')
             .upsert({ key, value }, { onConflict: 'key' });
@@ -56,6 +69,7 @@ const API = {
     },
 
     async updateMultipleSettings(settingsObj) {
+        this._settingsCache = null; // Invalidate cache
         const upsertData = Object.entries(settingsObj).map(([key, value]) => ({ key, value }));
         const { data, error } = await _supabase
             .from('settings')
@@ -74,14 +88,22 @@ const API = {
         return data;
     },
 
+    _lowStockCache: null,
+    _lowStockFetchTime: 0,
     async getLowStockProducts(limit = 10) {
+        const now = Date.now();
+        if (this._lowStockCache && now - this._lowStockFetchTime < 120000) {
+            return this._lowStockCache;
+        }
         const { data, error } = await _supabase
             .from('products')
-            .select('*')
-            .lt('stock', 10) // Example threshold
+            .select('id, title, stock, image')
+            .lt('stock', 10)
             .order('stock', { ascending: true })
             .limit(limit);
         if (error) throw error;
+        this._lowStockCache = data;
+        this._lowStockFetchTime = now;
         return data;
     }
 };

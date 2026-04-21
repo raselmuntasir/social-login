@@ -5,6 +5,11 @@ let _activeStatusLinkId = null;
 let _profileCache = null;
 let _profileFetchPromise = null;
 
+// Global Cache for Orders to prevent excessive API calls
+let _cachedOrders = null;
+let _lastOrdersFetchTime = 0;
+const CACHE_TTL_MS = 60000; // 60 seconds
+
 // Steadfast Courier API Configuration
 let STEADFAST_API_KEY = '';
 let STEADFAST_SECRET_KEY = '';
@@ -116,6 +121,7 @@ async function handleRouting() {
         navigateTo(dashboardHTML, async () => {
             const dbIcon = document.getElementById('icon-dashboard');
             if (dbIcon) dbIcon.className = 'fas fa-home w-7 text-center';
+            await fetchOrders(); // Full fetch only on dashboard
         });
     } else if (hash === '#/profile') {
         navigateTo(profileHTML, initProfilePage);
@@ -127,6 +133,7 @@ async function handleRouting() {
             initOrderForm();
             await fetchProductsForOrder();
             initNumericFields();
+            if (window.SettingsManager) await window.SettingsManager.populateCreateOrderDropdowns();
         });
     } else if (hash === '#/products') {
         highlightLink('link-inventory', false);
@@ -196,8 +203,27 @@ async function handleRouting() {
         });
     }
 
-    // Always refresh counts for sidebar badges
-    fetchOrders();
+    // Always refresh counts for sidebar badges (lightweight — only fetches status column)
+    updateSidebarBadges();
+}
+
+// Lightweight sidebar badge update — only fetches 'status' column
+async function updateSidebarBadges() {
+    try {
+        const orders = await AppAPI.getOrderCountsByStatus();
+        const pendingCount = orders.filter(o => o.status === 'Pending').length;
+        const badge = document.getElementById('sidebar-pending-count');
+        if (badge) {
+            badge.innerText = pendingCount;
+            if (pendingCount > 0) {
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+    } catch (e) {
+        console.error('Badge update error:', e);
+    }
 }
 
 // Helper to highlight sidebar links
@@ -307,9 +333,20 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
     }
 });
 
-async function fetchOrders() {
+async function fetchOrders(forceRefresh = false) {
     try {
+        const now = Date.now();
+        if (!forceRefresh && _cachedOrders && (now - _lastOrdersFetchTime < CACHE_TTL_MS)) {
+            updateDashboardStats(_cachedOrders);
+            renderTable(_cachedOrders.slice(0, 10));
+            // Skip fetching low stock repeatedly
+            return;
+        }
+
         const data = await AppAPI.getOrders();
+        _cachedOrders = data;
+        _lastOrdersFetchTime = now;
+
         updateDashboardStats(data);
         renderTable(data.slice(0, 10)); // Show top 10 recent
         await fetchLowStockProducts();
@@ -853,14 +890,12 @@ async function fetchSteadfastDistricts() {
             return;
         }
 
-        // 2. If no data in DB, fetch from API
+        // 2. If no data in DB, fetch from API using cached settings
         console.log("Cache empty, fetching from Steadfast API...");
-        const { data: settings } = await _supabase.from('settings').select('*');
+        const settings = await AppAPI.getSettings(); // Uses cache
         if (settings) {
-            settings.forEach(item => {
-                if (item.key === 'steadfast_api_key') STEADFAST_API_KEY = item.value;
-                if (item.key === 'steadfast_secret_key') STEADFAST_SECRET_KEY = item.value;
-            });
+            STEADFAST_API_KEY = settings['steadfast_api_key'] || '';
+            STEADFAST_SECRET_KEY = settings['steadfast_secret_key'] || '';
         }
 
         if (!STEADFAST_API_KEY || !STEADFAST_SECRET_KEY) {
@@ -1488,112 +1523,42 @@ window.deleteProduct = async function(id) {
 
 // General Settings Initialization & Save Logic
 async function initGeneralSettings() {
-    const saveBtn = document.getElementById('save-general-settings');
+    if (!window.SettingsManager) {
+        console.error('SettingsManager not loaded');
+        return;
+    }
+
+    // 1. Load all settings from DB into the UI
+    await window.SettingsManager.loadSettings();
+
+    // 2. Init tags inputs (Enter/comma to add pills)
+    window.SettingsManager.initTagsInput('settings-order-sources-container');
+    window.SettingsManager.initTagsInput('settings-order-tags-container');
+    window.SettingsManager.initTagsInput('settings-additional-statuses-container');
+    window.SettingsManager.initTagsInput('settings-customer-tags-container');
+
+    // 3. Logo preview on file select
     const logoInput = document.getElementById('setting-logo-input');
     const previewImg = document.getElementById('setting-logo-preview');
     const placeholder = document.getElementById('logo-placeholder');
-    
-    if (!saveBtn) return;
-
-    // 1. Load Existing Settings
-    try {
-        const settings = await AppAPI.getSettings();
-        
-        const fieldMap = {
-            'business_name': 'setting-business-name',
-            'business_mobile': 'setting-business-mobile',
-            'business_email': 'setting-business-email',
-            'business_web_url': 'setting-web-url',
-            'business_address': 'setting-address'
-        };
-
-        for (const [key, id] of Object.entries(fieldMap)) {
-            const el = document.getElementById(id);
-            if (el && settings[key]) el.value = settings[key];
-        }
-
-        // Handle Logo Preview
-        if (settings['business_logo']) {
-            previewImg.src = settings['business_logo'];
-            previewImg.classList.remove('hidden');
-            placeholder.classList.add('hidden');
-        }
-    } catch (error) {
-        console.error('Error loading general settings:', error);
-    }
-
-    // 2. Logo Preview Logic
     if (logoInput) {
-        logoInput.addEventListener('change', function(e) {
+        logoInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    if (previewImg) {
-                        previewImg.src = event.target.result;
-                        previewImg.classList.remove('hidden');
-                    }
-                    if (placeholder) placeholder.classList.add('hidden');
-                }
-                reader.readAsDataURL(file);
-            }
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                if (previewImg) { previewImg.src = ev.target.result; previewImg.classList.remove('hidden'); }
+                if (placeholder) placeholder.classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
         });
     }
 
-    // 3. Save Logic
-    saveBtn.addEventListener('click', async () => {
-        const originalText = saveBtn.innerText;
-        saveBtn.innerText = 'Updating...';
-        saveBtn.disabled = true;
-
-        let imageUrl = previewImg.src;
-
-        // If a new file was selected, upload it first
-        const file = logoInput?.files[0];
-        if (file) {
-            try {
-                // Compress product image to max 1000x1000
-                const compressedBlob = await compressImage(file, { maxWidth: 1000, maxHeight: 1000, quality: 0.7 });
-                
-                const fileName = `logo_${Date.now()}.jpg`;
-                
-                const { data, error } = await _supabase.storage
-                    .from('product-images')
-                    .upload(fileName, compressedBlob, { contentType: 'image/jpeg' });
-
-                if (error) {
-                    console.warn('Storage upload failed:', error);
-                } else {
-                    const { data: urlData } = _supabase.storage
-                        .from('product-images')
-                        .getPublicUrl(fileName);
-                    imageUrl = urlData.publicUrl;
-                }
-            } catch (err) {
-                console.error('Logo upload error:', err);
-            }
-        }
-
-        const settingsData = {
-            'business_name': document.getElementById('setting-business-name')?.value,
-            'business_mobile': document.getElementById('setting-business-mobile')?.value,
-            'business_email': document.getElementById('setting-business-email')?.value,
-            'business_web_url': document.getElementById('setting-web-url')?.value,
-            'business_address': document.getElementById('setting-address')?.value,
-            'business_logo': imageUrl
-        };
-
-        try {
-            await AppAPI.updateMultipleSettings(settingsData);
-            alert('General settings updated successfully!');
-        } catch (error) {
-            console.error('Error saving general settings:', error);
-            alert('Failed to save settings.');
-        } finally {
-            saveBtn.innerText = originalText;
-            saveBtn.disabled = false;
-        }
-    });
+    // 4. Wire Save button to SettingsManager
+    const saveBtn = document.getElementById('save-general-settings');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', () => window.SettingsManager.saveSettings('save-general-settings'));
+    }
 }
 
 window.removeGeneralLogo = function() {
