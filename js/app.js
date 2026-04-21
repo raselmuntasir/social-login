@@ -133,7 +133,10 @@ async function handleRouting() {
             initOrderForm();
             await fetchProductsForOrder();
             initNumericFields();
-            if (window.SettingsManager) await window.SettingsManager.populateCreateOrderDropdowns();
+            if (window.SettingsManager) {
+                await window.SettingsManager.populateCreateOrderDropdowns();
+                await window.SettingsManager.applyAdditionalStatuses();
+            }
         });
     } else if (hash === '#/products') {
         highlightLink('link-inventory', false);
@@ -288,6 +291,8 @@ window.addEventListener('hashchange', handleRouting);
 window.addEventListener('DOMContentLoaded', () => {
     initTrialBanner();
     handleRouting();
+    // Inject additional statuses into sidebar immediately
+    if (window.SettingsManager) window.SettingsManager.applyAdditionalStatuses();
 });
 function showView(viewName) {
     window.location.hash = `#/${viewName}`;

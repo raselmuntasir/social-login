@@ -216,6 +216,48 @@ class SettingsManager {
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
     }
+
+    // ─── APPLY ADDITIONAL STATUSES ────────────────────────────────────────
+    // 1. Appends to Order Status dropdown in Create Order
+    // 2. Injects sidebar links dynamically
+    static async applyAdditionalStatuses() {
+        if (!window.AppAPI) return;
+        try {
+            const s = await window.AppAPI.getSettings();
+            const raw = s['additional_statuses'] || '';
+            const statuses = raw.split(',').map(v => v.trim()).filter(Boolean);
+
+            // --- 1. Append to Order Status dropdown ---
+            const orderStatusSelect = document.getElementById('order-status');
+            if (orderStatusSelect) {
+                // Remove previously injected additional options (marked with data-additional)
+                orderStatusSelect.querySelectorAll('option[data-additional]').forEach(o => o.remove());
+                // Append new ones
+                statuses.forEach(status => {
+                    const opt = document.createElement('option');
+                    opt.value = status;
+                    opt.textContent = status;
+                    opt.setAttribute('data-additional', '1');
+                    orderStatusSelect.appendChild(opt);
+                });
+            }
+
+            // --- 2. Inject sidebar links ---
+            const sidebarContainer = document.getElementById('sidebar-additional-statuses');
+            if (sidebarContainer) {
+                sidebarContainer.innerHTML = '';
+                statuses.forEach(status => {
+                    const safeId = 'link-custom-' + status.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+                    const li = document.createElement('li');
+                    li.innerHTML = `<a href="#/status/${encodeURIComponent(status)}" id="${safeId}" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">${status}</a>`;
+                    sidebarContainer.appendChild(li);
+                });
+            }
+
+        } catch (err) {
+            console.error('[SettingsManager] applyAdditionalStatuses error:', err);
+        }
+    }
 }
 
 window.SettingsManager = SettingsManager;
