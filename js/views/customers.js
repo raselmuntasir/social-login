@@ -6,33 +6,33 @@ const customersHTML = `
             <h2 class="text-gray-800 font-medium text-sm">Filtering</h2>
             <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
         </button>
-        <div class="hidden p-4 border-t border-gray-100 space-y-5">
+        <div class="hidden p-4 border-t border-gray-100 space-y-6">
             <!-- Row 1 -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1.5">Create Date</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none bg-purple-700 text-white font-medium">
+                    <label class="block text-xs font-bold text-gray-800 mb-1">Create Date</label>
+                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
                         <option>All Time</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1.5">Last Order Range</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none bg-purple-700 text-white font-medium">
+                    <label class="block text-xs font-bold text-gray-800 mb-1">Last Order Range</label>
+                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
                         <option>All Time</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1.5">No Order Range</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none bg-purple-700 text-white font-medium">
+                    <label class="block text-xs font-bold text-gray-800 mb-1">No Order Range</label>
+                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
                         <option>All Time</option>
                     </select>
-                    <label class="flex items-center gap-1.5 mt-1 text-[10px] text-gray-600 cursor-pointer">
-                        <input type="checkbox" class="rounded-sm border-gray-300"> No lead note added in this range
+                    <label class="flex items-center gap-1.5 mt-1 text-[10px] text-gray-500 cursor-pointer">
+                        <input type="checkbox" class="rounded-sm"> No lead note added in this range
                     </label>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1.5">Customer Note Added At</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none bg-purple-700 text-white font-medium">
+                    <label class="block text-xs font-bold text-gray-800 mb-1">Customer Note Added At</label>
+                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
                         <option>All Time</option>
                     </select>
                 </div>
@@ -41,26 +41,26 @@ const customersHTML = `
             <!-- Row 2 -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1.5">Followup Range</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none bg-purple-700 text-white font-medium">
+                    <label class="block text-xs font-bold text-gray-800 mb-1">Followup Range</label>
+                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
                         <option>All Time</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1.5">Delivered At</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none bg-purple-700 text-white font-medium">
+                    <label class="block text-xs font-bold text-gray-800 mb-1">Delivered At</label>
+                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
                         <option>All Time</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1.5">Followup Status</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none bg-white text-gray-600">
+                    <label class="block text-xs font-bold text-gray-800 mb-1">Followup Status</label>
+                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
                         <option>All</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1.5">Note Added By</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none bg-white text-gray-600">
+                    <label class="block text-xs font-bold text-gray-800 mb-1">Note Added By</label>
+                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
                         <option>Search Employee</option>
                     </select>
                 </div>
@@ -69,27 +69,27 @@ const customersHTML = `
             <!-- Row 3 -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1.5">Number of Min Orders</label>
-                    <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none">
+                    <label class="block text-xs font-bold text-gray-800 mb-1">Number of Min Orders</label>
+                    <input type="text" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 text-gray-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1.5">Number of Min Delivered/Completed</label>
-                    <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none">
+                    <label class="block text-xs font-bold text-gray-800 mb-1">Number of Min Delivered/Completed</label>
+                    <input type="text" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 text-gray-500">
                 </div>
                 <div>
-                    <div class="flex justify-between items-center mb-1.5">
+                    <div class="flex justify-between items-center mb-1">
                         <label class="text-xs font-bold text-gray-800">Order Statuses</label>
-                        <label class="flex items-center gap-1 text-[10px] text-gray-600 cursor-pointer">
-                            <input type="checkbox" class="rounded-sm border-gray-300"> Exclude
+                        <label class="flex items-center gap-1 text-[10px] text-gray-500 cursor-pointer">
+                            <input type="checkbox" class="rounded-sm"> Exclude
                         </label>
                     </div>
-                    <select class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none bg-white text-gray-600">
+                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
                         <option>Select Statuses</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1.5">Order Source</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none bg-white text-gray-600">
+                    <label class="block text-xs font-bold text-gray-800 mb-1">Order Source</label>
+                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
                         <option>Select Source</option>
                     </select>
                 </div>
@@ -98,26 +98,26 @@ const customersHTML = `
             <!-- Row 4 -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1.5">Product</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none bg-white text-gray-600">
+                    <label class="block text-xs font-bold text-gray-800 mb-1">Product</label>
+                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
                         <option>Search Product</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1.5">Courier Success Rate</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none bg-white text-gray-600">
+                    <label class="block text-xs font-bold text-gray-800 mb-1">Courier Success Rate</label>
+                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
                         <option>All</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1.5">Customer Type</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none bg-white text-gray-600">
+                    <label class="block text-xs font-bold text-gray-800 mb-1">Customer Type</label>
+                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
                         <option>All</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1.5">Customer Tag</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none bg-white text-gray-600">
+                    <label class="block text-xs font-bold text-gray-800 mb-1">Customer Tag</label>
+                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
                         <option>Select Tag</option>
                     </select>
                 </div>
@@ -126,47 +126,47 @@ const customersHTML = `
             <!-- Row 5 -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1.5">Employee</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none bg-white text-gray-600">
+                    <label class="block text-xs font-bold text-gray-800 mb-1">Employee</label>
+                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
                         <option>Search Employee</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1.5">District</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none bg-white text-gray-600">
+                    <label class="block text-xs font-bold text-gray-800 mb-1">District</label>
+                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
                         <option>Search District</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1.5">Order Item Amount(Min)</label>
-                    <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none">
+                    <label class="block text-xs font-bold text-gray-800 mb-1">Order Item Amount(Min)</label>
+                    <input type="text" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 text-gray-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1.5">Order Item Amount(Max)</label>
-                    <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none">
+                    <label class="block text-xs font-bold text-gray-800 mb-1">Order Item Amount(Max)</label>
+                    <input type="text" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 text-gray-500">
                 </div>
             </div>
 
             <!-- Row 6 -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1.5">Product Category</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none bg-white text-gray-600">
+                    <label class="block text-xs font-bold text-gray-800 mb-1">Product Category</label>
+                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
                         <option>Search Category</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1.5">Number of Notes</label>
-                    <input type="text" class="w-full border border-gray-300 rounded px-3 py-2 text-xs focus:outline-none">
+                    <label class="block text-xs font-bold text-gray-800 mb-1">Number of Notes</label>
+                    <input type="text" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 text-gray-500">
                 </div>
             </div>
 
             <!-- Filter Buttons -->
-            <div class="flex items-center gap-3 pt-3 border-t border-gray-100">
-                <button class="bg-gray-600 hover:bg-gray-700 text-white px-5 py-2 rounded-full text-xs font-medium transition-colors shadow-sm flex items-center gap-1.5">
+            <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
+                <button class="bg-gray-600 hover:bg-gray-700 text-white px-5 py-1.5 rounded-full text-xs font-medium transition-colors shadow-sm flex items-center gap-1.5">
                     <i class="fas fa-undo"></i> Clear Filter
                 </button>
-                <button class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-2 rounded-full text-xs font-medium transition-colors shadow-sm flex items-center gap-1.5">
+                <button class="bg-teal-600 hover:bg-teal-700 text-white px-5 py-1.5 rounded-full text-xs font-medium transition-colors shadow-sm flex items-center gap-1.5">
                     <i class="fas fa-file-export"></i> Export Customers
                 </button>
             </div>

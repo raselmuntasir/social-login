@@ -1,48 +1,53 @@
 const allOrdersHTML = `
 <div class="space-y-4 pb-10">
-    <!-- Filtering Section -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-        <button class="w-full px-4 py-3 flex justify-between items-center bg-gray-50/50 hover:bg-gray-100/50 transition-colors rounded-lg text-left" onclick="this.nextElementSibling.classList.toggle('hidden');">
-            <h2 class="text-gray-800 font-medium text-sm">Filtering</h2>
-            <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
-        </button>
-        <div class="hidden p-4 border-t border-gray-100 space-y-6">
+    <!-- Filtering Section (collapsed by default) -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+        <!-- Header -->
+        <div class="bg-gray-50 px-6 py-3 border-b border-gray-200 flex items-center justify-between cursor-pointer" onclick="const content = this.nextElementSibling; content.classList.toggle('hidden'); this.querySelector('.toggle-icon').classList.toggle('rotate-180');">
+            <h2 class="text-sm font-bold text-gray-700 flex items-center gap-2 uppercase tracking-wide">
+                <i class="fa-solid fa-filter text-indigo-600"></i> ফিল্টারিং (Filtering)
+            </h2>
+            <button class="text-gray-400 hover:text-gray-600 transition-all toggle-icon">
+                <i class="fa-solid fa-chevron-down"></i>
+            </button>
+        </div>
+
+        <div class="hidden p-6 space-y-8">
             <!-- Search Field -->
             <div class="relative max-w-lg">
-                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                <input type="text" id="filter-search-text" placeholder="Search by Name, Phone, or Order ID..." class="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" id="filter-search-text" placeholder="Search by Name, Phone, or Order ID..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
             </div>
 
-            <!-- Row 1: Date filters -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">Order Created At</label>
+            <!-- Filter Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Group 1: Timeframes -->
+                <div class="space-y-1">
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Order Created At</label>
                     <div id="filter-created-at"></div>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">Courier Submitted At</label>
+                <div class="space-y-1">
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Courier Submitted At</label>
                     <div id="filter-courier-at"></div>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">Status Added At</label>
+                <div class="space-y-1">
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Status Added At</label>
                     <div id="filter-status-at"></div>
-                    <p class="text-[10px] text-gray-500 mt-1">NB: Max 90 days</p>
+                    <p class="text-[10px] text-gray-400 italic">NB: Max 90 days</p>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">Note Added At</label>
+                <div class="space-y-1">
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Note Added At</label>
                     <div id="filter-note-at"></div>
                 </div>
-            </div>
 
-            <!-- Row 2: Employee, Status, Employee Action, Order Source -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">Employee</label>
-                    <input type="text" placeholder="Search Employee" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 text-gray-500">
+                <!-- Group 2: Actors & Core Status -->
+                <div class="space-y-1">
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Employee</label>
+                    <input type="text" placeholder="Search Employee" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-100">
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">Status</label>
-                    <select id="filter-status" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
+                <div class="space-y-1">
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Status</label>
+                    <select id="filter-status" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-100 bg-white custom-select">
                         <option value="">All Status</option>
                         <option>Pending</option><option>Confirmed</option><option>Processing</option>
                         <option>Hold</option><option>Hold Followup</option><option>In Courier</option>
@@ -50,163 +55,115 @@ const allOrdersHTML = `
                         <option>Returned</option><option>Damage</option><option>Others</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">Employee Action</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
+                <div class="space-y-1">
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Employee Action</label>
+                    <select class="w-full border border-gray-300 rounded-lg px-4 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-100 bg-white custom-select">
                         <option>Order Created/Assigned</option>
                         <option>Status Updated</option>
                         <option>Note Added</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">Order Source</label>
-                    <select id="filter-order-source" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
+                <div class="space-y-1">
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Order Source</label>
+                    <select id="filter-order-source" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-100 bg-white custom-select">
                         <option value="">All Source</option>
                     </select>
                 </div>
-            </div>
 
-            <!-- Row 3: Order Tag, Courier, Courier Status, Courier Success Rate -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">Order Tag</label>
-                    <select id="filter-order-tag" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
+                <!-- Group 3: Metadata & Tags -->
+                <div class="space-y-1">
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Order Tag</label>
+                    <select id="filter-order-tag" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-100 bg-white custom-select">
                         <option value="">All Tag</option>
                         <option>No Tag</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">Courier</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
+                <div class="space-y-1">
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Courier</label>
+                    <select class="w-full border border-gray-300 rounded-lg px-4 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-100 bg-white custom-select">
                         <option>All</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">Courier Status</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
+                <div class="space-y-1">
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Courier Status</label>
+                    <select class="w-full border border-gray-300 rounded-lg px-4 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-100 bg-white custom-select">
                         <option>All</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">Courier Success Rate</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
+                <div class="space-y-1">
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Courier Success Rate</label>
+                    <select class="w-full border border-gray-300 rounded-lg px-4 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-100 bg-white custom-select">
                         <option>All</option>
                     </select>
                 </div>
-            </div>
 
-            <!-- Row 4: Courier Charged, Select Product (with Exclude), Product Category, District -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">Courier Charged</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
-                        <option>All</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1 flex items-center gap-3">
-                        Select Product 
-                        <span class="flex items-center gap-1 font-normal text-gray-600">
-                            <input type="checkbox" class="rounded"> Exclude
-                        </span>
-                    </label>
-                    <input type="text" placeholder="Search Product" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 text-gray-500 mb-1">
-                    <div class="flex items-center gap-3 text-[11px] text-gray-600">
-                        <label class="flex items-center gap-1"><input type="checkbox" class="rounded"> Include Returns</label>
-                        <label class="flex items-center gap-1"><input type="checkbox" class="rounded"> Only These</label>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">Product Category</label>
-                    <input type="text" placeholder="Search Category" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 text-gray-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">District</label>
-                    <select id="filter-order-district" class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-purple-500 bg-white text-gray-700">
+                <!-- Group 4: Location & Payment -->
+                <div class="space-y-1">
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">District</label>
+                    <select id="filter-order-district" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-100 bg-white text-gray-700 custom-select">
                         <option value="">All District</option>
                     </select>
                 </div>
-            </div>
-
-            <!-- Row 5: Payment Status, Website, Print Status, Email Status -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">Payment Status</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
+                <div class="space-y-1">
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Payment Status</label>
+                    <select class="w-full border border-gray-300 rounded-lg px-4 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-100 bg-white custom-select">
                         <option>All</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">Website</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
+                <div class="space-y-1">
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Website</label>
+                    <select class="w-full border border-gray-300 rounded-lg px-4 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-100 bg-white custom-select">
                         <option>All</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">Print Status</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
+                <div class="space-y-1">
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Courier Charged</label>
+                    <select class="w-full border border-gray-300 rounded-lg px-4 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-100 bg-white custom-select">
                         <option>All</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">Email Status</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
-                        <option>Any</option>
-                    </select>
+
+                <!-- Group 5: Advanced (Amounts & URL) -->
+                <div class="space-y-1">
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Product Amount Min</label>
+                    <input type="number" placeholder="Min" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-100">
+                </div>
+                <div class="space-y-1">
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Product Amount Max</label>
+                    <input type="number" placeholder="Max" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-100">
+                </div>
+                <div class="space-y-1">
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">UTM Source</label>
+                    <input type="text" placeholder="UTM" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-100">
+                </div>
+                <div class="space-y-1">
+                    <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">Order URL</label>
+                    <input type="text" placeholder="URL" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-100">
                 </div>
             </div>
 
-            <!-- Row 6: UTM Source, Product Amount Min, Product Amount Max, Url -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">UTM Source</label>
-                    <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
-                        <option>Any</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">Product Amount Min</label>
-                    <input type="number" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">Product Amount Max</label>
-                    <input type="number" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">Url</label>
-                    <input type="text" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500">
-                </div>
-            </div>
-
-            <!-- Row 7: Discount Amount -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-800 mb-1">Discount Amount</label>
-                    <div class="flex">
-                        <input type="number" class="w-full border border-gray-300 rounded-l px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500">
-                        <select class="border border-gray-300 border-l-0 rounded-r px-2 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
-                            <option>Greater Then Equal</option>
-                            <option>Less Then Equal</option>
-                            <option>Equal</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Filter Action Buttons Row -->
-            <div class="flex flex-wrap items-center gap-2 pt-2 border-t border-gray-100">
-                <button id="btn-apply-filter" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-1.5 rounded-full text-xs font-bold transition-colors shadow-sm flex items-center gap-1"><i class="fas fa-filter"></i> Apply Filter</button>
-                <button id="btn-clear-filter" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-1.5 rounded-full text-xs font-medium transition-colors shadow-sm flex items-center gap-1"><i class="fas fa-times"></i> Clear Filter</button>
-                <button class="bg-teal-700 hover:bg-teal-800 text-white px-4 py-1.5 rounded-full text-xs font-medium transition-colors shadow-sm flex items-center gap-1"><i class="fas fa-print"></i> Order Items</button>
-                <button class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-1.5 rounded-full text-xs font-medium transition-colors shadow-sm flex items-center gap-1"><i class="fas fa-list"></i> Order Sources</button>
-                <button class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-1.5 rounded-full text-xs font-medium transition-colors shadow-sm flex items-center gap-1"><i class="fas fa-copy"></i> Duplicate Orders</button>
-                <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-full text-xs font-medium transition-colors shadow-sm flex items-center gap-1"><i class="fas fa-user"></i> Orders Employee</button>
-                <button class="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-full text-xs font-medium transition-colors shadow-sm flex items-center gap-1"><i class="fas fa-history"></i> Order Previous Status</button>
-                <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-1.5 rounded-full text-xs font-medium transition-colors shadow-sm flex items-center gap-1"><i class="fas fa-map-marker-alt"></i> Orders by Locations</button>
-                <button class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-1.5 rounded-full text-xs font-medium transition-colors shadow-sm flex items-center gap-1"><i class="fas fa-list"></i> Courier Statuses</button>
+            <!-- Action Buttons Row -->
+            <div class="flex flex-wrap items-center gap-2 pt-4 border-t border-gray-100">
+                <button id="btn-apply-filter" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-xs font-bold transition-colors shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-filter"></i> Apply Filter
+                </button>
+                <button id="btn-clear-filter" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-xs font-medium transition-colors shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-xmark"></i> Clear Filter
+                </button>
+                <button class="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg text-xs font-medium transition-colors shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-list-check"></i> Order Items
+                </button>
+                <button class="bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-medium transition-colors shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group"></i> Order Sources
+                </button>
+                <button class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-xs font-medium transition-colors shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-copy"></i> Duplicate Orders
+                </button>
             </div>
         </div>
     </div>
+
+
 
     <!-- Group by Status Section -->
     <div class="bg-white rounded-lg shadow-sm border border-gray-200">
