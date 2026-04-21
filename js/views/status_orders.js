@@ -151,19 +151,8 @@ const statusOrdersHTML = (statusLabel) => `
 
                 <div class="space-y-1">
                     <label class="block text-[11px] font-bold text-gray-600 uppercase tracking-tight">District</label>
-                    <select class="w-full border border-gray-300 rounded-lg px-4 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-100 bg-white custom-select">
-                        <option>All District</option>
-                        <option>Dhaka</option>
-                        <option>Chattogram</option>
-                        <option>Gazipur</option>
-                        <option>Narayanganj</option>
-                        <option>Sylhet</option>
-                        <option>Khulna</option>
-                        <option>Rajshahi</option>
-                        <option>Barisal</option>
-                        <option>Rangpur</option>
-                        <option>Mymensingh</option>
-                        <option>Cumilla</option>
+                    <select id="filter-order-district" class="w-full border border-gray-300 rounded-lg px-4 py-2 text-xs outline-none focus:ring-2 focus:ring-indigo-100 bg-white custom-select">
+                        <option value="">All District</option>
                     </select>
                 </div>
 

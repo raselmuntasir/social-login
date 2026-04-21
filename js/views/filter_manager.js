@@ -11,6 +11,8 @@ window._orderFilters = {
     orderSource: '',
     orderTag:    '',
     orderStatus: '',
+    orderDistrict: '',
+    searchText:  '',
 };
 
 // ─── GLOBAL PANEL TRACKER ─────────────────────────────────────────────────────
@@ -246,6 +248,9 @@ function initOrderFilterSection(mode = 'all') {
     const statusEl = document.getElementById('filter-status');
     if (statusEl) statusEl.addEventListener('change', e => { f.orderStatus = e.target.value; });
 
+    const distEl = document.getElementById('filter-order-district');
+    if (distEl) distEl.addEventListener('change', e => { f.orderDistrict = e.target.value; });
+
     const searchEl = document.getElementById('filter-search-text');
     if (searchEl) {
         searchEl.addEventListener('input', e => { 
@@ -274,6 +279,8 @@ function initOrderFilterSection(mode = 'all') {
             if (tagEl) tagEl.value = '';
             const statusEl2 = document.getElementById('filter-status');
             if (statusEl2) statusEl2.value = '';
+            const distEl2 = document.getElementById('filter-order-district');
+            if (distEl2) distEl2.value = '';
             const searchEl2 = document.getElementById('filter-search-text');
             if (searchEl2) searchEl2.value = '';
             if (mode === 'all') fetchAllOrders();
@@ -299,6 +306,7 @@ async function applyAllOrdersFilter() {
         if (f.orderStatus) query = query.eq('status', f.orderStatus);
         if (f.orderSource)  query = query.eq('source', f.orderSource);
         if (f.orderTag)     query = query.eq('order_tag', f.orderTag);
+        if (f.orderDistrict) query = query.eq('district', f.orderDistrict);
 
         const { data, error } = await query;
         if (error) throw error;
@@ -322,8 +330,9 @@ async function applyStatusOrdersFilter() {
         if (f.startDate && f.endDate) {
             query = query.gte('created_at', f.startDate.toISOString()).lte('created_at', f.endDate.toISOString());
         }
-        if (f.orderSource) query = query.eq('source', f.orderSource);
-        if (f.orderTag)    query = query.eq('order_tag', f.orderTag);
+        if (f.orderSource)  query = query.eq('source', f.orderSource);
+        if (f.orderTag)     query = query.eq('order_tag', f.orderTag);
+        if (f.orderDistrict) query = query.eq('district', f.orderDistrict);
 
         const { data, error } = await query;
         if (error) throw error;
