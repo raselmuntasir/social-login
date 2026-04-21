@@ -10,6 +10,7 @@ window._orderFilters = {
     dateLabel:   'All Time',
     orderSource: '',
     orderTag:    '',
+    orderStatus: '',
 };
 
 // ─── GLOBAL PANEL TRACKER ─────────────────────────────────────────────────────
@@ -235,12 +236,15 @@ function initOrderFilterSection(mode = 'all') {
     DateRangePicker.init('filter-status-at',   () => {}, 'All Time');
     DateRangePicker.init('filter-note-at',     () => {}, 'All Time');
 
-    // 2. Source / Tag listeners
+    // 2. Source / Tag / Status listeners
     const srcEl = document.getElementById('filter-order-source');
     if (srcEl) srcEl.addEventListener('change', e => { f.orderSource = e.target.value; });
 
     const tagEl = document.getElementById('filter-order-tag');
     if (tagEl) tagEl.addEventListener('change', e => { f.orderTag = e.target.value; });
+
+    const statusEl = document.getElementById('filter-status');
+    if (statusEl) statusEl.addEventListener('change', e => { f.orderStatus = e.target.value; });
 
     // 3. Apply Filter button
     const applyBtn = document.getElementById('btn-apply-filter');
@@ -255,9 +259,11 @@ function initOrderFilterSection(mode = 'all') {
     const clearBtn = document.getElementById('btn-clear-filter');
     if (clearBtn) {
         clearBtn.addEventListener('click', () => {
-            window._orderFilters = { startDate:null, endDate:null, dateLabel:'All Time', orderSource:'', orderTag:'' };
+            window._orderFilters = { startDate:null, endDate:null, dateLabel:'All Time', orderSource:'', orderTag:'', orderStatus:'' };
             if (srcEl) srcEl.value = '';
             if (tagEl) tagEl.value = '';
+            const statusEl2 = document.getElementById('filter-status');
+            if (statusEl2) statusEl2.value = '';
             if (mode === 'all') fetchAllOrders();
             else {
                 const status = decodeURIComponent(window.location.hash.replace('#/status/',''));
@@ -278,8 +284,9 @@ async function applyAllOrdersFilter() {
         if (f.startDate && f.endDate) {
             query = query.gte('created_at', f.startDate.toISOString()).lte('created_at', f.endDate.toISOString());
         }
-        if (f.orderSource) query = query.eq('source', f.orderSource);
-        if (f.orderTag)    query = query.eq('order_tag', f.orderTag);
+        if (f.orderStatus) query = query.eq('status', f.orderStatus);
+        if (f.orderSource)  query = query.eq('source', f.orderSource);
+        if (f.orderTag)     query = query.eq('order_tag', f.orderTag);
 
         const { data, error } = await query;
         if (error) throw error;

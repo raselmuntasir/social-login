@@ -37,7 +37,13 @@ const allOrdersHTML = `
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-800 mb-1">Status</label>
-                    <input type="text" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500">
+                    <select id="filter-status" class="w-full border border-gray-300 rounded px-3 py-1.5 text-xs focus:outline-none focus:border-purple-500 bg-white text-gray-600">
+                        <option value="">All Status</option>
+                        <option>Pending</option><option>Confirmed</option><option>Processing</option>
+                        <option>Hold</option><option>Hold Followup</option><option>In Courier</option>
+                        <option>Delivered</option><option>Completed</option><option>Canceled</option>
+                        <option>Returned</option><option>Damage</option><option>Others</option>
+                    </select>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-800 mb-1">Employee Action</label>

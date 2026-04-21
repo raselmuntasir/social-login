@@ -265,6 +265,20 @@ class SettingsManager {
                 });
             }
 
+            // Filter Status dropdown (All Orders filter section) — also add additional statuses
+            const filterStatusEl = document.getElementById('filter-status');
+            if (filterStatusEl && additional) {
+                additional.split(',').map(v => v.trim()).filter(Boolean).forEach(st => {
+                    // Avoid duplicates
+                    if (!filterStatusEl.querySelector(`option[value="${st}"]`)) {
+                        const opt = document.createElement('option');
+                        opt.value = st; opt.textContent = st;
+                        opt.setAttribute('data-additional', '1');
+                        filterStatusEl.appendChild(opt);
+                    }
+                });
+            }
+
         } catch (err) {
             console.error('[SettingsManager] populateFilterDropdowns error:', err);
         }
