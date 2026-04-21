@@ -34,7 +34,7 @@ class DateRangePicker {
         'This Month', 'Last Month', 'This Year', 'Last Year', 'Max', 'Custom Range'
     ];
 
-    static init(containerId, onApply, defaultLabel = 'All Time') {
+    static init(containerId, onApply, defaultLabel = 'All Time', align = 'left') {
         const container = document.getElementById(containerId);
         if (!container) return;
         container.innerHTML = '';
@@ -50,8 +50,9 @@ class DateRangePicker {
         display.className = 'text-[9px] text-gray-500 mt-1 drp-display min-h-[12px]';
 
         // ── Panel ──
+        const alignClass = align === 'right' ? 'right-0' : 'left-0';
         const panel = document.createElement('div');
-        panel.className = 'hidden absolute z-[9999] bg-white border border-gray-200 rounded-xl shadow-2xl top-full left-0 mt-1';
+        panel.className = `hidden absolute z-[9999] bg-white border border-gray-200 rounded-xl shadow-2xl top-full ${alignClass} mt-1`;
         panel.style.minWidth = '560px';
         panel.setAttribute('data-drp-panel', containerId);
 
@@ -233,10 +234,10 @@ function initOrderFilterSection(mode = 'all') {
     window._drpOpenPanels = [];
 
     // 1. Date pickers
-    DateRangePicker.init('filter-created-at',  (s, e, lbl) => { f.startDate = s; f.endDate = e; f.dateLabel = lbl; }, 'All Time');
-    DateRangePicker.init('filter-courier-at',  () => {}, 'All Time');
-    DateRangePicker.init('filter-status-at',   () => {}, 'All Time');
-    DateRangePicker.init('filter-note-at',     () => {}, 'All Time');
+    DateRangePicker.init('filter-created-at',  (s, e, lbl) => { f.startDate = s; f.endDate = e; f.dateLabel = lbl; }, 'All Time', 'left');
+    DateRangePicker.init('filter-courier-at',  () => {}, 'All Time', 'left');
+    DateRangePicker.init('filter-status-at',   () => {}, 'All Time', 'right');
+    DateRangePicker.init('filter-note-at',     () => {}, 'All Time', 'right');
 
     // 2. Source / Tag / Status listeners
     const srcEl = document.getElementById('filter-order-source');

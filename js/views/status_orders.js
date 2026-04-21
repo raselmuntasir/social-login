@@ -1,7 +1,7 @@
 const statusOrdersHTML = (statusLabel) => `
 <div class="space-y-4 pb-10">
     <!-- Filtering Section (collapsed by default) -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
         <!-- Header -->
         <div class="bg-gray-50 px-6 py-3 border-b border-gray-200 flex items-center justify-between cursor-pointer" onclick="const content = this.nextElementSibling; content.classList.toggle('hidden'); this.querySelector('.toggle-icon').classList.toggle('rotate-180');">
             <h2 class="text-sm font-bold text-gray-700 flex items-center gap-2 uppercase tracking-wide">
