@@ -99,7 +99,7 @@ const createOrderHTML = `
             <div class="flex items-center justify-between mb-6">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-emerald-50 border border-emerald-100 text-emerald-500 shadow-sm">
-                        <i class="fas fa-shield-check text-lg"></i>
+                        <i class="fas fa-shield-alt text-lg"></i>
                     </div>
                     <div>
                         <h2 class="text-slate-800 font-bold text-lg tracking-tight">Courier Success Rate</h2>
@@ -131,7 +131,7 @@ const createOrderHTML = `
                     <div class="mt-2 bg-amber-50/30 border border-amber-100 rounded-xl p-3 flex items-start gap-2 shadow-sm">
                         <i class="fas fa-info-circle text-amber-500 mt-0.5 text-sm"></i>
                         <p class="text-[11px] text-slate-600 font-medium">
-                            <span class="text-amber-600 font-bold">NB:</span> BizMation (Shop History) এর হিসাব টোটাল এ যোগ হবে না।
+                            <span class="text-amber-600 font-bold">NB:</span> Top One (Shop History) এর হিসাব টোটাল এ যোগ হবে না।
                         </p>
                     </div>
                 </div>
@@ -151,7 +151,7 @@ const createOrderHTML = `
                             </div>
                         </div>
                         <div class="text-center">
-                            <p class="font-bold text-slate-700 text-[13px]">BizMation</p>
+                            <p class="font-bold text-slate-700 text-[13px]">Top One</p>
                             <div class="mt-1 flex items-center justify-center gap-2 text-[10px] font-bold">
                                 <span class="text-slate-400">T: <span id="biz-total" class="text-slate-600">0</span></span>
                                 <span class="text-emerald-400">S: <span id="biz-success" class="text-emerald-600">0</span></span>
