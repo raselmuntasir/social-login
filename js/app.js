@@ -470,133 +470,10 @@ async function fetchOrdersByStatus(status) {
 
 // Global function to render the status orders table
 window._renderStatusOrdersTable = function(data) {
-    const table = document.getElementById('statusOrderTable');
-    if (table) {
-        table.innerHTML = data.map((order, idx) => {
-            const phone = order.phone || '';
-            const safeName = (order.name || '-').replace(/'/g, "\\'");
-            const safeAddress = (order.address || '-').replace(/'/g, "\\'");
-            const dateStr = new Date(order.created_at).toLocaleDateString();
-            const timeStr = new Date(order.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            const successRate = 99.12; 
-
-            // Format for clipboard copy
-            const copyContent = `${order.name || '-'}
-${order.address || '-'}
-${phone}
-----------------------
-${order.product_name || 'Manual Order'} - ${order.amount} Tk
-----------------------
-Shipping: ${order.shipping_charge || 150} Tk
-Total: ${order.amount} Tk
-Paid: ${order.advance_amount || 0} Tk
-Due: ${parseFloat(order.amount) - parseFloat(order.advance_amount || 0)} Tk`.replace(/'/g, "\\'").replace(/\n/g, "\\n");
-
-            return `
-            <tr class="hover:bg-slate-50 transition-colors group border-b border-slate-100">
-                <td class="px-6 py-4 text-center border-l-2 border-transparent group-hover:border-indigo-500">
-                    <div class="flex flex-col items-center gap-1">
-                        <button onclick="toggleOrderDetails(this, '${order.id}')" class="text-emerald-500 hover:scale-110 transition-transform">
-                            <i data-lucide="plus-circle" class="w-5 h-5 toggle-icon"></i>
-                        </button>
-                        <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-medium ${order.status === 'Pending' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'} w-fit">
-                            ${order.status}
-                        </span>
-                        <div class="text-[9px] text-slate-400 mt-0.5">SL: ${idx + 1}</div>
-                    </div>
-                </td>
-                <td class="px-6 py-4 text-center">
-                    <input type="checkbox" class="status-row-check order-id-check w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" value="${order.id}">
-                </td>
-                <td class="px-6 py-4">
-                    <div class="flex items-center gap-2">
-                        <button onclick="copyToClipboard('${copyContent}')" class="p-1.5 hover:bg-white border border-transparent hover:border-slate-200 rounded transition-all text-slate-400 hover:text-indigo-600" title="Copy Info">
-                            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
-                        </button>
-                        <button class="p-1.5 bg-indigo-50 text-indigo-600 rounded hover:bg-indigo-100 transition-all">
-                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                        </button>
-                    </div>
-                </td>
-                <td class="px-6 py-4">
-                    <div class="flex flex-col">
-                        <span class="text-indigo-600 font-bold hover:underline cursor-pointer">#${order.id.toString().slice(-6)}</span>
-                        <div class="mt-1 text-[11px] text-slate-700">
-                            <p class="flex items-center gap-1"><span class="text-slate-400">•</span> ${order.product_name || 'Manual Order'} - ${order.amount}Tk</p>
-                            <button class="text-[10px] text-indigo-500 font-medium mt-1 hover:text-indigo-700">View Stock</button>
-                        </div>
-                    </div>
-                </td>
-                <td class="px-6 py-4">
-                    <div class="flex flex-col gap-1">
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold text-slate-800">${order.name || '-'}</span>
-                            <i data-lucide="calendar" class="w-3 h-3 text-slate-400"></i>
-                        </div>
-                        <div class="flex items-center gap-2 mt-1">
-                            <span class="bg-slate-100 px-2 py-0.5 rounded text-[10px] font-mono text-slate-600 tracking-wider">${phone}</span>
-                            <a href="https://wa.me/88${phone}" target="_blank" class="text-green-500 hover:scale-110 transition-transform"><i data-lucide="message-circle" class="w-3.5 h-3.5 fill-current"></i></a>
-                            <a href="tel:${phone}" class="text-indigo-500 hover:scale-110 transition-transform"><i data-lucide="phone" class="w-3.5 h-3.5 fill-current"></i></a>
-                        </div>
-                        <span class="text-[10px] text-slate-400 mt-1 flex items-center gap-1"><i data-lucide="map-pin" class="w-3 h-3"></i> ${order.address || '-'}</span>
-                    </div>
-                </td>
-                <td class="px-6 py-4">
-                    <div class="text-[11px] text-slate-600 space-y-1">
-                        <div class="flex items-center gap-2">
-                            <span class="text-teal-600 font-semibold">C:</span>
-                            <span>${dateStr} - ${timeStr}</span>
-                        </div>
-                        <div class="pt-1 text-[10px] text-slate-500 italic">By: Admin</div>
-                    </div>
-                </td>
-                <td class="px-6 py-4">
-                    <div class="w-40">
-                        <div class="flex justify-between text-[9px] font-bold text-slate-500 mb-1 uppercase">
-                            <span>To: 1</span>
-                            <span class="text-emerald-600">${successRate}%</span>
-                        </div>
-                        <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden flex">
-                            <div class="bg-emerald-500 h-full transition-all duration-500" style="width: ${successRate}%"></div>
-                            <div class="bg-rose-400 h-full" style="width: ${100 - successRate}%"></div>
-                        </div>
-                        <div class="flex justify-between text-[9px] mt-1 text-slate-400 uppercase">
-                            <span>${order.courier || 'No Courier'}</span>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            <tr id="details-${order.id}" class="hidden bg-slate-50/50 border-b border-slate-100">
-                <td colspan="7" class="px-8 py-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div class="space-y-2">
-                            <h4 class="text-[11px] font-bold text-slate-400 uppercase">Summary:</h4>
-                            <div class="space-y-1 text-sm">
-                                <p class="flex justify-between"><span class="text-slate-600">Total:</span> <span class="font-bold text-slate-800">${order.amount}.00</span></p>
-                                <p class="flex justify-between"><span class="text-rose-500">Less:</span> <span class="font-bold text-rose-500">0.00</span></p>
-                                <p class="flex justify-between"><span class="text-emerald-600">Paid:</span> <span class="font-bold text-emerald-600">${order.advance_amount || 0}.00</span></p>
-                                <p class="flex justify-between pt-1 border-t border-slate-200"><span class="font-bold text-slate-800">Due:</span> <span class="font-bold text-indigo-600">${parseFloat(order.amount) - parseFloat(order.advance_amount || 0)}.00</span></p>
-                            </div>
-                        </div>
-                        <div class="space-y-2">
-                            <h4 class="text-[11px] font-bold text-slate-400 uppercase">Employee:</h4>
-                            <p class="text-sm text-slate-700">Assigned: Admin</p>
-                        </div>
-                        <div class="space-y-2 col-span-2">
-                            <h4 class="text-[11px] font-bold text-slate-400 uppercase">Internal Notes:</h4>
-                            <p class="text-xs text-slate-500 italic">No notes found for this order.</p>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        `}).join('') || '<tr><td colspan="7" class="p-6 text-center text-slate-400 text-xs">No orders found</td></tr>';
-
-        // Re-initialize Lucide icons after rendering
-        if (window.lucide) {
-            window.lucide.createIcons();
-        }
+    if (window._renderAllOrdersTable) {
+        window._renderAllOrdersTable(data);
     }
-}
+};
 
 // Toggle Expandable Order Details Row
 function toggleOrderDetails(btn, orderId) {
@@ -719,23 +596,93 @@ async function fetchAllOrders() {
     } else {
         const table = document.getElementById('allOrderTable');
         if (table) {
-            table.innerHTML = (data || []).map((order) => `
-                <tr class="hover:bg-gray-50 border-b border-gray-100 transition-colors text-[11px]">
-                    <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-[10px] bg-purple-100 text-purple-700 font-medium">${order.status}</span></td>
-                    <td class="px-2 py-3 text-center"><input type="checkbox" class="order-row-check"></td>
-                    <td class="px-4 py-3"><i class="fas fa-sticky-note text-gray-400"></i></td>
-                    <td class="px-4 py-3 font-medium text-blue-600">#${order.id.toString().slice(-6)}</td>
-                    <td class="px-4 py-3 font-medium">${order.name || '-'}<br><span class="text-gray-500 text-[10px]">${order.phone || '-'}</span></td>
-                    <td class="px-4 py-3">${new Date(order.created_at).toLocaleDateString()}</td>
-                    <td class="px-4 py-3 truncate max-w-[150px]">${order.address || '-'}</td>
-                    <td class="px-4 py-3">${order.courier || 'None'}</td>
-                    <td class="px-4 py-3 font-bold text-gray-900">${order.amount} TK</td>
-                    <td class="px-4 py-3 text-gray-500">Admin</td>
-                </tr>
-            `).join('') || '<tr><td colspan="10" class="p-4 text-center text-gray-500">No orders found</td></tr>';
+            table.innerHTML = '<tr><td colspan="10" class="p-4 text-center text-gray-500">Please refresh. Filter manager is not loaded.</td></tr>';
         }
     }
 }
+
+// Global Order Delete Function
+window.deleteOrder = async function(orderId) {
+    if(!confirm('Are you sure you want to delete Order #' + orderId + '?')) return;
+    
+    try {
+        const { error } = await _supabase.from('orders').delete().eq('id', orderId);
+        if (error) throw error;
+        
+        alert('Order deleted successfully!');
+        if (window.fetchAllOrders) window.fetchAllOrders();
+    } catch (err) {
+        console.error('Error deleting order:', err);
+        alert('Failed to delete order. Check console for details.');
+    }
+};
+
+window.deleteSelectedOrders = async function() {
+    const checkboxes = document.querySelectorAll('.order-row-check:checked');
+    if (checkboxes.length === 0) {
+        alert('Please select at least one order to delete.');
+        return;
+    }
+    
+    if(!confirm(`Are you sure you want to delete ${checkboxes.length} selected orders?`)) return;
+    
+    const idsToDelete = Array.from(checkboxes).map(cb => parseInt(cb.value));
+    
+    try {
+        const { error } = await _supabase.from('orders').delete().in('id', idsToDelete);
+        if (error) throw error;
+        
+        alert(`${checkboxes.length} orders deleted successfully!`);
+        document.getElementById('selectAllOrders').checked = false;
+        if (window.fetchAllOrders) window.fetchAllOrders();
+    } catch (err) {
+        console.error('Error deleting multiple orders:', err);
+        alert('Failed to delete selected orders.');
+    }
+};
+
+window.copyOrderInfo = function(orderId) {
+    if (!window.allOrders) return;
+    const order = window.allOrders.find(o => o.id == orderId);
+    if (!order) return;
+    
+    const name = order.name || 'Unknown';
+    const address = order.address || 'No Address';
+    const phone = order.phone || '';
+    
+    // Parse product name and format
+    const products = order.product_name || 'Manual Order';
+    const productPrice = order.amount || 0;
+    
+    const shipping = order.shipping_cost || 0;
+    const total = parseFloat(order.amount || 0);
+    const paid = parseFloat(order.paid || 0);
+    const due = total - paid;
+    
+    const textToCopy = `${name}
+${address}
+${phone}
+----------------------
+1 x ${products} - ${total}.00 Tk
+----------------------
+Shipping: ${shipping}.00 Tk
+Total: ${total}.00 Tk
+Paid: ${paid}.00 Tk
+Due: ${due}.00 Tk`;
+
+    navigator.clipboard.writeText(textToCopy).then(() => {
+        alert('Order Info Copied!');
+    }).catch(err => {
+        console.error('Failed to copy', err);
+    });
+};
+
+window.toggleSelectAllOrders = function(checkbox) {
+    const checkboxes = document.querySelectorAll('.order-row-check');
+    checkboxes.forEach(cb => {
+        cb.checked = checkbox.checked;
+    });
+};
 
 function renderTable(orders) {
     const table = document.getElementById('recentOrdersTable');
@@ -1119,6 +1066,9 @@ function initOrderForm() {
                         }
                     }
 
+                    // Reset lastFraudStats
+                    window.lastFraudStats = null;
+                    
                     // Trigger Fraud Check
                     performFraudCheck(phone);
                 } catch (err) {
@@ -1143,7 +1093,8 @@ function initOrderForm() {
             amount: parseFloat(document.getElementById('subtotal')?.value || 0) + parseFloat(document.getElementById('shipping')?.value || 0) - parseFloat(document.getElementById('discount')?.value || 0),
             status: document.getElementById('order-status')?.value || 'Pending',
             product_name: productNames,
-            created_at: new Date().toISOString()
+            created_at: new Date().toISOString(),
+            ...(window.lastFraudStats || {})
         };
 
         if (!orderData.name || !orderData.phone) {
@@ -2213,11 +2164,23 @@ async function performFraudCheck(phone) {
 
         // All External Donut Color
         let allColor = '#6366f1'; // indigo-500 (default)
-        if (allRate >= 80) allColor = '#10b981'; // emerald-500
-        else if (allRate > 0 && allRate < 50) allColor = '#f43f5e'; // rose-500
-        else if (allRate >= 50 && allRate < 80) allColor = '#f59e0b'; // amber-500
+        let badgeText = 'New';
+        if (allRate >= 80) { allColor = '#10b981'; badgeText = 'Excellent'; }
+        else if (allRate > 0 && allRate < 50) { allColor = '#f43f5e'; badgeText = 'Poor'; }
+        else if (allRate >= 50 && allRate < 80) { allColor = '#f59e0b'; badgeText = 'Good'; }
         
         updateDonut('all', allTotal, allSuccess, allFailed, allRate, allTotal === 0 ? '#cbd5e1' : allColor);
+
+        // Save for order submission
+        window.lastFraudStats = {
+            courier_total: allTotal, 
+            courier_completed: allSuccess, 
+            courier_pct: allRate,
+            courier_to: allTotal,
+            courier_su: allSuccess,
+            courier_fa: allFailed,
+            courier: badgeText
+        };
 
         // 5. Update Courier Rows (Table Section)
         const container = document.getElementById('courier-rows-container');

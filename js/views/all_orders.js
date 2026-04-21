@@ -196,75 +196,302 @@ const allOrdersHTML = `
     </div>
 
     <!-- Order List -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div class="px-4 py-3 border-b border-gray-200 bg-gray-50/50 rounded-t-lg flex justify-between items-center">
-            <h2 class="text-gray-800 font-medium text-sm order-list-title">Order List</h2>
-            <div class="flex">
-                <span class="bg-gray-100 border border-gray-200 border-r-0 rounded-l px-3 py-1.5 text-xs text-gray-500 flex items-center">ID</span>
-                <input type="text" placeholder="Search by Only ID" class="border border-gray-200 rounded-r px-3 py-1.5 text-xs w-48 focus:outline-none focus:border-brand-teal text-gray-600">
-            </div>
+    <style id="ao-styles">
+    /* ── BLOBS ── */
+    .blob{position:fixed;border-radius:50%;filter:blur(90px);opacity:.28;animation:floatb 9s ease-in-out infinite;pointer-events:none;z-index:0;}
+    .b1{width:500px;height:500px;background:radial-gradient(#c7d2fe,#a5b4fc);top:-140px;left:-160px;animation-delay:0s;}
+    .b2{width:380px;height:380px;background:radial-gradient(#e9d5ff,#ddd6fe);bottom:-100px;right:-100px;animation-delay:-4s;}
+    .b3{width:240px;height:240px;background:radial-gradient(#fce7f3,#fbcfe8);top:38%;left:52%;animation-delay:-6s;}
+    @keyframes floatb{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-30px) scale(1.05);}}
+
+    /* ── MAIN CARD ── */
+    .glass-card{
+      position:relative;z-index:1;
+      width:100%;max-width:1800px;margin:0 auto;
+      background:rgba(255,255,255,0.72);
+      backdrop-filter:blur(22px) saturate(1.7);
+      -webkit-backdrop-filter:blur(22px) saturate(1.7);
+      border:1px solid rgba(255,255,255,0.88);
+      border-radius:26px;
+      box-shadow:0 8px 40px rgba(99,102,241,0.11),0 2px 10px rgba(0,0,0,0.06),0 0 0 1px rgba(99,102,241,0.05);
+      overflow:hidden;
+    }
+
+    /* ── TOP BAR ── */
+    .top-bar{
+      background:linear-gradient(90deg,#4f46e5 0%,#7c3aed 55%,#a855f7 100%);
+      padding:12px 20px;
+      display:flex;align-items:center;justify-content:space-between;
+      position:relative;overflow:hidden;
+    }
+    .top-bar::after{content:'';position:absolute;top:-70%;right:-4%;width:340px;height:340px;
+      background:radial-gradient(circle,rgba(255,255,255,0.14),transparent 68%);border-radius:50%;pointer-events:none;}
+    .top-bar h2{color:#fff;font-size:18px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:10px;margin:0;}
+    .id-search{display:flex;align-items:center;background:rgba(255,255,255,0.17);
+      border:1px solid rgba(255,255,255,0.32);border-radius:10px;overflow:hidden;backdrop-filter:blur(8px);}
+    .id-label{padding:6px 12px;background:rgba(255,255,255,0.2);color:#fff;font-size:12px;font-weight:700;
+      letter-spacing:.06em;border-right:1px solid rgba(255,255,255,0.22);}
+    .id-input{background:transparent;border:none;outline:none;color:#fff;font-size:13px;
+      padding:6px 14px;width:175px;font-family:inherit;}
+    .id-input::placeholder{color:rgba(255,255,255,0.5);}
+
+    /* ── CONTROLS ── */
+    .ctrl-bar{
+      padding:10px 20px;display:flex;align-items:center;justify-content:space-between;
+      border-bottom:1px solid rgba(148,163,184,0.18);
+      background:rgba(255,255,255,0.38);flex-wrap:wrap;gap:10px;
+    }
+    .show-lbl{font-size:13px;color:#64748b;display:flex;align-items:center;gap:6px;}
+    .styled-sel{background:rgba(255,255,255,0.85);border:1px solid rgba(148,163,184,0.28);
+      border-radius:7px;padding:3px 8px;font-size:13px;color:#374151;font-family:inherit;outline:none;cursor:pointer;
+      box-shadow:0 1px 4px rgba(99,102,241,0.07);}
+    .entry-info{font-size:12px;color:#94a3b8;font-weight:500;}
+    .srch-wrap{display:flex;align-items:center;gap:7px;}
+    .srch-wrap label{font-size:13px;color:#64748b;font-weight:500;}
+    .srch-input{
+      background:rgba(255,255,255,0.82);border:1px solid rgba(148,163,184,0.28);
+      border-radius:9px;padding:6px 12px 6px 32px;font-size:13px;color:#374151;
+      font-family:inherit;outline:none;width:190px;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='M21 21l-4.35-4.35'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;background-position:10px center;
+      box-shadow:0 1px 5px rgba(99,102,241,0.07);
+      transition:box-shadow .2s,border-color .2s;
+    }
+    .srch-input:focus{border-color:rgba(99,102,241,0.38);box-shadow:0 0 0 3px rgba(99,102,241,0.1);}
+
+    /* ── TABLE SCROLL ── */
+    .tbl-wrap{overflow-x:auto;padding-bottom:4px;}
+    .glass-card table{width:100%;border-collapse:collapse;min-width:1400px;}
+
+    /* THEAD */
+    .glass-card thead tr{
+      background:linear-gradient(90deg,rgba(238,242,255,0.95),rgba(245,243,255,0.95));
+      border-bottom:1px solid rgba(148,163,184,0.18);
+    }
+    .glass-card th{padding:10px 14px;text-align:left;font-size:11.5px;font-weight:700;
+      text-transform:uppercase;letter-spacing:.07em;color:#6366f1;white-space:nowrap;}
+
+    /* TBODY */
+    .glass-card tbody tr{
+      border-bottom:1px solid rgba(148,163,184,0.11);
+      transition:background .16s,transform .16s,box-shadow .16s;
+      animation:rowIn .42s ease both;
+    }
+    .glass-card tbody tr:last-child{border-bottom:none;}
+    .glass-card tbody tr:hover{
+      background:rgba(99,102,241,0.035);
+      transform:translateX(3px);
+      box-shadow:inset 4px 0 0 #6366f1,0 2px 14px rgba(99,102,241,0.06);
+    }
+    .glass-card tbody tr:nth-child(1){animation-delay:.07s;}
+    .glass-card tbody tr:nth-child(2){animation-delay:.16s;}
+    @keyframes rowIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+
+    .glass-card td{padding:12px 14px;vertical-align:top;font-size:13.5px;color:#374151;}
+
+    /* STATUS */
+    .status-badge{
+      display:inline-flex;align-items:center;gap:5px;
+      padding:4px 10px;border-radius:100px;font-size:11.5px;font-weight:700;letter-spacing:.04em;
+      background:linear-gradient(135deg,#d1fae5,#a7f3d0);color:#065f46;
+      border:1px solid rgba(16,185,129,0.28);box-shadow:0 0 10px rgba(16,185,129,0.18);
+    }
+    .sdot{width:6px;height:6px;border-radius:50%;background:#10b981;animation:sdotP 1.7s ease infinite;}
+    @keyframes sdotP{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.5);}50%{box-shadow:0 0 0 4px rgba(16,185,129,0);}}
+    .sl-tag{font-size:11px;color:#94a3b8;font-weight:500;margin-top:4px;display:flex;align-items:center;gap:3px;}
+
+    /* CHECKBOX */
+    .cb{width:16px;height:16px;border:1.5px solid #c7d2fe;border-radius:5px;
+      background:rgba(255,255,255,0.8);cursor:pointer;accent-color:#6366f1;}
+
+    /* ICON BTN */
+    .ibtn{
+      display:inline-flex;align-items:center;justify-content:center;
+      width:28px;height:28px;border-radius:8px;
+      background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.17);
+      color:#6366f1;cursor:pointer;
+      transition:background .14s,box-shadow .14s,transform .14s;
+    }
+    .ibtn:hover{background:rgba(99,102,241,0.15);box-shadow:0 0 9px rgba(99,102,241,0.22);transform:scale(1.1);}
+    .ibtn.g{background:rgba(16,185,129,0.07);border-color:rgba(16,185,129,0.2);color:#059669;}
+    .ibtn.g:hover{background:rgba(16,185,129,0.15);box-shadow:0 0 9px rgba(16,185,129,0.22);}
+    .ibtn.red { background:rgba(239,68,68,0.08); border-color:rgba(239,68,68,0.2); color:#ef4444; }
+    .ibtn.red:hover { background:rgba(239,68,68,0.16);box-shadow:0 0 10px rgba(239,68,68,0.25); }
+
+    /* INVOICE */
+    .inv-id{font-weight:800;font-size:14.5px;
+      background:linear-gradient(90deg,#4f46e5,#7c3aed);
+      -webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .prod-item{font-size:12.5px;color:#64748b;display:flex;align-items:flex-start;gap:4px;margin-top:3px;}
+    .prod-item::before{content:'•';color:#a5b4fc;flex-shrink:0;}
+    .vlink{color:#6366f1;font-weight:600;font-size:12px;text-decoration:none;
+      border-bottom:1px dashed rgba(99,102,241,0.32);transition:color .14s;}
+    .vlink:hover{color:#7c3aed;}
+
+    /* NAME & PHONE */
+    .name-txt{font-weight:700;color:#1e293b;font-size:13.5px;margin-bottom:5px;
+      display:flex;align-items:center;gap:4px;}
+    .phone-chip{
+      display:inline-flex;align-items:center;
+      background:linear-gradient(90deg,#1e293b,#334155);
+      border-radius:9px;overflow:hidden;
+      box-shadow:0 2px 10px rgba(30,41,59,0.2);
+    }
+    .pnum{padding:5px 11px;color:#fff;font-size:12.5px;font-weight:600;letter-spacing:.02em;}
+    .pbtn{padding:5px 8px;cursor:pointer;transition:background .13s;border-left:1px solid rgba(255,255,255,0.09);border-top:none;border-bottom:none;border-right:none;}
+    .pbtn.wa{background:#25d366;}.pbtn.wa:hover{background:#22c55e;}
+    .pbtn.cl{background:#6366f1;}.pbtn.cl:hover{background:#4f46e5;}
+    .pbtn.cp{background:#475569;}.pbtn.cp:hover{background:#64748b;}
+    .src-tag{font-size:12px;color:#94a3b8;margin-top:5px;display:flex;align-items:center;gap:4px;}
+    .src-tag b{color:#6366f1;font-weight:600;}
+
+    /* DATE */
+    .dl{font-size:12.5px;margin-bottom:3px;display:flex;align-items:center;gap:5px;color:#374151;}
+    .dlbl{font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:4px;letter-spacing:.05em;}
+    .dc{background:#dbeafe;color:#1d4ed8;}.du{background:#f3e8ff;color:#7e22ce;}
+    .by-t{font-size:11.5px;color:#94a3b8;margin-top:3px;}
+    .by-t b{color:#6366f1;}
+
+    /* ADDRESS */
+    .addr{font-size:13.5px;color:#374151;font-weight:500;display:flex;align-items:flex-start;gap:5px;}
+    .cpaddr{
+      display:inline-flex;align-items:center;justify-content:center;
+      width:22px;height:22px;border-radius:6px;
+      background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.18);
+      color:#6366f1;cursor:pointer;margin-left:4px;
+      transition:background .13s,box-shadow .13s;
+    }
+    .cpaddr:hover{background:rgba(99,102,241,0.15);box-shadow:0 0 7px rgba(99,102,241,0.2);}
+
+    /* COURIER */
+    .cour-top{display:flex;align-items:center;gap:7px;margin-bottom:5px;flex-wrap:wrap;}
+    .cstat{font-size:12.5px;color:#475569;font-weight:500;}
+    .cstat b{color:#1e293b;font-weight:700;}
+    .new-bdg{padding:2px 8px;border-radius:100px;
+      background:linear-gradient(90deg,#e0e7ff,#ede9fe);color:#4338ca;
+      font-size:10.5px;font-weight:700;letter-spacing:.05em;border:1px solid #c7d2fe;}
+    .bar-track{background:#e2e8f0;border-radius:100px;height:8px;overflow:hidden;margin:4px 0 3px;position:relative;}
+    .bar-fill{height:100%;border-radius:100px;width:0%;transition:width 1.3s cubic-bezier(.4,0,.2,1);}
+    .bar-pct-lbl{
+      position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+      font-size:9.5px;font-weight:700;color:#fff;letter-spacing:.03em;pointer-events:none;
+    }
+    .bg-green{background:linear-gradient(90deg,#059669,#10b981);box-shadow:0 0 8px rgba(16,185,129,0.32);}
+    .bstats{display:flex;gap:10px;font-size:12px;color:#64748b;}
+    .bstats .su{color:#059669;font-weight:700;}.bstats .fa{color:#ef4444;font-weight:700;}
+
+    /* SUMMARY */
+    .sum-total{font-size:13.5px;color:#374151;font-weight:600;}
+    .sum-less{font-size:13px;color:#ef4444;font-weight:600;}
+    .sum-paid{font-size:13px;color:#64748b;}
+    .sum-due{font-size:13.5px;color:#dc2626;font-weight:700;margin-top:2px;}
+    .sum-line{display:flex;align-items:center;gap:5px;margin-bottom:1px;}
+    .sum-key{font-size:11.5px;color:#94a3b8;font-weight:500;width:40px;flex-shrink:0;}
+
+    /* EMPLOYEE */
+    .emp-badge{
+      display:inline-flex;align-items:center;gap:5px;
+      padding:4px 10px;border-radius:100px;
+      background:linear-gradient(135deg,#ede9fe,#e0e7ff);
+      color:#5b21b6;font-size:12px;font-weight:700;
+      border:1px solid rgba(139,92,246,0.25);
+      box-shadow:0 0 10px rgba(139,92,246,0.12);
+    }
+
+    /* PAGINATION */
+    .pgn{
+      padding:12px 20px;display:flex;align-items:center;justify-content:space-between;
+      border-top:1px solid rgba(148,163,184,0.16);
+      background:rgba(255,255,255,0.38);flex-wrap:wrap;gap:10px;
+    }
+    .pinfo{font-size:11.5px;color:#94a3b8;font-weight:500;}
+    .pbtns{display:flex;align-items:center;gap:5px;}
+    .pbtnp{
+      padding:5px 13px;border-radius:8px;font-size:12px;font-weight:600;
+      border:1px solid rgba(148,163,184,0.28);
+      background:rgba(255,255,255,0.72);color:#64748b;
+      cursor:pointer;transition:all .16s;font-family:inherit;
+    }
+    .pbtnp:hover{background:rgba(255,255,255,0.95);box-shadow:0 2px 8px rgba(99,102,241,0.1);color:#6366f1;}
+    .pbtnp.active{
+      background:linear-gradient(135deg,#6366f1,#7c3aed);color:#fff;
+      border-color:transparent;box-shadow:0 4px 14px rgba(99,102,241,0.32);
+    }
+    </style>
+
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+
+    <div class="glass-card mb-6">
+      <!-- TOP BAR -->
+      <div class="top-bar">
+        <h2>
+          <span style="width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.28);display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          </span>
+          Order List
+        </h2>
+        <div class="id-search">
+          <div class="id-label">ID</div>
+          <input class="id-input" type="text" placeholder="Search by Only ID"/>
         </div>
-        
-        <div class="p-4">
-            <div class="flex justify-between items-center mb-4">
-                <div class="flex items-center text-xs text-gray-600">
-                    <span>Show</span>
-                    <select class="mx-2 border border-gray-300 rounded px-2 py-1 outline-none focus:border-brand-teal">
-                        <option>10</option><option>25</option><option>50</option><option>100</option>
-                    </select>
-                    <span>entries</span>
-                </div>
-                <div class="flex items-center text-xs text-gray-600">
-                    <span class="mr-2">Search:</span>
-                    <input type="text" class="border border-gray-300 rounded px-2 py-1 outline-none focus:border-brand-teal w-48">
-                </div>
-            </div>
+      </div>
 
-            <div class="text-xs text-gray-500 mb-2 all-orders-entry-info">Showing 0 to 0 of 0 entries</div>
-
-            <div class="overflow-x-auto border border-gray-200 rounded">
-                <table class="w-full text-left text-[11px] whitespace-nowrap">
-                    <thead class="bg-gray-50/80 border-b border-gray-200 text-gray-700 font-bold text-[11px] uppercase tracking-wider">
-                        <tr>
-                            <th class="px-4 py-3 border-r border-gray-200">Status</th>
-                            <th class="px-2 py-3 border-r border-gray-200 text-center"><input type="checkbox" id="selectAllOrders" onchange="document.querySelectorAll('.order-row-check').forEach(c=>c.checked=this.checked)"><br>Select</th>
-                            <th class="px-4 py-3 border-r border-gray-200">Notes</th>
-                            <th class="px-4 py-3 border-r border-gray-200">
-                                <div class="flex items-center justify-between gap-3">Invoice ID <i class="fas fa-sort text-gray-300"></i></div>
-                            </th>
-                            <th class="px-4 py-3 border-r border-gray-200">Name & Number</th>
-                            <th class="px-4 py-3 border-r border-gray-200">Date</th>
-                            <th class="px-4 py-3 border-r border-gray-200">Address</th>
-                            <th class="px-4 py-3 border-r border-gray-200">Courier</th>
-                            <th class="px-4 py-3 border-r border-gray-200">Summary</th>
-                            <th class="px-4 py-3">Employee</th>
-                        </tr>
-                    </thead>
-                    <tbody id="allOrderTable">
-                        <tr>
-                            <td colspan="10" class="px-4 py-6 text-center text-red-400 bg-gray-50/50 text-xs">No data available in table</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="flex justify-between items-center mt-4">
-                <div>
-                    <div class="text-xs text-gray-500 mb-2 all-orders-entry-info">Showing 0 to 0 of 0 entries</div>
-                    <div class="flex items-center text-xs text-gray-600">
-                        <span>Show</span>
-                        <select class="mx-2 border border-gray-300 rounded px-2 py-1 outline-none focus:border-brand-teal">
-                            <option>10</option><option>25</option><option>50</option>
-                        </select>
-                        <span>entries</span>
-                    </div>
-                </div>
-                <div class="flex">
-                    <button class="px-3 py-1.5 border border-gray-300 bg-white text-gray-500 text-xs rounded-l cursor-not-allowed hover:bg-gray-50">Previous</button>
-                    <button class="px-3 py-1.5 border border-gray-300 border-l-0 bg-white text-gray-500 text-xs rounded-r cursor-not-allowed hover:bg-gray-50">Next</button>
-                </div>
-            </div>
+      <!-- CONTROLS -->
+      <div class="ctrl-bar">
+        <!-- Removed Top Entries Counter -->
+        <div class="srch-wrap" style="display:flex; gap:10px; align-items:center;">
+          <button onclick="deleteSelectedOrders()" style="background:#ef4444; color:white; padding:7px 14px; border-radius:8px; font-size:12.5px; font-weight:600; border:none; cursor:pointer; box-shadow:0 2px 6px rgba(239,68,68,0.25); display:flex; gap:6px; align-items:center; transition:all 0.2s;" onmouseover="this.style.background='#dc2626'" onmouseout="this.style.background='#ef4444'">
+            <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            Delete Selected
+          </button>
+          <div style="display:flex; align-items:center; gap:5px;">
+            <label>Search:</label>
+            <input class="srch-input" type="text" placeholder="Filter orders…"/>
+          </div>
         </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Status</th>
+              <th><input type="checkbox" id="selectAllOrders" onclick="toggleSelectAllOrders(this)" title="Select All" style="cursor:pointer;"/></th>
+              <th>Notes</th>
+              <th>Invoice ID ↓</th>
+              <th>Name &amp; Number</th>
+              <th>Date</th>
+              <th>Address</th>
+              <th>Courier</th>
+              <th>Summary</th>
+              <th>Employee</th>
+            </tr>
+          </thead>
+          <tbody id="allOrderTable">
+            <tr>
+              <td colspan="10" class="px-4 py-6 text-center text-red-400 bg-gray-50/50 text-xs">No data available in table</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- PAGINATION -->
+      <div class="pgn">
+        <span class="pinfo all-orders-entry-info">Showing 0 entries</span>
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+          <div class="show-lbl">
+            Show <select class="styled-sel" style="font-size:11px;padding:2px 7px;"><option>10</option><option>25</option><option>50</option></select> entries
+          </div>
+          <div class="pbtns">
+            <button class="pbtnp">← Previous</button>
+            <button class="pbtnp active">1</button>
+            <button class="pbtnp">Next →</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Action & Summary Row -->

@@ -360,11 +360,12 @@ async function applyStatusOrdersFilter() {
 
 // ─── RENDER ALL ORDERS TABLE ─────────────────────────────────────────────────
 function _renderAllOrdersTable(data) {
-    const table = document.getElementById('allOrderTable');
+    let table = document.getElementById('allOrderTable');
+    if (!table) table = document.getElementById('statusOrderTable');
     if (!table) return;
 
-    document.querySelectorAll('.all-orders-entry-info').forEach(el => {
-        el.textContent = `Showing ${data.length} entries`;
+    document.querySelectorAll('.all-orders-entry-info, .status-entry-info').forEach(el => {
+        el.textContent = `Showing 1 to ${data.length} of ${data.length} entries`;
     });
 
     if (!data.length) {
@@ -372,20 +373,150 @@ function _renderAllOrdersTable(data) {
         return;
     }
 
-    table.innerHTML = data.map(order => `
-        <tr class="hover:bg-gray-50 border-b border-gray-100 transition-colors text-[11px]">
-            <td class="px-4 py-3"><span class="px-2 py-0.5 rounded-full text-[10px] bg-purple-100 text-purple-700 font-medium">${order.status}</span></td>
-            <td class="px-2 py-3 text-center"><input type="checkbox" class="order-row-check"></td>
-            <td class="px-4 py-3"><i class="fas fa-sticky-note text-gray-400"></i></td>
-            <td class="px-4 py-3 font-medium text-blue-600">#${order.id.toString().slice(-6)}</td>
-            <td class="px-4 py-3 font-medium">${order.name || '-'}<br><span class="text-gray-500 text-[10px]">${order.phone || '-'}</span></td>
-            <td class="px-4 py-3">${new Date(order.created_at).toLocaleDateString()}</td>
-            <td class="px-4 py-3 truncate max-w-[150px]">${order.address || '-'}</td>
-            <td class="px-4 py-3">${order.courier || 'None'}</td>
-            <td class="px-4 py-3 font-bold text-gray-900">${order.amount} TK</td>
-            <td class="px-4 py-3 text-gray-500">Admin</td>
+    // Save globally so copyOrderInfo can access it
+    window.allOrders = data;
+
+    table.innerHTML = data.map((order, index) => {
+        const dateObj = new Date(order.created_at);
+        const dateStr = dateObj.toLocaleDateString('en-GB') + ' · ' + dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).toLowerCase();
+        
+        return `
+        <tr>
+          <!-- Status -->
+          <td>
+            <div style="display:flex;flex-direction:column;align-items:flex-start;gap:3px;">
+              <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#d1fae5,#6ee7b7);display:flex;align-items:center;justify-content:center;box-shadow:0 0 10px rgba(16,185,129,0.28);margin-bottom:2px;">
+                <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="#059669" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+              </div>
+              <span class="status-badge"><span class="sdot"></span>${order.status || 'Pending'}</span>
+              <div class="sl-tag">
+                <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="#94a3b8" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.056 48.056 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z"/></svg>
+                sl: ${index + 1}
+              </div>
+            </div>
+          </td>
+          <!-- Select -->
+          <td style="text-align:center;">
+            <input type="checkbox" class="cb order-row-check" value="${order.id}"/>
+            <button class="ibtn" onclick="copyOrderInfo(${order.id})" title="Copy Order Info" style="margin-top: 8px; width:24px; height:24px; border-radius:6px;">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/></svg>
+            </button>
+          </td>
+          <!-- Notes -->
+          <td>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <button class="ibtn g" title="View Note" onclick="alert('${order.note || 'No notes available'}')">
+                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 00-2.25-2.25H6A2.25 2.25 0 003.75 6v8.25A2.25 2.25 0 006 16.5h2.25m3.75-10.5H18A2.25 2.25 0 0120.25 8.25V18A2.25 2.25 0 0118 20.25h-7.5A2.25 2.25 0 018.25 18v-1.5m3.75-10.5h6.375c.621 0 1.125.504 1.125 1.125v6.375"/></svg>
+              </button>
+              <button class="ibtn red" title="Delete Order" onclick="deleteOrder(${order.id})">
+                <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+              </button>
+            </div>
+          </td>
+          <!-- Invoice -->
+          <td>
+            <span class="inv-id">#${order.id}</span>
+            <div class="prod-item">1 x ${order.product_name || 'Product'} - ${order.amount}Tk &nbsp;<a href="#" class="vlink" onclick="event.preventDefault(); alert('Stock info for ' + '${order.product_name || 'this product'}')">View Stock</a></div>
+          </td>
+          <!-- Name & Number -->
+          <td>
+            <div class="name-txt">
+              ${order.name || '-'}
+              <button class="ibtn" style="width:21px;height:21px;border-radius:6px;" title="Copy Name" onclick="navigator.clipboard.writeText('${order.name || ''}')">
+                <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              </button>
+              <button class="ibtn" style="width:21px;height:21px;border-radius:6px;" title="Copy Alternative Number" onclick="navigator.clipboard.writeText('${order.alt_phone || ''}')">
+                <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </button>
+            </div>
+            <div class="phone-chip">
+              <span class="pnum">${order.phone || '-'}</span>
+              <button class="pbtn wa" title="WhatsApp" onclick="window.open('https://wa.me/+88${order.phone}', '_blank')"><svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.555 4.122 1.528 5.855L.057 23.5l5.797-1.517A11.951 11.951 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.686-.5-5.223-1.373l-.374-.222-3.882 1.017 1.034-3.772-.243-.386A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg></button>
+              <button class="pbtn cl" title="Call" onclick="window.open('tel:${order.phone}')"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/></svg></button>
+              <button class="pbtn cp" title="Copy" onclick="navigator.clipboard.writeText('${order.phone}')"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75"/></svg></button>
+            </div>
+            <div class="src-tag">
+              <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="#94a3b8" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"/></svg>
+              Source: <b>${order.source || 'Direct'}</b>
+            </div>
+          </td>
+          <!-- Date -->
+          <td>
+            <div class="dl"><span class="dlbl dc">C</span>${dateStr}</div>
+            <div class="dl"><span class="dlbl du">U</span>${order.updated_at ? (new Date(order.updated_at).toLocaleDateString('en-GB') + ' · ' + new Date(order.updated_at).toLocaleTimeString('en-US', {hour:'numeric',minute:'2-digit'}).toLowerCase()) : dateStr}</div>
+            <div class="by-t">By: <b>${order.created_by || 'Admin'}</b></div>
+          </td>
+          <!-- Address -->
+          <td>
+            <div class="addr">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="#6366f1" stroke-width="2" style="flex-shrink:0;margin-top:2px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
+              ${order.address || '-'}
+              <button class="cpaddr" onclick="navigator.clipboard.writeText('${order.address || ''}')"><svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75"/></svg></button>
+            </div>
+          </td>
+          <!-- Courier -->
+          <td style="min-width: 140px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 8px; padding-right:4px;">
+                <div style="text-align:left;">
+                    <div style="font-size:9px; font-weight:800; color:#94a3b8; text-transform:uppercase; margin-bottom:1px;">To</div>
+                    <div style="font-size:17px; font-weight:800; color:#1e293b; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.07));">${order.courier_total || 0}</div>
+                </div>
+                <div style="text-align:left;">
+                    <div style="font-size:9px; font-weight:800; color:#94a3b8; text-transform:uppercase; margin-bottom:1px;">Co</div>
+                    <div style="font-size:17px; font-weight:800; color:#1e293b; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.07));">${order.courier_completed || 0}</div>
+                </div>
+                <div style="text-align:right; padding-bottom: 3px; display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+                    <button onclick="syncCourierStats(${order.id}, '${order.phone}')" style="background:none; border:none; cursor:pointer; color:#94a3b8; transition:color 0.2s; padding:2px;" onmouseover="this.style.color='#6366f1'" onmouseout="this.style.color='#94a3b8'" title="Fetch latest stats">
+                        <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                    </button>
+                    <span style="padding: 2px 7px; background: #fbbf24; color: white; font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 9999px; box-shadow: 0 4px 12px rgba(245,158,11,0.25);">
+                        ${order.courier || 'New'}
+                    </span>
+                </div>
+            </div>
+
+            <div style="position:relative; width:100%; height:18px; margin-bottom: 8px; border-radius:12px; background:#f1f5f9; overflow:hidden; border:1px solid rgba(226,232,240,0.5); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+                <div style="position:absolute; inset:0 0 0 auto; width:100%; background:rgba(244,63,94,0.1);"></div>
+                <div style="position:absolute; inset:0 auto 0 0; width:${order.courier_pct || 100}%; background:linear-gradient(to right, #10b981, #34d399); border-radius:12px; box-shadow: 0 4px 14px 0 rgba(34,197,94,0.25); border-right: 3px solid #f43f5e; display:flex; align-items:center; justify-content:center;">
+                    <span style="font-size:10px; font-weight:900; color:white; text-shadow: 0 1px 2px rgba(0,0,0,0.25);">${order.courier_pct || 100}%</span>
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px solid rgba(226,232,240,0.6); padding-top: 6px;">
+                <div>
+                    <div style="font-size:8px; font-weight:800; color:#94a3b8; text-transform:uppercase; margin-bottom:1px; letter-spacing:-0.02em;">Total</div>
+                    <div style="font-size:12px; font-weight:800; color:#334155;">${order.courier_to || 1}</div>
+                </div>
+                <div>
+                    <div style="font-size:8px; font-weight:800; color:#059669; text-transform:uppercase; margin-bottom:1px; letter-spacing:-0.02em;">Success</div>
+                    <div style="font-size:12px; font-weight:800; color:#059669;">${order.courier_su || 1}</div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:8px; font-weight:800; color:#f43f5e; text-transform:uppercase; margin-bottom:1px; letter-spacing:-0.02em;">Failed</div>
+                    <div style="font-size:12px; font-weight:800; color:#f43f5e;">${order.courier_fa || 0}</div>
+                </div>
+            </div>
+          </td>
+          <!-- Summary -->
+          <td>
+            <div class="sum-line"><span class="sum-key">Total</span><span class="sum-total">${order.amount || 0}</span></div>
+            <div class="sum-line"><span class="sum-key">Less</span><span class="sum-less">${order.discount || 0}</span></div>
+            <div class="sum-line"><span class="sum-key">Paid</span><span class="sum-paid">${order.paid || 0}</span></div>
+            <div style="margin-top:3px;padding:3px 8px;border-radius:7px;background:rgba(220,38,38,0.07);border:1px solid rgba(220,38,38,0.15);display:inline-block;">
+              <span style="font-size:10px;color:#94a3b8;font-weight:500;">Due </span>
+              <span class="sum-due" style="font-size:13px;">${(order.amount || 0) - (order.discount || 0) - (order.paid || 0)}</span>
+            </div>
+          </td>
+          <!-- Employee -->
+          <td>
+            <span class="emp-badge">
+              <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+              ${order.employee || 'Admin'}
+            </span>
+          </td>
         </tr>
-    `).join('');
+        `;
+    }).join('');
 }
 
 window.initOrderFilterSection  = initOrderFilterSection;
