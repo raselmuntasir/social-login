@@ -2121,12 +2121,18 @@ async function performFraudCheck(phone) {
 
     // Show section and reset UI to loading state
     fraudSection.classList.remove('hidden');
-    const msg = document.getElementById('fraud-insight-msg');
-    if (msg) msg.innerHTML = '<div class="flex items-center gap-2 text-indigo-600 font-bold"><i class="fas fa-circle-notch fa-spin"></i> Analyzing global delivery history...</div>';
-
-    // Clear previous breakdown if any
-    const oldBreakdown = document.getElementById('courier-breakdown-details');
-    if (oldBreakdown) oldBreakdown.innerHTML = '';
+    
+    // Clear previous breakdown and show loader
+    const container = document.getElementById('courier-rows-container');
+    if (container) {
+        container.innerHTML = `
+            <div class="flex justify-center items-center p-8">
+                <div class="flex items-center gap-2 text-indigo-600 font-bold text-xs bg-indigo-50 px-4 py-2 rounded-full">
+                    <i class="fas fa-circle-notch fa-spin"></i> Analyzing global delivery history...
+                </div>
+            </div>
+        `;
+    }
 
     try {
         // 1. Fetch internal stats using direct fetch (to fix 406 error)
@@ -2165,140 +2171,128 @@ async function performFraudCheck(phone) {
         }
 
         // 3. Aggregate Data
-        const total = internalTotal + (externalData.total || 0);
-        const success = internalSuccess + (externalData.success || 0);
-        const failed = internalFailed + (externalData.cancel || 0);
-        const successRate = total > 0 ? Math.round((success / total) * 100) : 0;
+        // BizMation (Internal)
+        const bizTotal = internalTotal;
+        const bizSuccess = internalSuccess;
+        const bizFailed = internalFailed;
+        const bizRate = bizTotal > 0 ? Math.round((bizSuccess / bizTotal) * 100) : 0;
 
-        // 4. Update Main UI
-        const totalEl = document.getElementById('fraud-total');
-        const successEl = document.getElementById('fraud-success');
-        const failedEl = document.getElementById('fraud-failed');
-        const percentText = document.getElementById('fraud-percent-text');
-        const scoreText = document.getElementById('fraud-score-text');
-        
-        if (totalEl) totalEl.innerText = total;
-        if (successEl) successEl.innerText = success;
-        if (failedEl) failedEl.innerText = failed;
-        if (percentText) percentText.innerText = successRate + '%';
-        if (scoreText) scoreText.innerText = successRate + '%';
-        
-        const bar = document.getElementById('fraud-score-bar');
-        const circle = document.getElementById('fraud-circle-path');
-        const tag = document.getElementById('fraud-tag');
+        // All External
+        const allTotal = externalData.total || 0;
+        const allSuccess = externalData.success || 0;
+        const allFailed = externalData.cancel || 0;
+        const allRate = allTotal > 0 ? Math.round((allSuccess / allTotal) * 100) : 0;
 
-        if (bar) bar.style.width = successRate + '%';
-        if (circle) circle.setAttribute('stroke-dasharray', `${successRate}, 100`);
+        // 4. Update Donuts
+        const updateDonut = (prefix, total, success, failed, rate, color) => {
+            const elTotal = document.getElementById(`${prefix}-total`);
+            const elSuccess = document.getElementById(`${prefix}-success`);
+            const elFailed = document.getElementById(`${prefix}-failed`);
+            const elPercent = document.getElementById(`${prefix}-percent`);
+            const elArc = document.getElementById(`${prefix}-arc`);
 
-        // 5. Build Insight Message & Risk Tags
-        let riskColor = '#6366f1';
-        let riskText = 'New Customer';
-        let insight = '';
+            if (elTotal) elTotal.innerText = total;
+            if (elSuccess) elSuccess.innerText = success;
+            if (elFailed) elFailed.innerText = failed;
+            if (elPercent) elPercent.innerText = rate + '%';
 
-        if (total === 0) {
-            insight = "No previous order history detected in your database or external courier networks.";
-            if (tag) tag.classList.add('hidden');
-        } else if (successRate >= 80) {
-            riskColor = '#22c55e';
-            riskText = 'Safe Customer';
-            insight = `Excellent reliability! This customer has a ${successRate}% delivery success rate across ${total} orders.`;
-            if (bar) bar.className = 'bg-green-500 h-full transition-all duration-1000';
-        } else if (successRate >= 50) {
-            riskColor = '#f59e0b';
-            riskText = 'Moderate Risk';
-            insight = `Average reliability. ${failed} orders were canceled/returned in the past. Proceed with verification.`;
-            if (bar) bar.className = 'bg-yellow-500 h-full transition-all duration-1000';
-        } else {
-            riskColor = '#ef4444';
-            riskText = 'High Risk Alert';
-            insight = `Warning! Extremely low delivery rate (${successRate}%). Highly recommend advance payment.`;
-            if (bar) bar.className = 'bg-red-500 h-full transition-all duration-1000';
-        }
-
-        if (circle) circle.setAttribute('stroke', riskColor);
-        if (msg) msg.innerText = insight;
-        
-        if (tag && total > 0) {
-            tag.innerText = riskText;
-            tag.className = `inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-tighter ${
-                successRate >= 80 ? 'bg-green-100 text-green-700' : 
-                successRate >= 50 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
-            }`;
-            tag.classList.remove('hidden');
-        }
-
-        // 6. Enhanced Courier Breakdown Grid (Merging Internal & External)
-        const allCouriers = [];
-
-        // Add Internal Shop Data if exists
-        if (internalTotal > 0) {
-            allCouriers.push({
-                name: "Your Shop History",
-                total: internalTotal,
-                success: internalSuccess,
-                cancel: internalFailed,
-                isInternal: true
-            });
-        }
-
-        // Add External Courier Data
-        if (externalData.couriers && externalData.couriers.length > 0) {
-            externalData.couriers.forEach(c => allCouriers.push(c));
-        }
-
-        if (allCouriers.length > 0) {
-            const footer = fraudSection.querySelector('.p-6');
-            let breakdownDiv = document.getElementById('courier-breakdown-details');
-            
-            if (!breakdownDiv) {
-                breakdownDiv = document.createElement('div');
-                breakdownDiv.id = 'courier-breakdown-details';
-                breakdownDiv.className = 'mt-8 pt-6 border-t border-gray-100';
-                footer.appendChild(breakdownDiv);
+            if (elArc) {
+                const circ = 326.7;
+                const offset = circ - (rate / 100) * circ;
+                elArc.style.strokeDashoffset = offset;
+                if (color) elArc.setAttribute('stroke', color);
             }
+        };
 
-            const cardsHTML = allCouriers.map(c => {
-                const rate = Math.round((c.success / c.total) * 100);
-                const colorClass = rate >= 80 ? 'text-green-600' : rate >= 50 ? 'text-yellow-600' : 'text-red-600';
-                const bgClass = rate >= 80 ? 'bg-green-50' : rate >= 50 ? 'bg-yellow-50' : 'bg-red-50';
-                const borderClass = c.isInternal ? 'border-purple-300 ring-1 ring-purple-100' : 'border-gray-100';
+        // BizMation Donut Color
+        let bizColor = '#10b981'; // emerald-500
+        if (bizRate < 50) bizColor = '#f43f5e'; // rose-500
+        else if (bizRate < 80) bizColor = '#f59e0b'; // amber-500
+        
+        updateDonut('biz', bizTotal, bizSuccess, bizFailed, bizRate, bizTotal === 0 ? '#cbd5e1' : bizColor);
 
-                return `
-                    <div class="bg-white p-3 rounded-xl border ${borderClass} shadow-sm flex flex-col justify-between hover:border-purple-200 transition-colors group">
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="text-[10px] font-black ${c.isInternal ? 'text-purple-600' : 'text-gray-400'} uppercase tracking-tighter truncate w-24 group-hover:text-purple-600">
-                                ${c.isInternal ? '<i class="fas fa-store mr-1"></i>' : ''}${c.name}
-                            </span>
-                            <span class="text-[9px] font-bold ${bgClass} ${colorClass} px-1.5 py-0.5 rounded shadow-sm">${rate}%</span>
-                        </div>
-                        <div class="flex justify-between items-end">
-                            <div>
-                                <p class="text-[8px] font-bold text-gray-400 uppercase leading-none mb-1">Total Parcels</p>
-                                <p class="text-sm font-black text-gray-700 leading-none">${c.total}</p>
+        // All External Donut Color
+        let allColor = '#6366f1'; // indigo-500 (default)
+        if (allRate >= 80) allColor = '#10b981'; // emerald-500
+        else if (allRate > 0 && allRate < 50) allColor = '#f43f5e'; // rose-500
+        else if (allRate >= 50 && allRate < 80) allColor = '#f59e0b'; // amber-500
+        
+        updateDonut('all', allTotal, allSuccess, allFailed, allRate, allTotal === 0 ? '#cbd5e1' : allColor);
+
+        // 5. Update Courier Rows (Table Section)
+        const container = document.getElementById('courier-rows-container');
+        if (container) {
+            let rowsHTML = '';
+
+            // Handle external couriers
+            if (externalData.couriers && externalData.couriers.length > 0) {
+                rowsHTML = externalData.couriers.map((c, i) => {
+                    const cTotal = c.total || 0;
+                    const cSuccess = c.success || 0;
+                    const cFailed = c.cancel || 0;
+                    const cRate = cTotal > 0 ? Math.round((cSuccess / cTotal) * 100) : 0;
+                    
+                    let barColor = 'from-emerald-400 to-emerald-500';
+                    let textColor = 'text-emerald-500';
+                    let bgWidth = cTotal === 0 ? 0 : cRate;
+                    
+                    if (cTotal === 0) {
+                        barColor = 'from-slate-300 to-slate-400';
+                        textColor = 'text-slate-500';
+                    } else if (cRate < 50) {
+                        barColor = 'from-rose-400 to-rose-500';
+                        textColor = 'text-rose-500';
+                    } else if (cRate < 80) {
+                        barColor = 'from-amber-400 to-amber-500';
+                        textColor = 'text-amber-500';
+                    }
+                    
+                    return `
+                    <div class="bg-white border border-slate-200 rounded-xl p-3 px-4 hover:border-indigo-300 transition-all shadow-sm group">
+                        <div class="flex items-center gap-4">
+                            <div class="w-28 flex-shrink-0 flex items-center gap-2">
+                                <p class="font-bold text-slate-700 text-[13px] truncate" title="${c.name}">${c.name}</p>
                             </div>
-                            <div class="flex gap-2">
-                                <div class="text-right">
-                                    <p class="text-[8px] font-bold text-green-400 uppercase leading-none mb-1">Success</p>
-                                    <p class="text-[11px] font-bold text-green-600 leading-none">${c.success}</p>
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <span class="text-xs font-black ${textColor}">${cTotal === 0 ? '—' : cRate + '%'}</span>
+                                    <div class="flex items-center gap-1.5 text-[11px]">
+                                        <span class="text-slate-400 font-semibold">To: <span class="text-slate-700">${cTotal}</span></span>
+                                        <span class="text-slate-300">|</span>
+                                        <span class="text-slate-400 font-semibold">Su: <span class="text-emerald-500">${cSuccess}</span></span>
+                                        <span class="text-slate-300">|</span>
+                                        <span class="text-slate-400 font-semibold">Fa: <span class="text-rose-500">${cFailed}</span></span>
+                                    </div>
                                 </div>
-                                <div class="text-right">
-                                    <p class="text-[8px] font-bold text-red-400 uppercase leading-none mb-1">Cancel</p>
-                                    <p class="text-[11px] font-bold text-red-600 leading-none">${c.cancel}</p>
+                                <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden shadow-inner">
+                                    <div class="bg-gradient-to-r ${barColor} h-full transition-all duration-1000 ease-out" style="width: 0%" data-width="${bgWidth}"></div>
                                 </div>
+                            </div>
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center ml-2 flex-shrink-0 bg-slate-50 border border-slate-100 group-hover:bg-indigo-50 group-hover:border-indigo-100 transition-colors">
+                                <i class="fas fa-truck text-slate-400 group-hover:text-indigo-500 transition-colors"></i>
                             </div>
                         </div>
                     </div>
-                `;
-            }).join('');
-
-            breakdownDiv.innerHTML = `
-                <h3 class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-                    <i class="fas fa-chart-pie"></i> Delivery Success Breakdown
-                </h3>
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                    ${cardsHTML}
+                    `;
+                }).join('');
+            } else {
+                rowsHTML = `
+                <div class="bg-slate-50 border border-slate-200 border-dashed rounded-xl p-6 text-center text-slate-500 text-xs font-bold uppercase tracking-widest">
+                    No external courier history found
                 </div>
-            `;
+                `;
+            }
+
+            container.innerHTML = rowsHTML;
+
+            // Trigger progress bar animations after a slight delay
+            setTimeout(() => {
+                const bars = container.querySelectorAll('.bg-gradient-to-r');
+                bars.forEach(bar => {
+                    const w = bar.getAttribute('data-width');
+                    if (w) bar.style.width = w + '%';
+                });
+            }, 100);
         }
 
     } catch (err) {

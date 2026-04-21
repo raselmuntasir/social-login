@@ -21,12 +21,12 @@
         .sidebar-scroll::-webkit-scrollbar { width: 4px; }
         .sidebar-scroll::-webkit-scrollbar-thumb { background-color: #4b5563; border-radius: 4px; }
         
-        /* Custom Colors based on the screenshot */
-        .bg-brand-sidebar { background-color: #2a2a2a; }
-        .bg-brand-header { background-color: #551578; }
-        .bg-brand-search { background-color: #410f5e; }
-        .text-brand-orange { color: #f26822; }
-        .bg-brand-teal { background-color: #00a884; }
+        /* Custom Colors updated to match the new Premium UI */
+        .bg-brand-sidebar { background-color: #0f172a; } /* slate-900 */
+        .bg-brand-header { background-color: #020617; } /* slate-950 */
+        .bg-brand-search { background-color: #0f172a; } /* slate-900 */
+        .text-brand-orange { color: #818cf8; } /* indigo-400 */
+        .bg-brand-teal { background-color: #4f46e5; } /* indigo-600 */
 
 
         /* Sidebar Toggle Classes */
@@ -169,14 +169,17 @@
     </script>
 
     <!-- Sidebar -->
-    <aside id="sidebar" class="w-[240px] bg-brand-sidebar text-gray-300 flex flex-col h-full z-20 flex-shrink-0 sidebar-transition overflow-hidden border-r border-gray-800">
+    <aside id="sidebar" class="w-[240px] bg-brand-sidebar text-slate-400 flex flex-col h-full z-20 flex-shrink-0 sidebar-transition overflow-hidden border-r border-slate-800/60 shadow-2xl relative">
         <!-- Logo Area (Fixed Height Header) -->
-        <div class="h-[64px] flex items-center px-4 bg-brand-header border-b border-purple-800 border-r border-purple-900/50 shrink-0 shadow-none">
-            <button onclick="toggleSidebar()" class="text-white hover:text-white mr-3 shrink-0">
+        <div class="h-[64px] flex items-center px-4 bg-brand-header border-b border-slate-800/80 shrink-0 shadow-sm z-10 relative">
+            <button onclick="toggleSidebar()" class="text-slate-400 hover:text-indigo-400 mr-3 shrink-0 transition-colors">
                 <i class="fas fa-bars text-lg"></i>
             </button>
-            <div class="flex items-center text-cyan-400 font-bold text-xl tracking-tight logo-text truncate">
-                <i class="fas fa-shopping-bag mr-2"></i> Top One
+            <div class="flex items-center text-white font-black text-xl tracking-tighter logo-text truncate">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white mr-3 shadow-lg shadow-indigo-500/20">
+                    <i class="fas fa-bolt text-sm"></i>
+                </div>
+                Top One
             </div>
         </div>
 
@@ -184,164 +187,164 @@
         <nav class="flex-1 py-4 text-sm font-medium overflow-y-auto sidebar-scroll">
             <ul class="space-y-1 px-2">
                 <li>
-                    <a href="#/dashboard" id="link-dashboard" class="flex items-center px-3 py-2.5 text-brand-orange bg-black/20 rounded-md">
-                        <i id="icon-dashboard" class="fas fa-home w-7 text-center"></i>
+                    <a href="#/dashboard" id="link-dashboard" class="flex items-center px-3 py-2.5 text-indigo-400 bg-indigo-500/10 rounded-xl transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] shadow-indigo-500/10 group font-bold">
+                        <i id="icon-dashboard" class="fas fa-home w-8 text-center group-hover:scale-110 transition-transform"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" onclick="toggleSubmenu('submenu-orders', 'icon-orders'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                    <a href="#" onclick="toggleSubmenu('submenu-orders', 'icon-orders'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-slate-100 group font-semibold">
                         <div class="flex items-center">
-                            <i class="fas fa-clipboard-list w-7 text-center"></i>
+                            <i class="fas fa-clipboard-list w-8 text-center group-hover:text-indigo-400 transition-colors"></i>
                             <span>Orders</span>
                         </div>
                         <i id="icon-orders" class="fas fa-chevron-right text-xs opacity-50 transition-transform duration-200 chevron-icon"></i>
                     </a>
                     <ul id="submenu-orders" class="hidden mt-1 space-y-0.5">
-                        <li><a href="#/create-order" id="link-create-new" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Create New</a></li>
-                        <li><a href="#/all-orders" id="link-all-orders" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">All Orders</a></li>
+                        <li><a href="#/create-order" id="link-create-new" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Create New</a></li>
+                        <li><a href="#/all-orders" id="link-all-orders" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">All Orders</a></li>
                         <li>
                             <a href="#/status/Pending" id="link-pending" class="flex items-center justify-between pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">
                                 <span>Pending</span>
                                 <span id="sidebar-pending-count" class="hidden bg-yellow-500 text-black text-[10px] font-extrabold px-1.5 py-0.5 rounded shadow-sm min-w-[18px] text-center">0</span>
                             </a>
                         </li>
-                        <li><a href="#/status/Confirmed" id="link-confirmed" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Confirmed</a></li>
-                        <li><a href="#/status/Failed Orders" id="link-failed-orders" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Failed Orders</a></li>
-                        <li><a href="#/status/Processing" id="link-processing" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Processing</a></li>
-                        <li><a href="#/status/Hold" id="link-hold" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Hold</a></li>
-                        <li><a href="#/status/Hold Followup" id="link-hold-followup" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Hold Followup</a></li>
-                        <li><a href="#/status/In Courier" id="link-in-courier" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">In Courier</a></li>
-                        <li><a href="#/status/COD Changed" id="link-cod-changed" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">COD Changed</a></li>
-                        <li><a href="#/status/Delivered" id="link-delivered" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Delivered</a></li>
-                        <li><a href="#/status/Completed" id="link-completed" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Completed</a></li>
-                        <li><a href="#/status/Canceled" id="link-canceled" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Canceled</a></li>
-                        <li><a href="#/status/Pending Return" id="link-pending-return" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Pending Return</a></li>
-                        <li><a href="#/status/Returned" id="link-returned" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Returned</a></li>
-                        <li><a href="#/status/Damage" id="link-damage" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Damage</a></li>
-                        <li><a href="#/status/Hand Delivery" id="link-hand-delivery" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Hand Delivery</a></li>
-                        <li><a href="#/status/Hand Delivery Completed" id="link-hand-delivery-completed" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Hand Delivery Completed</a></li>
-                        <li><a href="#/status/Others" id="link-others" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Others</a></li>
+                        <li><a href="#/status/Confirmed" id="link-confirmed" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Confirmed</a></li>
+                        <li><a href="#/status/Failed Orders" id="link-failed-orders" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Failed Orders</a></li>
+                        <li><a href="#/status/Processing" id="link-processing" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Processing</a></li>
+                        <li><a href="#/status/Hold" id="link-hold" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Hold</a></li>
+                        <li><a href="#/status/Hold Followup" id="link-hold-followup" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Hold Followup</a></li>
+                        <li><a href="#/status/In Courier" id="link-in-courier" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">In Courier</a></li>
+                        <li><a href="#/status/COD Changed" id="link-cod-changed" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">COD Changed</a></li>
+                        <li><a href="#/status/Delivered" id="link-delivered" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Delivered</a></li>
+                        <li><a href="#/status/Completed" id="link-completed" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Completed</a></li>
+                        <li><a href="#/status/Canceled" id="link-canceled" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Canceled</a></li>
+                        <li><a href="#/status/Pending Return" id="link-pending-return" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Pending Return</a></li>
+                        <li><a href="#/status/Returned" id="link-returned" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Returned</a></li>
+                        <li><a href="#/status/Damage" id="link-damage" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Damage</a></li>
+                        <li><a href="#/status/Hand Delivery" id="link-hand-delivery" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Hand Delivery</a></li>
+                        <li><a href="#/status/Hand Delivery Completed" id="link-hand-delivery-completed" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Hand Delivery Completed</a></li>
+                        <li><a href="#/status/Others" id="link-others" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Others</a></li>
                         <!-- Dynamic Additional Statuses (injected by SettingsManager) -->
                         <div id="sidebar-additional-statuses"></div>
                     </ul>
                 </li>
                 <li>
-                    <a href="#" onclick="toggleSubmenu('submenu-more', 'icon-more'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                    <a href="#" onclick="toggleSubmenu('submenu-more', 'icon-more'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-slate-100 group font-semibold">
                         <div class="flex items-center">
-                            <i class="fas fa-plus-circle w-7 text-center"></i>
+                            <i class="fas fa-plus-circle w-8 text-center group-hover:text-indigo-400 transition-colors"></i>
                             <span>More Actions</span>
                         </div>
                         <i id="icon-more" class="fas fa-chevron-right text-xs opacity-50 transition-transform duration-200 chevron-icon"></i>
                     </a>
                     <ul id="submenu-more" class="hidden mt-1 space-y-0.5">
-                        <li><a href="#/return-collection" id="link-return-collection" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Return Collection</a></li>
-                        <li><a href="#/courier-payment" id="link-courier-payment" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Courier Payment Validate</a></li>
-                        <li><a href="#/bulk-print" id="link-bulk-print" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Bulk Print</a></li>
-                        <li><a href="#/send-courier" id="link-send-courier" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Send Courier by Barcode</a></li>
-                        <li><a href="#/payments" id="link-payments" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Payments</a></li>
+                        <li><a href="#/return-collection" id="link-return-collection" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Return Collection</a></li>
+                        <li><a href="#/courier-payment" id="link-courier-payment" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Courier Payment Validate</a></li>
+                        <li><a href="#/bulk-print" id="link-bulk-print" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Bulk Print</a></li>
+                        <li><a href="#/send-courier" id="link-send-courier" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Send Courier by Barcode</a></li>
+                        <li><a href="#/payments" id="link-payments" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Payments</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#/pre-orders" id="link-pre-orders" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
-                        <i class="fas fa-file-invoice w-7 text-center"></i>
+                    <a href="#/pre-orders" id="link-pre-orders" class="flex items-center px-3 py-2.5 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-slate-100 group font-semibold">
+                        <i class="fas fa-file-invoice w-8 text-center group-hover:text-indigo-400 transition-colors"></i>
                         <span>Pre Orders/Lead</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
-                        <i class="fas fa-desktop w-7 text-center"></i>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-slate-100 group font-semibold">
+                        <i class="fas fa-desktop w-8 text-center group-hover:text-indigo-400 transition-colors"></i>
                         <span>POS</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#/customers" id="link-customers" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
-                        <i class="fas fa-users w-7 text-center"></i>
+                    <a href="#/customers" id="link-customers" class="flex items-center px-3 py-2.5 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-slate-100 group font-semibold">
+                        <i class="fas fa-users w-8 text-center group-hover:text-indigo-400 transition-colors"></i>
                         <span>Customers</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
-                        <i class="fas fa-paper-plane w-7 text-center"></i>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-slate-100 group font-semibold">
+                        <i class="fas fa-paper-plane w-8 text-center group-hover:text-indigo-400 transition-colors"></i>
                         <span>Steadfast Notifications</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
-                        <i class="fas fa-calendar-check w-7 text-center"></i>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-slate-100 group font-semibold">
+                        <i class="fas fa-calendar-check w-8 text-center group-hover:text-indigo-400 transition-colors"></i>
                         <span>Followups</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" id="link-inventory" onclick="toggleSubmenu('submenu-inventory', 'icon-inventory'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                    <a href="#" id="link-inventory" onclick="toggleSubmenu('submenu-inventory', 'icon-inventory'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-slate-100 group font-semibold">
                         <div class="flex items-center">
-                            <i class="fas fa-boxes w-7 text-center"></i>
+                            <i class="fas fa-boxes w-8 text-center group-hover:text-indigo-400 transition-colors"></i>
                             <span>Inventory</span>
                         </div>
                         <i id="icon-inventory" class="fas fa-chevron-right text-xs opacity-50 transition-transform duration-200 chevron-icon"></i>
                     </a>
                     <ul id="submenu-inventory" class="hidden mt-1 space-y-0.5">
-                        <li><a href="#/products" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Product</a></li>
-                        <li><a href="#/suppliers" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Suppliers</a></li>
-                        <li><a href="#/purchase" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Purchase</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Purchase Returns</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Manufacture</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Mixer</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Stock Adjustment</a></li>
+                        <li><a href="#/products" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Product</a></li>
+                        <li><a href="#/suppliers" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Suppliers</a></li>
+                        <li><a href="#/purchase" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Purchase</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Purchase Returns</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Manufacture</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Mixer</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Stock Adjustment</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
-                        <i class="fas fa-question-circle w-7 text-center"></i>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-slate-100 group font-semibold">
+                        <i class="fas fa-question-circle w-8 text-center group-hover:text-indigo-400 transition-colors"></i>
                         <span>Support Tickets</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
-                        <i class="fas fa-wallet w-7 text-center"></i>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-slate-100 group font-semibold">
+                        <i class="fas fa-wallet w-8 text-center group-hover:text-indigo-400 transition-colors"></i>
                         <span>Other Expense</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
-                        <i class="fas fa-money-bill-wave w-7 text-center"></i>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-slate-100 group font-semibold">
+                        <i class="fas fa-money-bill-wave w-8 text-center group-hover:text-indigo-400 transition-colors"></i>
                         <span>Other Incomes</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" onclick="toggleSubmenu('submenu-report', 'icon-report'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                    <a href="#" onclick="toggleSubmenu('submenu-report', 'icon-report'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-slate-100 group font-semibold">
                         <div class="flex items-center">
-                            <i class="fas fa-chart-pie w-7 text-center"></i>
+                            <i class="fas fa-chart-pie w-8 text-center group-hover:text-indigo-400 transition-colors"></i>
                             <span>Report</span>
                         </div>
                         <i id="icon-report" class="fas fa-chevron-right text-xs opacity-50 transition-transform duration-200 chevron-icon"></i>
                     </a>
                     <ul id="submenu-report" class="hidden mt-1 space-y-0.5">
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Report Summary</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Repeat Customers</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Product</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">POS</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Product Daily Sales</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Top Return Products</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Top Sold Products</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Top Purchased Products</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Lowest Stock Products</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Login Histories</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Employee Activities</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Orders by Employee</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Up-Sales</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Exports</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Report Summary</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Repeat Customers</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Product</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">POS</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Product Daily Sales</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Top Return Products</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Top Sold Products</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Top Purchased Products</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Lowest Stock Products</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Login Histories</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Employee Activities</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Orders by Employee</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Up-Sales</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Exports</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
-                        <i class="fas fa-ticket-alt w-7 text-center"></i>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-slate-100 group font-semibold">
+                        <i class="fas fa-ticket-alt w-8 text-center group-hover:text-indigo-400 transition-colors"></i>
                         <span>Coupons</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
-                        <i class="fas fa-trash-alt w-7 text-center"></i>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-slate-100 group font-semibold">
+                        <i class="fas fa-trash-alt w-8 text-center group-hover:text-indigo-400 transition-colors"></i>
                         <span>Recycle Bin</span>
                     </a>
                 </li>
@@ -349,58 +352,58 @@
                 <!-- Account Section -->
                 <li class="px-3 pt-6 pb-2 text-[11px] font-bold text-gray-500 uppercase tracking-wider account-header">Account</li>
                 <li>
-                    <a href="#" onclick="toggleSubmenu('submenu-settings', 'icon-settings'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                    <a href="#" onclick="toggleSubmenu('submenu-settings', 'icon-settings'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-slate-100 group font-semibold">
                         <div class="flex items-center">
-                            <i class="fas fa-cog w-7 text-center"></i>
+                            <i class="fas fa-cog w-8 text-center group-hover:text-indigo-400 transition-colors"></i>
                             <span>Settings</span>
                         </div>
                         <i id="icon-settings" class="fas fa-chevron-right text-xs opacity-50 transition-transform duration-200 chevron-icon"></i>
                     </a>
                     <ul id="submenu-settings" class="hidden mt-1 space-y-0.5">
-                        <li><a href="#/settings/general" id="link-general-settings" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">General Settings</a></li>
-                        <li><a href="#/settings/website" id="link-website-settings" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Website/Landing Page</a></li>
-                        <li><a href="#/settings/courier" id="link-courier-settings" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Courier</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">SMS</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Email</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Import</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Product Categories</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Product Brands</a></li>
-                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Product Attributes</a></li>
+                        <li><a href="#/settings/general" id="link-general-settings" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">General Settings</a></li>
+                        <li><a href="#/settings/website" id="link-website-settings" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Website/Landing Page</a></li>
+                        <li><a href="#/settings/courier" id="link-courier-settings" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Courier</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">SMS</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Email</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Import</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Product Categories</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Product Brands</a></li>
+                        <li><a href="#" class="block pl-11 pr-3 py-2 text-[12px] font-medium text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">Product Attributes</a></li>
                     </ul>
                 </li>
                 <li>
-                    <a href="#/roles" id="link-roles" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white nav-link">
-                        <i class="fas fa-user-tag w-7 text-center nav-icon"></i>
+                    <a href="#/roles" id="link-roles" class="flex items-center px-3 py-2.5 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-slate-100 group font-semibold nav-link">
+                        <i class="fas fa-user-tag w-8 text-center group-hover:text-indigo-400 transition-colors nav-icon"></i>
                         <span>Roles</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#/admins" id="link-admins" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white nav-link">
-                        <i class="fas fa-user-shield w-7 text-center nav-icon"></i>
+                    <a href="#/admins" id="link-admins" class="flex items-center px-3 py-2.5 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-slate-100 group font-semibold nav-link">
+                        <i class="fas fa-user-shield w-8 text-center group-hover:text-indigo-400 transition-colors nav-icon"></i>
                         <span>Admins</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
-                        <i class="fas fa-credit-card w-7 text-center"></i>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-slate-100 group font-semibold">
+                        <i class="fas fa-credit-card w-8 text-center group-hover:text-indigo-400 transition-colors"></i>
                         <span>Billing</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
-                        <i class="fas fa-times w-7 text-center"></i>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-slate-100 group font-semibold">
+                        <i class="fas fa-times w-8 text-center group-hover:text-indigo-400 transition-colors"></i>
                         <span>IP/Mobile Blocked</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
-                        <i class="fas fa-sitemap w-7 text-center"></i>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-slate-100 group font-semibold">
+                        <i class="fas fa-sitemap w-8 text-center group-hover:text-indigo-400 transition-colors"></i>
                         <span>Affiliate</span>
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
-                        <i class="fab fa-whatsapp w-7 text-center"></i>
+                    <a href="#" class="flex items-center px-3 py-2.5 hover:bg-white/5 rounded-xl transition-all text-slate-400 hover:text-slate-100 group font-semibold">
+                        <i class="fab fa-whatsapp w-8 text-center group-hover:text-indigo-400 transition-colors"></i>
                         <span>Contact Support <i class="fas fa-external-link-alt text-[9px] ml-1 opacity-50"></i></span>
                     </a>
                 </li>
