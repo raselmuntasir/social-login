@@ -53,20 +53,7 @@ const adminsHTML = `
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="px-3 py-4 text-center border-r border-gray-100">1</td>
-                            <td class="px-3 py-4 border-r border-gray-100">
-                                <div class="font-bold text-gray-800">MD Rasel</div>
-                                <div class="text-gray-500">01710501210</div>
-                                <div class="text-gray-400">raselmoontasir@gmail.com</div>
-                            </td>
-                            <td class="px-3 py-4 text-center border-r border-gray-100 text-gray-400">n/a</td>
-                            <td class="px-3 py-4 text-center border-r border-gray-100 text-gray-400">n/a</td>
-                            <td class="px-3 py-4 text-center border-r border-gray-100 text-gray-400">n/a</td>
-                            <td class="px-3 py-4 text-center border-r border-gray-100">
-                                <span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-[10px] font-bold">Active</span>
-                            </td>
-                            <td class="px-3 py-4 text-center border-r border-gray-100 text-gray-400">n/a</td>
-                            <td class="px-3 py-4 text-right text-gray-400">n/a</td>
+                            <td colspan="8" class="px-3 py-6 text-center text-gray-400 bg-gray-50/50">No data available in table</td>
                         </tr>
                     </tbody>
                 </table>

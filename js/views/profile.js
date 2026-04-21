@@ -69,21 +69,21 @@ const profileHTML = `
                                 <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Full Name</label>
                                 <div class="relative">
                                     <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm"></i>
-                                    <input type="text" id="profile-name" value="MD Rasel" class="w-full bg-gray-50/50 border border-gray-100 rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/10 focus:border-purple-500 transition-all text-gray-700">
+                                    <input type="text" id="profile-name" value="" placeholder="Enter your name" class="w-full bg-gray-50/50 border border-gray-100 rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/10 focus:border-purple-500 transition-all text-gray-700">
                                 </div>
                             </div>
                             <div class="space-y-2">
                                 <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Email Address</label>
                                 <div class="relative">
                                     <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm"></i>
-                                    <input type="email" id="profile-email" value="raselmoontasir@gmail.com" class="w-full bg-gray-50/50 border border-gray-100 rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/10 focus:border-purple-500 transition-all text-gray-700">
+                                    <input type="email" id="profile-email" value="" placeholder="email@example.com" class="w-full bg-gray-50/50 border border-gray-100 rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/10 focus:border-purple-500 transition-all text-gray-700">
                                 </div>
                             </div>
                             <div class="space-y-2">
                                 <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Mobile Number</label>
                                 <div class="relative">
                                     <i class="fas fa-phone-alt absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-sm"></i>
-                                    <input type="text" id="profile-mobile" value="01710501210" class="w-full bg-gray-50/50 border border-gray-100 rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/10 focus:border-purple-500 transition-all text-gray-700">
+                                    <input type="text" id="profile-mobile" value="" placeholder="01XXXXXXXXX" class="w-full bg-gray-50/50 border border-gray-100 rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/10 focus:border-purple-500 transition-all text-gray-700">
                                 </div>
                             </div>
                         </div>
@@ -91,7 +91,7 @@ const profileHTML = `
                             <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Mailing Address</label>
                             <div class="relative">
                                 <i class="fas fa-map-marker-alt absolute left-4 top-4 text-gray-300 text-sm"></i>
-                                <textarea id="profile-address" rows="3" class="w-full bg-gray-50/50 border border-gray-100 rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/10 focus:border-purple-500 transition-all text-gray-700">550/c, Khilgaon, Dhaka, bangladesh.</textarea>
+                                <textarea id="profile-address" rows="3" placeholder="Enter your full address" class="w-full bg-gray-50/50 border border-gray-100 rounded-xl pl-11 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/10 focus:border-purple-500 transition-all text-gray-700"></textarea>
                             </div>
                         </div>
                         

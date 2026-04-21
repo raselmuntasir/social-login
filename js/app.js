@@ -1604,7 +1604,7 @@ async function loadGlobalUserProfile() {
 }
 
 function applyProfileToUI(settings) {
-    const name = settings['admin_name'] || 'Top One Bazar';
+    const name = settings['admin_name'] || 'Admin';
     const imageUrl = settings['admin_image'];
 
     const headerName = document.getElementById('header-user-name');
@@ -1638,7 +1638,7 @@ async function initProfilePage() {
     try {
         const settings = await AppAPI.getSettings();
         
-        const adminName = settings['admin_name'] || 'Top One Bazar';
+        const adminName = settings['admin_name'] || 'Admin';
         if (settings['admin_name']) document.getElementById('profile-name').value = settings['admin_name'];
         if (settings['admin_email']) document.getElementById('profile-email').value = settings['admin_email'];
         if (settings['admin_mobile']) document.getElementById('profile-mobile').value = settings['admin_mobile'];

@@ -56,7 +56,6 @@ const statusOrdersHTML = (statusLabel) => `
                     <select class="w-full border border-gray-300 rounded-lg px-4 py-2 text-xs focus:ring-2 focus:ring-indigo-100 outline-none transition-all bg-white custom-select">
                         <option>All Employee</option>
                         <option>Not Assigned</option>
-                        <option>MD Rasel</option>
                     </select>
                 </div>
 
