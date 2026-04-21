@@ -27,11 +27,7 @@
         .bg-brand-search { background-color: #410f5e; }
         .text-brand-orange { color: #f26822; }
         .bg-brand-teal { background-color: #00a884; }
-        .bg-card-purple { background-color: #551578; }
-        .bg-card-teal { background-color: #108e89; }
-        .bg-card-yellow { background-color: #eee077; }
-        .bg-card-orange { background-color: #f5b97d; }
-        .bg-card-dark { background-color: #333333; }
+
 
         /* Sidebar Toggle Classes */
         .sidebar-transition { transition: all 0.3s ease; }
@@ -65,6 +61,13 @@
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('sidebar-collapsed');
+        }
+
+        function toggleSubmenu(id, iconId) {
+            const submenu = document.getElementById(id);
+            const icon = document.getElementById(iconId);
+            if(submenu) submenu.classList.toggle('hidden');
+            if(icon) icon.classList.toggle('rotate-90');
         }
     </script>
     <!-- Custom Tooltip CSS -->
@@ -186,7 +189,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" onclick="document.getElementById('submenu-orders').classList.toggle('hidden'); document.getElementById('icon-orders').classList.toggle('rotate-90'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                    <a href="#" onclick="toggleSubmenu('submenu-orders', 'icon-orders'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
                         <div class="flex items-center">
                             <i class="fas fa-clipboard-list w-7 text-center"></i>
                             <span>Orders</span>
@@ -221,12 +224,12 @@
                     </ul>
                 </li>
                 <li>
-                    <a href="#" onclick="document.getElementById('submenu-more').classList.toggle('hidden'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                    <a href="#" onclick="toggleSubmenu('submenu-more', 'icon-more'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
                         <div class="flex items-center">
                             <i class="fas fa-plus-circle w-7 text-center"></i>
                             <span>More Actions</span>
                         </div>
-                        <i class="fas fa-chevron-right text-xs opacity-50"></i>
+                        <i id="icon-more" class="fas fa-chevron-right text-xs opacity-50 transition-transform duration-200 chevron-icon"></i>
                     </a>
                     <ul id="submenu-more" class="hidden mt-1 space-y-0.5">
                         <li><a href="#/return-collection" id="link-return-collection" class="block pl-11 pr-3 py-2 text-[13px] text-gray-400 hover:text-white hover:bg-black/20 rounded-md transition-colors">Return Collection</a></li>
@@ -267,7 +270,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" id="link-inventory" onclick="document.getElementById('submenu-inventory').classList.toggle('hidden'); document.getElementById('icon-inventory').classList.toggle('rotate-90'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                    <a href="#" id="link-inventory" onclick="toggleSubmenu('submenu-inventory', 'icon-inventory'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
                         <div class="flex items-center">
                             <i class="fas fa-boxes w-7 text-center"></i>
                             <span>Inventory</span>
@@ -303,7 +306,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#" onclick="document.getElementById('submenu-report').classList.toggle('hidden'); document.getElementById('icon-report').classList.toggle('rotate-90'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                    <a href="#" onclick="toggleSubmenu('submenu-report', 'icon-report'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
                         <div class="flex items-center">
                             <i class="fas fa-chart-pie w-7 text-center"></i>
                             <span>Report</span>
@@ -343,7 +346,7 @@
                 <!-- Account Section -->
                 <li class="px-3 pt-6 pb-2 text-[11px] font-bold text-gray-500 uppercase tracking-wider account-header">Account</li>
                 <li>
-                    <a href="#" onclick="document.getElementById('submenu-settings').classList.toggle('hidden'); document.getElementById('icon-settings').classList.toggle('rotate-90'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
+                    <a href="#" onclick="toggleSubmenu('submenu-settings', 'icon-settings'); return false;" class="flex items-center justify-between px-3 py-2.5 hover:bg-black/20 rounded-md transition-colors text-gray-300 hover:text-white">
                         <div class="flex items-center">
                             <i class="fas fa-cog w-7 text-center"></i>
                             <span>Settings</span>
@@ -448,7 +451,7 @@
                 <div class="relative px-2">
                     <div id="profile-trigger" onclick="toggleProfileDropdown(event)" class="flex items-center space-x-3 pl-4 ml-2 border-l border-white/20 cursor-pointer group">
                         <div class="text-right hidden md:block">
-                            <p id="header-user-name" class="text-[13px] font-bold leading-none truncate max-w-[120px]">Rasel Muntasir</p>
+                            <p id="header-user-name" class="text-[13px] font-bold leading-none truncate max-w-[120px]">Admin</p>
                             <p class="text-[10px] text-purple-200 mt-1">Super Admin</p>
                         </div>
                         <div class="w-9 h-9 rounded-full bg-white/20 border border-white/30 overflow-hidden flex items-center justify-center shadow-sm group-hover:border-white transition-all relative">
@@ -468,7 +471,7 @@
                     <!-- Profile Dropdown -->
                     <div id="profile-dropdown" class="hidden absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[100] transform transition-all duration-200">
                         <div class="p-5 border-b border-gray-50 text-center bg-gray-50/50">
-                            <p id="dropdown-user-name" class="text-[15px] font-bold text-gray-800">Rasel Muntasir</p>
+                            <p id="dropdown-user-name" class="text-[15px] font-bold text-gray-800">Admin</p>
                             <div class="mt-2 flex items-center justify-center space-x-1.5">
                                 <span class="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
                                 <span class="text-[10px] font-extrabold text-gray-400 tracking-widest uppercase">Active Employees</span>
@@ -497,20 +500,8 @@
         <!-- Main Content Area -->
         <main class="flex-1 overflow-y-auto bg-gray-100 p-4 md:p-6 flex flex-col">
             
-            <!-- Professional Trial Banner -->
 
 
-            <style>
-                @keyframes pulse-subtle {
-                    0%, 100% { opacity: 1; }
-                    50% { opacity: 0.95; }
-                }
-                .animate-pulse-subtle {
-                    animation: pulse-subtle 3s infinite ease-in-out;
-                }
-            </style>
-
-            <!-- View Container -->
             <!-- View Container -->
             <div id="view-container" class="flex-1">
                 <!-- Views will be injected here via app.js -->

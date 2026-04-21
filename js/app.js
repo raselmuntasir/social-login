@@ -45,6 +45,61 @@ function resetSidebarLinks() {
     });
 }
 
+// ─── Routing & Loading Navigation ───
+function getLoaderHTML() {
+    return `
+        <div id="page-loader" class="flex flex-col items-center justify-center h-full space-y-4">
+            <div class="relative w-16 h-16">
+                <div class="absolute inset-0 border-4 border-purple-100 rounded-full"></div>
+                <div class="absolute inset-0 border-4 border-purple-600 rounded-full border-t-transparent animate-spin"></div>
+            </div>
+            <div class="flex flex-col items-center">
+                <p class="text-sm font-bold text-gray-400 uppercase tracking-widest">Loading Data</p>
+                <p class="text-[10px] text-gray-300 mt-1 uppercase tracking-tighter">Please wait a moment...</p>
+            </div>
+        </div>
+    `;
+}
+
+async function navigateTo(viewHTML, initFn) {
+    const container = document.getElementById('view-container');
+    if (!container) return;
+
+    // 1. Show Loader
+    container.innerHTML = getLoaderHTML();
+    
+    // 2. Prepare content hidden initially
+    const tempDiv = document.createElement('div');
+    tempDiv.className = 'opacity-0 transition-opacity duration-300 flex-1 flex flex-col h-full';
+    tempDiv.innerHTML = viewHTML;
+    
+    // Append to container immediately (so init functions can find elements)
+    // but keep it hidden via opacity
+    container.appendChild(tempDiv);
+    
+    // 3. Initialize content (fetch data)
+    try {
+        if (initFn) await initFn();
+    } catch (err) {
+        console.error('Initialization error:', err);
+    }
+
+    // 4. Show content and remove loader
+    const loader = document.getElementById('page-loader');
+    if (loader) {
+        loader.classList.add('opacity-0');
+        setTimeout(() => loader.remove(), 300);
+    }
+    
+    requestAnimationFrame(() => {
+        tempDiv.classList.remove('opacity-0');
+        tempDiv.classList.add('opacity-100');
+    });
+    
+    // Initialize icons if any
+    if (window.lucide) window.lucide.createIcons();
+}
+
 // Router logic
 async function handleRouting() {
     const hash = window.location.hash || '#/dashboard';
@@ -57,90 +112,88 @@ async function handleRouting() {
     resetSidebarLinks();
 
     if (hash === '#/dashboard') {
-        container.innerHTML = dashboardHTML;
         highlightLink('link-dashboard');
-        const dbIcon = document.getElementById('icon-dashboard');
-        if (dbIcon) dbIcon.className = 'fas fa-home w-7 text-center';
+        navigateTo(dashboardHTML, async () => {
+            const dbIcon = document.getElementById('icon-dashboard');
+            if (dbIcon) dbIcon.className = 'fas fa-home w-7 text-center';
+        });
     } else if (hash === '#/profile') {
-        container.innerHTML = profileHTML;
-        initProfilePage();
+        navigateTo(profileHTML, initProfilePage);
     } else if (hash === '#/create-order') {
-        container.innerHTML = createOrderHTML;
         highlightLink('link-create-new', true);
-        initOrderCalculations();
-        fetchSteadfastDistricts();
-        initOrderForm();
-        fetchProductsForOrder();
-        initNumericFields();
+        navigateTo(createOrderHTML, async () => {
+            initOrderCalculations();
+            await fetchSteadfastDistricts();
+            initOrderForm();
+            await fetchProductsForOrder();
+            initNumericFields();
+        });
     } else if (hash === '#/products') {
-        container.innerHTML = productListHTML;
         highlightLink('link-inventory', false);
-        fetchAllProducts();
+        navigateTo(productListHTML, fetchAllProducts);
     } else if (hash === '#/create-product') {
-        container.innerHTML = createProductHTML;
         highlightLink('link-inventory', false);
-        initProductForm();
-        
-        // Lazy-load CKEditor only when needed (saves ~2MB on all other pages)
-        loadCKEditorLazy();
+        navigateTo(createProductHTML, async () => {
+            initProductForm();
+            loadCKEditorLazy();
+        });
     } else if (hash === '#/purchase') {
-        container.innerHTML = purchaseHTML;
         highlightLink('link-inventory', false);
+        navigateTo(purchaseHTML);
     } else if (hash === '#/roles') {
-        container.innerHTML = rolesHTML;
         highlightLink('link-roles', false);
+        navigateTo(rolesHTML);
     } else if (hash === '#/admins') {
-        container.innerHTML = adminsHTML;
         highlightLink('link-admins', false);
+        navigateTo(adminsHTML);
     } else if (hash === '#/settings/general') {
-        container.innerHTML = settingsGeneralHTML;
         highlightLink('link-general-settings', true);
-        initGeneralSettings();
+        navigateTo(settingsGeneralHTML, initGeneralSettings);
     } else if (hash === '#/settings/website') {
-        container.innerHTML = settingsWebsiteHTML;
         highlightLink('link-website-settings', true);
+        navigateTo(settingsWebsiteHTML);
     } else if (hash === '#/settings/courier') {
-        container.innerHTML = settingsCourierHTML;
         highlightLink('link-courier-settings', true);
-        initCourierSettings();
-        loadCourierSettings();
+        navigateTo(settingsCourierHTML, async () => {
+            initCourierSettings();
+            await loadCourierSettings();
+        });
     } else if (hash === '#/suppliers') {
-        container.innerHTML = suppliersHTML;
         highlightLink('link-inventory', false);
+        navigateTo(suppliersHTML);
     } else if (hash === '#/all-orders') {
-        container.innerHTML = allOrdersHTML;
         highlightLink('link-all-orders', true);
-        setTimeout(() => fetchAllOrders(), 50);
+        navigateTo(allOrdersHTML, fetchAllOrders);
     } else if (hash === '#/return-collection') {
-        container.innerHTML = returnCollectionHTML;
         highlightLink('link-return-collection', true);
+        navigateTo(returnCollectionHTML);
     } else if (hash === '#/courier-payment') {
-        container.innerHTML = courierPaymentHTML;
         highlightLink('link-courier-payment', true);
+        navigateTo(courierPaymentHTML);
     } else if (hash === '#/bulk-print') {
-        container.innerHTML = bulkPrintHTML;
         highlightLink('link-bulk-print', true);
+        navigateTo(bulkPrintHTML);
     } else if (hash === '#/send-courier') {
-        container.innerHTML = sendCourierHTML;
         highlightLink('link-send-courier', true);
+        navigateTo(sendCourierHTML);
     } else if (hash === '#/payments') {
-        container.innerHTML = paymentsHTML;
         highlightLink('link-payments', true);
+        navigateTo(paymentsHTML);
     } else if (hash === '#/pre-orders') {
-        container.innerHTML = preOrdersHTML;
         highlightLink('link-pre-orders');
+        navigateTo(preOrdersHTML);
     } else if (hash === '#/customers') {
-        container.innerHTML = customersHTML;
         highlightLink('link-customers');
-        fetchCustomers();
+        navigateTo(customersHTML, fetchCustomers);
     } else if (hash === '#/roles') {
-        container.innerHTML = rolesHTML;
         highlightLink('link-roles');
-        fetchRoles();
+        navigateTo(rolesHTML, fetchRoles);
     } else if (hash.startsWith('#/status/')) {
         const status = decodeURIComponent(hash.replace('#/status/', ''));
-        showOrdersByStatus(status);
-        setTimeout(initBulkActions, 200); // Initialize bulk actions for status view
+        navigateTo(statusOrdersHTML(status), async () => {
+            await showOrdersByStatus(status);
+            initBulkActions();
+        });
     }
 
     // Always refresh counts for sidebar badges
@@ -215,10 +268,9 @@ function showView(viewName) {
 }
 
 // Show orders filtered by a specific status
-function showOrdersByStatus(status) {
+async function showOrdersByStatus(status) {
     const container = document.getElementById('view-container');
-    container.innerHTML = statusOrdersHTML(status);
-
+    
     // Highlight the matching status link
     const statusIdMap = {
         'Pending': 'link-pending', 'Confirmed': 'link-confirmed', 'Failed Orders': 'link-failed-orders',
@@ -234,7 +286,7 @@ function showOrdersByStatus(status) {
         highlightLink(linkId, true);
     }
     
-    setTimeout(() => fetchOrdersByStatus(status), 50);
+    await fetchOrdersByStatus(status);
 }
 
 // Supabase Initialization
@@ -260,7 +312,7 @@ async function fetchOrders() {
         const data = await AppAPI.getOrders();
         updateDashboardStats(data);
         renderTable(data.slice(0, 10)); // Show top 10 recent
-        fetchLowStockProducts();
+        await fetchLowStockProducts();
     } catch (error) {
         console.error('Error fetching dashboard data:', error);
     }
@@ -1648,13 +1700,32 @@ async function initProfilePage() {
         const displayName = document.getElementById('profile-display-name');
         if (displayName) displayName.innerText = adminName;
 
-        // Show profile picture if available, otherwise show default SVG avatar
+        // Show profile picture only after it has successfully loaded
         const picDefault = document.getElementById('profile-pic-default');
-        if (settings['admin_image']) {
-            profilePicPreview.src = settings['admin_image'];
-            profilePicPreview.classList.remove('hidden');
-            if (picDefault) picDefault.classList.add('hidden');
+        const adminImgValue = settings['admin_image'];
+        const hasValidUrl = adminImgValue && 
+                           adminImgValue.trim() !== '' && 
+                           adminImgValue !== 'null' && 
+                           adminImgValue !== 'undefined' &&
+                           (adminImgValue.startsWith('http') || adminImgValue.startsWith('data:image'));
+
+        if (hasValidUrl) {
+            // First set the src but keep it hidden
+            profilePicPreview.src = adminImgValue;
+            
+            // Only toggle visibility after success
+            profilePicPreview.onload = function() {
+                profilePicPreview.classList.remove('hidden');
+                if (picDefault) picDefault.classList.add('hidden');
+            };
+
+            // If image fails to load, stay on default
+            profilePicPreview.onerror = function() {
+                profilePicPreview.classList.add('hidden');
+                if (picDefault) picDefault.classList.remove('hidden');
+            };
         } else {
+            profilePicPreview.src = '';
             profilePicPreview.classList.add('hidden');
             if (picDefault) picDefault.classList.remove('hidden');
         }
