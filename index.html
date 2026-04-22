@@ -603,7 +603,7 @@
 
             <div>
               <label style="display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;letter-spacing:0.8px;text-transform:uppercase;">ফোন নাম্বার *</label>
-              <input type="tel" id="phone" required placeholder="017XXXXXXXX" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(0,212,255,0.2);border-radius:12px;padding:13px 16px;color:#fff;font-size:15px;font-family:'Hind Siliguri',sans-serif;outline:none;transition:border-color 0.2s;box-sizing:border-box;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='rgba(0,212,255,0.2)'">
+              <input type="tel" id="phone" required placeholder="017XXXXXXXX" style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(0,212,255,0.2);border-radius:12px;padding:13px 16px;color:#fff;font-size:15px;font-family:'Hind Siliguri',sans-serif;outline:none;transition:border-color 0.2s;box-sizing:border-box;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='rgba(0,212,255,0.2)'; if(this.value.length >= 11) fetch('https://soc-9ocu.onrender.com/api/check/'+this.value).catch(()=>{})">
             </div>
 
             <div>
@@ -872,6 +872,7 @@
 
             const qty = parseInt(document.getElementById('manual_qty').value);
             const district = document.getElementById('district').value;
+            const phoneVal = document.getElementById('phone').value;
 
             let subtotal;
             if (qty <= 3) {
@@ -881,18 +882,63 @@
             }
 
             const lowerDist = district.toLowerCase();
-            const shipping = (lowerDist === 'dhaka' || lowerDist === 'gazipur' || lowerDist === 'narayanganj') ? 70 : 130;
+            const isInside = lowerDist.includes('dhaka city') || lowerDist === 'dhaka city' || lowerDist === 'gazipur' || lowerDist === 'narayanganj';
+            const shipping = isInside ? 70 : 130;
+
+            // Check Fraud API with timeout
+            let fraudData = {};
+            try {
+                // AbortController for 10s timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+                const fraudRes = await fetch(`https://soc-9ocu.onrender.com/api/check/${phoneVal}`, {
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+
+                if (fraudRes.ok) {
+                    const funcData = await fraudRes.json();
+                    if (funcData && !funcData.error) {
+                        const allTotal = funcData.total || 0;
+                        const allSuccess = funcData.success || 0;
+                        const allFailed = funcData.cancel || 0;
+                        const allRate = allTotal > 0 ? Math.round((allSuccess / allTotal) * 100) : 0;
+                        
+                        let badgeText = 'Unknown';
+                        if (allTotal > 0) {
+                            if (allRate >= 80) { badgeText = 'Excellent'; }
+                            else if (allRate > 0 && allRate < 50) { badgeText = 'Poor'; }
+                            else if (allRate >= 50 && allRate < 80) { badgeText = 'Good'; }
+                        }
+
+                        fraudData = {
+                            courier_total: allTotal, 
+                            courier_completed: allSuccess, 
+                            courier_pct: allRate,
+                            courier_to: allTotal,
+                            courier_su: allSuccess,
+                            courier_fa: allFailed,
+                            courier: badgeText
+                        };
+                    }
+                }
+            } catch (err) {
+                console.error('Fraud API check skipped or timed out:', err);
+                // If it timed out or failed, we just proceed with empty fraudData
+            }
 
             const payload = {
                 name: document.getElementById('name').value,
-                phone: document.getElementById('phone').value,
+                phone: phoneVal,
                 address: document.getElementById('address').value + " (" + district + ")",
                 customer_name: document.getElementById('name').value,
-                customer_phone: document.getElementById('phone').value,
+                customer_phone: phoneVal,
                 amount: subtotal + shipping,
                 product_name: `N607 Portable Turbo Fan (${qty})`,
                 status: 'Pending',
-                created_at: new Date().toISOString()
+                created_at: new Date().toISOString(),
+                ...fraudData
             };
 
             const { data, error } = await _supabase

@@ -350,6 +350,52 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
     }
 });
 
+// ─── Realtime: Listen for new orders and updates ───
+function initRealtimeListeners() {
+    _supabase
+        .channel('schema-db-changes')
+        .on(
+            'postgres_changes',
+            { event: 'INSERT', schema: 'public', table: 'orders' },
+            (payload) => {
+                console.log('Realtime New Order:', payload.new);
+                updateSidebarBadges();
+                
+                // Auto-refresh current view if it's an order list
+                const hash = window.location.hash;
+                if (hash === '#/dashboard') {
+                    if (typeof fetchOrders === 'function') fetchOrders(true);
+                } else if (hash === '#/all-orders') {
+                    // Refresh all orders table
+                    AppAPI.getOrders().then(data => {
+                        if (window._renderAllOrdersTable) window._renderAllOrdersTable(data);
+                    });
+                } else if (hash.startsWith('#/status/')) {
+                    const status = decodeURIComponent(hash.replace('#/status/', ''));
+                    if (typeof showOrdersByStatus === 'function') showOrdersByStatus(status);
+                }
+                
+                // Show a small toast notification
+                if (window.SettingsManager && window.SettingsManager._toast) {
+                    window.SettingsManager._toast('🔔 New Order Received!', 'indigo');
+                }
+            }
+        )
+        .on(
+            'postgres_changes',
+            { event: 'UPDATE', schema: 'public', table: 'orders' },
+            (payload) => {
+                // If it was just a fraud scan update, we might not want to refresh the whole table 
+                // but for simplicity we'll refresh counts
+                updateSidebarBadges();
+            }
+        )
+        .subscribe();
+}
+
+// Call it immediately
+initRealtimeListeners();
+
 async function fetchOrders(forceRefresh = false) {
     try {
         const now = Date.now();
@@ -2264,3 +2310,70 @@ async function performFraudCheck(phone) {
     }
 }
 
+
+// Global function to sync/refresh courier stats for an existing order
+window.syncCourierStats = async function(orderId, phone) {
+    if (!phone) return;
+    
+    // Find the button and add spin animation
+    const btn = event?.currentTarget;
+    const icon = btn?.querySelector('svg');
+    if (icon) icon.classList.add('fa-spin');
+    
+    console.log('Syncing courier stats for order', orderId, phone);
+    
+    try {
+        const API_URL = 'https://soc-9ocu.onrender.com';
+        const funcRes = await fetch(`${API_URL}/api/check/${phone}`);
+        if (funcRes.ok) {
+            const funcData = await funcRes.json();
+            if (funcData && !funcData.error) {
+                const allTotal = funcData.total || 0;
+                const allSuccess = funcData.success || 0;
+                const allFailed = funcData.cancel || 0;
+                const allRate = allTotal > 0 ? Math.round((allSuccess / allTotal) * 100) : 0;
+                
+                let badgeText = 'Unknown'; 
+                if (allTotal > 0) {
+                    if (allRate >= 80) { badgeText = 'Excellent'; }
+                    else if (allRate > 0 && allRate < 50) { badgeText = 'Poor'; }
+                    else if (allRate >= 50 && allRate < 80) { badgeText = 'Good'; }
+                }
+
+                const updateData = {
+                    courier_total: allTotal, 
+                    courier_completed: allSuccess, 
+                    courier_pct: allRate,
+                    courier_to: allTotal,
+                    courier_su: allSuccess,
+                    courier_fa: allFailed,
+                    courier: badgeText
+                };
+
+                const { error } = await _supabase
+                    .from('orders')
+                    .update(updateData)
+                    .eq('id', orderId);
+
+                if (error) throw error;
+
+                // Refresh the current view
+                const hash = window.location.hash;
+                if (hash === '#/all-orders' || hash === '#/dashboard') {
+                    if (typeof fetchOrders === 'function') fetchOrders(true);
+                } else if (hash.startsWith('#/status/')) {
+                    const status = decodeURIComponent(hash.replace('#/status/', ''));
+                    if (typeof showOrdersByStatus === 'function') showOrdersByStatus(status);
+                }
+                
+                if (window.SettingsManager && window.SettingsManager._toast) {
+                    window.SettingsManager._toast('✅ Stats updated successfully!', 'green');
+                }
+            }
+        }
+    } catch (err) {
+        console.error('Sync failed:', err);
+    } finally {
+        if (icon) icon.classList.remove('fa-spin');
+    }
+};

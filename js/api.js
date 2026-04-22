@@ -8,7 +8,7 @@ const API = {
     async getOrders() {
         const { data, error } = await _supabase
             .from('orders')
-            .select('id, name, phone, address, product_name, amount, status, created_at, purchase_price, shipping_charge, advance_amount, courier')
+            .select('id, name, phone, address, product_name, amount, status, created_at, purchase_price, shipping_charge, advance_amount, courier, courier_total, courier_completed, courier_pct, courier_to, courier_su, courier_fa')
             .order('created_at', { ascending: false });
         if (error) throw error;
         return data;

@@ -517,7 +517,60 @@ function _renderAllOrdersTable(data) {
         </tr>
         `;
     }).join('');
+
+    // --- AUTO SYNC LOGIC ---
+    // Automatically trigger sync for any order that has 'New' status or no courier info
+    setTimeout(() => {
+        data.forEach(order => {
+            const needsSync = !order.courier || order.courier === 'New';
+            if (needsSync && window.autoSyncCourierStats) {
+                window.autoSyncCourierStats(order.id, order.phone);
+            }
+        });
+    }, 1500);
 }
+
+// Quiet version of sync for auto-background use
+window.autoSyncCourierStats = async function(orderId, phone) {
+    if (!phone || window._syncingIds?.has(orderId)) return;
+    if (!window._syncingIds) window._syncingIds = new Set();
+    window._syncingIds.add(orderId);
+
+    try {
+        const FRAUD_API_URL = 'https://soc-9ocu.onrender.com';
+        const funcRes = await fetch(`${FRAUD_API_URL}/api/check/${phone}`);
+        if (funcRes.ok) {
+            const funcData = await funcRes.json();
+            if (funcData && !funcData.error) {
+                const allTotal = funcData.total || 0;
+                const allSuccess = funcData.success || 0;
+                const allFailed = funcData.cancel || 0;
+                const allRate = allTotal > 0 ? Math.round((allSuccess / allTotal) * 100) : 0;
+                
+                // Default to 'Unknown' if scanned but no history found
+                let badgeText = 'Unknown'; 
+                if (allTotal > 0) {
+                    if (allRate >= 80) { badgeText = 'Excellent'; }
+                    else if (allRate > 0 && allRate < 50) { badgeText = 'Poor'; }
+                    else if (allRate >= 50 && allRate < 80) { badgeText = 'Good'; }
+                }
+
+                const updateData = {
+                    courier_total: allTotal, 
+                    courier_completed: allSuccess, 
+                    courier_pct: allRate,
+                    courier_to: allTotal,
+                    courier_su: allSuccess,
+                    courier_fa: allFailed,
+                    courier: badgeText
+                };
+
+                await _supabase.from('orders').update(updateData).eq('id', orderId);
+            }
+        }
+    } catch (e) { console.warn('Auto-sync failed for', orderId); }
+    finally { window._syncingIds.delete(orderId); }
+};
 
 window.initOrderFilterSection  = initOrderFilterSection;
 window.applyAllOrdersFilter    = applyAllOrdersFilter;
