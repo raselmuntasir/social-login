@@ -150,12 +150,7 @@ async function handleRouting() {
     } else if (hash === '#/purchase') {
         highlightLink('link-inventory', false);
         navigateTo(purchaseHTML);
-    } else if (hash === '#/roles') {
-        highlightLink('link-roles', false);
-        navigateTo(rolesHTML);
-    } else if (hash === '#/admins') {
-        highlightLink('link-admins', false);
-        navigateTo(adminsHTML);
+
     } else if (hash === '#/settings/general') {
         highlightLink('link-general-settings', true);
         navigateTo(settingsGeneralHTML, initGeneralSettings);
@@ -204,6 +199,9 @@ async function handleRouting() {
     } else if (hash === '#/roles') {
         highlightLink('link-roles');
         navigateTo(rolesHTML, fetchRoles);
+    } else if (hash === '#/admins') {
+        highlightLink('link-admins');
+        navigateTo(adminsHTML, fetchAdmins);
     } else if (hash.startsWith('#/status/')) {
         const status = decodeURIComponent(hash.replace('#/status/', ''));
         navigateTo(statusOrdersHTML(status), async () => {
@@ -388,6 +386,25 @@ function initRealtimeListeners() {
                 // If it was just a fraud scan update, we might not want to refresh the whole table 
                 // but for simplicity we'll refresh counts
                 updateSidebarBadges();
+            }
+        )
+        .on(
+            'postgres_changes',
+            { event: 'DELETE', schema: 'public', table: 'orders' },
+            (payload) => {
+                console.log('Realtime Order Deleted:', payload.old);
+                updateSidebarBadges();
+                
+                // Refresh current view if needed
+                const hash = window.location.hash;
+                if (hash === '#/dashboard') {
+                    if (typeof fetchOrders === 'function') fetchOrders(true);
+                } else if (hash === '#/all-orders') {
+                    if (typeof fetchAllOrders === 'function') fetchAllOrders();
+                } else if (hash.startsWith('#/status/')) {
+                    const status = decodeURIComponent(hash.replace('#/status/', ''));
+                    if (typeof showOrdersByStatus === 'function') showOrdersByStatus(status);
+                }
             }
         )
         .subscribe();
@@ -656,7 +673,10 @@ window.deleteOrder = async function(orderId) {
         if (error) throw error;
         
         alert('Order deleted successfully!');
+        updateSidebarBadges(); // Update sidebar count immediately
         if (window.fetchAllOrders) window.fetchAllOrders();
+        // Also refresh dashboard stats if on dashboard
+        if (window.location.hash === '#/dashboard') fetchOrders(true);
     } catch (err) {
         console.error('Error deleting order:', err);
         alert('Failed to delete order. Check console for details.');
@@ -680,7 +700,10 @@ window.deleteSelectedOrders = async function() {
         
         alert(`${checkboxes.length} orders deleted successfully!`);
         document.getElementById('selectAllOrders').checked = false;
+        updateSidebarBadges(); // Update sidebar count immediately
         if (window.fetchAllOrders) window.fetchAllOrders();
+        // Also refresh dashboard stats if on dashboard
+        if (window.location.hash === '#/dashboard') fetchOrders(true);
     } catch (err) {
         console.error('Error deleting multiple orders:', err);
         alert('Failed to delete selected orders.');
@@ -811,34 +834,6 @@ function renderCustomersTable(customers) {
     `).join('');
 }
 
-async function fetchRoles() {
-    const { data, error } = await _supabase
-        .from('roles')
-        .select('*')
-        .order('name', { ascending: true });
-
-    if (error) {
-        console.error('Error fetching roles:', error);
-        return;
-    }
-
-    const table = document.getElementById('roles-table-body');
-    if (table) {
-        table.innerHTML = data.map((role, idx) => `
-            <tr class="hover:bg-gray-50 border-b border-gray-100 transition-colors">
-                <td class="px-4 py-3">${idx + 1}</td>
-                <td class="px-4 py-3 font-medium text-gray-800">${role.name}</td>
-                <td class="px-4 py-3 text-gray-500 text-xs">${Array.isArray(role.permissions) ? role.permissions.join(', ') : 'No permissions'}</td>
-                <td class="px-4 py-3">
-                    <div class="flex space-x-2">
-                        <button class="text-blue-500 hover:bg-blue-50 p-1.5 rounded transition-colors"><i class="fas fa-edit"></i></button>
-                        <button class="text-red-500 hover:bg-red-50 p-1.5 rounded transition-colors"><i class="fas fa-trash"></i></button>
-                    </div>
-                </td>
-            </tr>
-        `).join('') || '<tr><td colspan="4" class="p-4 text-center text-gray-500">No roles found</td></tr>';
-    }
-}
 
 function initOrderCalculations() {
     const fields = ['subtotal', 'discount', 'shipping', 'advance'];
