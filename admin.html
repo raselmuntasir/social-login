@@ -29,8 +29,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"></noscript>
 
-    <!-- Critical scripts: defer so they don't block HTML parsing -->
-    <script src="https://cdn.tailwindcss.com" defer></script>
+    <!-- Critical scripts -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
     <!-- Lucide Icons: async, non-critical -->
@@ -566,6 +566,10 @@
     <!-- App Logic -->
     <script src="js/settings_manager.js" defer></script>
     <script src="js/views/filter_manager.js" defer></script>
+    <script src="js/controllers/product_controller.js" defer></script>
+    <script src="js/controllers/settings_controller.js" defer></script>
+    <script src="js/controllers/customer_controller.js" defer></script>
+    <script src="js/controllers/profile_controller.js" defer></script>
     <script src="js/app.js" defer></script>
 </body>
 </html>

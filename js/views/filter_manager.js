@@ -1,4 +1,4 @@
-﻿/**
+/**
  * FilterManager — Date Range Picker + Order Filtering
  * Fixed: lazy Flatpickr init + close-others-on-open
  */
@@ -476,7 +476,7 @@ function _renderAllOrdersTable(data) {
                         <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                     </button>
                     <span style="padding: 2px 6px; background: ${(order.courier_pct ?? 0) >= 80 ? '#10b981' : ((order.courier_pct ?? 0) >= 50 ? '#f59e0b' : ((order.courier_pct ?? 0) > 0 ? '#f43f5e' : '#64748b'))}; color: white; font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                        ${order.courier || 'New'}
+                        ${order.courier === 'Unknown' ? 'New' : (order.courier || 'New')}
                     </span>
                 </div>
             </div>
@@ -509,10 +509,10 @@ function _renderAllOrdersTable(data) {
     }).join('');
 
     // --- AUTO SYNC LOGIC ---
-    // Automatically trigger sync for any order that has 'New' status or no courier info
+    // Automatically trigger sync for any order that has 'New' or 'Unknown' status
     setTimeout(() => {
         data.forEach(order => {
-            const needsSync = !order.courier || order.courier === 'New';
+            const needsSync = !order.courier || order.courier === 'New' || order.courier === 'Unknown';
             if (needsSync && window.autoSyncCourierStats) {
                 window.autoSyncCourierStats(order.id, order.phone);
             }
