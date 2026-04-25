@@ -1,4 +1,4 @@
-/**
+﻿/**
  * FilterManager — Date Range Picker + Order Filtering
  * Fixed: lazy Flatpickr init + close-others-on-open
  */
@@ -405,7 +405,7 @@ function _renderAllOrdersTable(data) {
           <!-- Notes -->
           <td>
             <div style="display:flex;flex-direction:column;gap:4px;">
-              <button class="ibtn g" title="View Note" onclick="alert('${order.note || 'No notes available'}')">
+              <button class="ibtn g" title="View Note" onclick="alert('${UI.escapeHTML(order.note || 'No notes available')}')">
                 <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 8.25V6a2.25 2.25 0 00-2.25-2.25H6A2.25 2.25 0 003.75 6v8.25A2.25 2.25 0 006 16.5h2.25m3.75-10.5H18A2.25 2.25 0 0120.25 8.25V18A2.25 2.25 0 0118 20.25h-7.5A2.25 2.25 0 018.25 18v-1.5m3.75-10.5h6.375c.621 0 1.125.504 1.125 1.125v6.375"/></svg>
               </button>
               <button class="ibtn red" title="Delete Order" onclick="deleteOrder(${order.id})">
@@ -421,7 +421,7 @@ function _renderAllOrdersTable(data) {
           <!-- Name & Number -->
           <td>
             <div class="name-txt">
-              ${order.name || '-'}
+              ${UI.escapeHTML(order.name || '-')}
               <button class="ibtn" style="width:21px;height:21px;border-radius:6px;" title="Copy Name" onclick="navigator.clipboard.writeText('${order.name || ''}')">
                 <svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
               </button>
@@ -430,7 +430,7 @@ function _renderAllOrdersTable(data) {
               </button>
             </div>
             <div class="phone-chip">
-              <span class="pnum">${order.phone || '-'}</span>
+              <span class="pnum">${UI.escapeHTML(order.phone || '-')}</span>
               <button class="pbtn wa" title="WhatsApp" onclick="window.open('https://wa.me/+88${order.phone}', '_blank')"><svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.555 4.122 1.528 5.855L.057 23.5l5.797-1.517A11.951 11.951 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.686-.5-5.223-1.373l-.374-.222-3.882 1.017 1.034-3.772-.243-.386A9.96 9.96 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg></button>
               <button class="pbtn cl" title="Call" onclick="window.open('tel:${order.phone}')"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"/></svg></button>
               <button class="pbtn cp" title="Copy" onclick="navigator.clipboard.writeText('${order.phone}')"><svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75"/></svg></button>
@@ -450,50 +450,40 @@ function _renderAllOrdersTable(data) {
           <td>
             <div class="addr">
               <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="#6366f1" stroke-width="2" style="flex-shrink:0;margin-top:2px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/></svg>
-              ${order.address || '-'}
+              ${UI.escapeHTML(order.address || '-')}
               <button class="cpaddr" onclick="navigator.clipboard.writeText('${order.address || ''}')"><svg width="10" height="10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75"/></svg></button>
             </div>
           </td>
           <!-- Courier -->
           <td style="min-width: 140px;">
-            <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 8px; padding-right:4px;">
-                <div style="text-align:left;">
-                    <div style="font-size:9px; font-weight:800; color:#94a3b8; text-transform:uppercase; margin-bottom:1px;">To</div>
-                    <div style="font-size:17px; font-weight:800; color:#1e293b; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.07));">${order.courier_total || 0}</div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom: 6px;">
+                <div style="display:flex; gap: 10px;">
+                    <div>
+                        <div style="font-size:9px; font-weight:800; color:#94a3b8; text-transform:uppercase;">Total</div>
+                        <div style="font-size:15px; font-weight:800; color:#1e293b;">${order.courier_total ?? 0}</div>
+                    </div>
+                    <div>
+                        <div style="font-size:9px; font-weight:800; color:#059669; text-transform:uppercase;">Succ</div>
+                        <div style="font-size:15px; font-weight:800; color:#059669;">${order.courier_completed ?? 0}</div>
+                    </div>
+                    <div>
+                        <div style="font-size:9px; font-weight:800; color:#f43f5e; text-transform:uppercase;">Fail</div>
+                        <div style="font-size:15px; font-weight:800; color:#f43f5e;">${order.courier_fa ?? 0}</div>
+                    </div>
                 </div>
-                <div style="text-align:left;">
-                    <div style="font-size:9px; font-weight:800; color:#94a3b8; text-transform:uppercase; margin-bottom:1px;">Co</div>
-                    <div style="font-size:17px; font-weight:800; color:#1e293b; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.07));">${order.courier_completed || 0}</div>
-                </div>
-                <div style="text-align:right; padding-bottom: 3px; display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+                <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
                     <button onclick="syncCourierStats(${order.id}, '${order.phone}')" style="background:none; border:none; cursor:pointer; color:#94a3b8; transition:color 0.2s; padding:2px;" onmouseover="this.style.color='#6366f1'" onmouseout="this.style.color='#94a3b8'" title="Fetch latest stats">
                         <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                     </button>
-                    <span style="padding: 2px 7px; background: #fbbf24; color: white; font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 9999px; box-shadow: 0 4px 12px rgba(245,158,11,0.25);">
+                    <span style="padding: 2px 6px; background: ${(order.courier_pct ?? 0) >= 80 ? '#10b981' : ((order.courier_pct ?? 0) >= 50 ? '#f59e0b' : ((order.courier_pct ?? 0) > 0 ? '#f43f5e' : '#64748b'))}; color: white; font-size: 8px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                         ${order.courier || 'New'}
                     </span>
                 </div>
             </div>
 
-            <div style="position:relative; width:100%; height:18px; margin-bottom: 8px; border-radius:12px; background:#f1f5f9; overflow:hidden; border:1px solid rgba(226,232,240,0.5); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
-                <div style="position:absolute; inset:0 0 0 auto; width:100%; background:rgba(244,63,94,0.1);"></div>
-                <div style="position:absolute; inset:0 auto 0 0; width:${order.courier_pct || 100}%; background:linear-gradient(to right, #10b981, #34d399); border-radius:12px; box-shadow: 0 4px 14px 0 rgba(34,197,94,0.25); border-right: 3px solid #f43f5e; display:flex; align-items:center; justify-content:center;">
-                    <span style="font-size:10px; font-weight:900; color:white; text-shadow: 0 1px 2px rgba(0,0,0,0.25);">${order.courier_pct || 100}%</span>
-                </div>
-            </div>
-
-            <div style="display:flex; justify-content:space-between; align-items:center; border-top: 1px solid rgba(226,232,240,0.6); padding-top: 6px;">
-                <div>
-                    <div style="font-size:8px; font-weight:800; color:#94a3b8; text-transform:uppercase; margin-bottom:1px; letter-spacing:-0.02em;">Total</div>
-                    <div style="font-size:12px; font-weight:800; color:#334155;">${order.courier_to || 1}</div>
-                </div>
-                <div>
-                    <div style="font-size:8px; font-weight:800; color:#059669; text-transform:uppercase; margin-bottom:1px; letter-spacing:-0.02em;">Success</div>
-                    <div style="font-size:12px; font-weight:800; color:#059669;">${order.courier_su || 1}</div>
-                </div>
-                <div style="text-align:right;">
-                    <div style="font-size:8px; font-weight:800; color:#f43f5e; text-transform:uppercase; margin-bottom:1px; letter-spacing:-0.02em;">Failed</div>
-                    <div style="font-size:12px; font-weight:800; color:#f43f5e;">${order.courier_fa || 0}</div>
+            <div style="position:relative; width:100%; height:16px; border-radius:12px; background:#f1f5f9; overflow:hidden; border:1px solid rgba(226,232,240,0.5); box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+                <div style="position:absolute; inset:0 auto 0 0; width:${order.courier_pct ?? 0}%; background:linear-gradient(to right, #10b981, #34d399); border-radius:12px; display:flex; align-items:center; justify-content:center;">
+                    ${(order.courier_pct ?? 0) > 0 ? `<span style="font-size:9px; font-weight:900; color:white; text-shadow: 0 1px 2px rgba(0,0,0,0.25);">${order.courier_pct}%</span>` : ''}
                 </div>
             </div>
           </td>

@@ -5,16 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Top One - Admin Panel</title>
     <link rel="icon" type="image/png" href="images/logo.png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Supabase JS -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Flatpickr (Date Picker) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <!-- Performance: DNS Prefetch & Preconnect for external resources -->
+    <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="//unpkg.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cmdculyngchoxcnzaypt.supabase.co">
+
+    <!-- Fonts: preload for faster render -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"></noscript>
+
+    <!-- Font Awesome: non-blocking -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"></noscript>
+
+    <!-- Critical scripts: defer so they don't block HTML parsing -->
+    <script src="https://cdn.tailwindcss.com" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
+    <!-- Lucide Icons: async, non-critical -->
+    <script src="https://unpkg.com/lucide@latest" async></script>
     <!-- CKEditor 4 is loaded lazily only on Create Product page -->
     <style>
         body { font-family: 'Inter', 'Hind Siliguri', sans-serif; background-color: #f3f4f6; }
@@ -125,47 +145,33 @@
     </style>
 </head>
 <body class="flex h-screen overflow-hidden text-gray-800">
-    <!-- Admin Login Overlay -->
-    <div id="adminLoginOverlay" class="fixed inset-0 z-[9999] bg-gray-900/95 flex items-center justify-center transition-opacity duration-300">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center transform transition-all">
-            <div class="w-16 h-16 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center mx-auto mb-4 shadow-inner">
-                <i class="fa-solid fa-shield-halved text-2xl"></i>
-            </div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2 font-['Baloo_Da_2']">অ্যাডমিন প্যানেল</h2>
-            <p class="text-gray-500 text-sm mb-6">অ্যাক্সেস পেতে পাসওয়ার্ড দিন</p>
-            <div class="space-y-4">
-                <input type="password" id="adminPassword" placeholder="••••••••" class="w-full border border-gray-300 rounded-xl px-4 py-3 text-center text-xl tracking-widest focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
-                <p id="loginError" class="text-red-500 text-xs hidden font-medium">❌ পাসওয়ার্ড ভুল হয়েছে!</p>
-                <button onclick="checkAdminPassword()" class="w-full bg-purple-700 hover:bg-purple-800 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-md">
-                    লগইন করুন
-                </button>
-            </div>
-        </div>
-    </div>
+    <!-- Service Worker Registration for ultra-fast caching -->
     <script>
-        function checkAdminPassword() {
-            const pwd = document.getElementById('adminPassword').value;
-            const err = document.getElementById('loginError');
-            // Default password is set to: 123456
-            if(pwd === '123456') {
-                const overlay = document.getElementById('adminLoginOverlay');
-                overlay.style.opacity = '0';
-                setTimeout(() => overlay.style.display = 'none', 300);
-                sessionStorage.setItem('admin_auth', 'true');
-            } else {
-                err.classList.remove('hidden');
-                document.getElementById('adminPassword').value = '';
-            }
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('[SW] Registered:', reg.scope))
+                .catch(err => console.warn('[SW] Registration failed:', err));
         }
-        
-        window.addEventListener('DOMContentLoaded', () => {
-            if(sessionStorage.getItem('admin_auth') === 'true') {
-                document.getElementById('adminLoginOverlay').style.display = 'none';
+    </script>
+    <script>
+        window.addEventListener('DOMContentLoaded', async () => {
+            if (window.AuthManager) await AuthManager.init();
+            
+            // Redirect to login page if not authenticated
+            if(sessionStorage.getItem('admin_auth') !== 'true') {
+                window.location.href = 'login.html';
+                return;
             }
-            document.getElementById('adminPassword').addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') { checkAdminPassword(); }
-            });
         });
+        
+        // Global logout function
+        window.logoutAdmin = () => {
+            if (window.AuthManager) AuthManager.logout();
+            else {
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+            }
+        };
     </script>
 
     <!-- Sidebar -->
@@ -491,7 +497,7 @@
                                 </div>
                                 <span class="font-bold text-[13px]">My Profile</span>
                             </a>
-                            <a href="javascript:void(0)" onclick="alert('Logging out...')" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-red-50 hover:text-red-700 transition-all group">
+                            <a href="javascript:void(0)" onclick="logoutAdmin()" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-red-50 hover:text-red-700 transition-all group">
                                 <div class="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center group-hover:bg-red-600 group-hover:text-white transition-all">
                                     <i class="fas fa-power-off text-sm"></i>
                                 </div>
@@ -524,39 +530,42 @@
         </main>
     </div>
 
-    <!-- Scripts -->
-    <!-- Define views as strings to avoid CORS issues locally -->
-    <script src="js/views/dashboard.js"></script>
-    <script src="js/views/product_list.js"></script>
-    <script src="js/views/create_product.js"></script>
-    <script src="js/views/create_order.js"></script>
-    <script src="js/views/all_orders.js"></script>
-    <script src="js/views/status_orders.js"></script>
-    <script src="js/views/purchase.js"></script>
-    <script src="js/views/suppliers.js"></script>
-    <script src="js/views/return_collection.js"></script>
-    <script src="js/views/courier_payment.js"></script>
-    <script src="js/views/bulk_print.js"></script>
-    <script src="js/views/send_courier.js"></script>
-    <script src="js/views/payments.js"></script>
-    <script src="js/views/pre_orders.js"></script>
-    <script src="js/views/customers.js"></script>
-    <script src="js/views/roles.js"></script>
-    <script src="js/views/admins.js"></script>
-        <script src="js/views/settings_tabs/tab_general.js"></script>
-    <script src="js/views/settings_tabs/tab_order.js"></script>
-    <script src="js/views/settings_tabs/tab_invoice.js"></script>
-    <script src="js/views/settings_tabs/tab_customer.js"></script>
-    <script src="js/views/settings_tabs/tab_others.js"></script>
-    <script src="js/views/settings_general.js"></script>
-    <script src="js/views/settings_website.js"></script>
-    <script src="js/views/settings_courier.js"></script>
-    <script src="js/views/profile.js"></script>
+    <!-- Core Scripts (must load in order) -->
+    <script src="js/ui_utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+
+    <!-- Views: defer so browser parses HTML first -->
+    <script src="js/views/dashboard.js" defer></script>
+    <script src="js/views/product_list.js" defer></script>
+    <script src="js/views/create_product.js" defer></script>
+    <script src="js/views/create_order.js" defer></script>
+    <script src="js/views/all_orders.js" defer></script>
+    <script src="js/views/status_orders.js" defer></script>
+    <script src="js/views/purchase.js" defer></script>
+    <script src="js/views/suppliers.js" defer></script>
+    <script src="js/views/return_collection.js" defer></script>
+    <script src="js/views/courier_payment.js" defer></script>
+    <script src="js/views/bulk_print.js" defer></script>
+    <script src="js/views/send_courier.js" defer></script>
+    <script src="js/views/payments.js" defer></script>
+    <script src="js/views/pre_orders.js" defer></script>
+    <script src="js/views/customers.js" defer></script>
+    <script src="js/views/roles.js" defer></script>
+    <script src="js/views/admins.js" defer></script>
+    <script src="js/views/settings_tabs/tab_general.js" defer></script>
+    <script src="js/views/settings_tabs/tab_order.js" defer></script>
+    <script src="js/views/settings_tabs/tab_invoice.js" defer></script>
+    <script src="js/views/settings_tabs/tab_customer.js" defer></script>
+    <script src="js/views/settings_tabs/tab_others.js" defer></script>
+    <script src="js/views/settings_general.js" defer></script>
+    <script src="js/views/settings_website.js" defer></script>
+    <script src="js/views/settings_courier.js" defer></script>
+    <script src="js/views/profile.js" defer></script>
 
     <!-- App Logic -->
-    <script src="js/api.js"></script>
-    <script src="js/settings_manager.js"></script>
-    <script src="js/views/filter_manager.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/settings_manager.js" defer></script>
+    <script src="js/views/filter_manager.js" defer></script>
+    <script src="js/app.js" defer></script>
 </body>
 </html>

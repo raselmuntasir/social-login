@@ -33,6 +33,24 @@ const tabOthersHTML = `
                             <option>Last Month</option>
                         </select>
                     </div>
+
+                    <!-- Product Categories -->
+                    <div class="flex flex-col gap-2">
+                        <label class="text-sm font-bold text-gray-800">Product Categories:</label>
+                        <div id="settings-product-categories-container" class="flex flex-wrap gap-2 border border-gray-300 rounded px-3 py-2 min-h-[42px] focus-within:border-purple-500 transition-colors w-full md:w-4/5">
+                            <input type="text" placeholder="Add Category..." class="flex-1 min-w-[120px] outline-none text-sm font-bold text-gray-700 bg-transparent">
+                        </div>
+                        <p class="text-[10px] text-gray-400 font-bold italic">Type and press Enter or comma (,) to add multiple categories.</p>
+                    </div>
+
+                    <!-- Product Brands -->
+                    <div class="flex flex-col gap-2">
+                        <label class="text-sm font-bold text-gray-800">Product Brands:</label>
+                        <div id="settings-product-brands-container" class="flex flex-wrap gap-2 border border-gray-300 rounded px-3 py-2 min-h-[42px] focus-within:border-purple-500 transition-colors w-full md:w-4/5">
+                            <input type="text" placeholder="Add Brand..." class="flex-1 min-w-[120px] outline-none text-sm font-bold text-gray-700 bg-transparent">
+                        </div>
+                        <p class="text-[10px] text-gray-400 font-bold italic">Type and press Enter or comma (,) to add multiple brands.</p>
+                    </div>
                 </div>
             </div>
 `;

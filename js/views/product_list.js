@@ -27,8 +27,8 @@ const productListHTML = `
             </div>
             <div>
                 <label class="block text-xs font-bold text-gray-700 mb-1">Category</label>
-                <select class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-purple-500 bg-white">
-                    <option>All</option>
+                <select id="filter-prod-category" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-purple-500 bg-white">
+                    <option value="">All Categories</option>
                 </select>
             </div>
             <div>

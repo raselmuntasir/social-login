@@ -17,6 +17,8 @@ class SettingsManager {
         currency:             '৳',
         default_shipping:     '150',
         low_stock_alert:      '5',
+        product_categories:   'Electronics,Fashion,Home,Gadgets',
+        product_brands:       'Top One,Apple,Samsung,Nike',
     };
 
     // ─── LOAD & APPLY — Call this when Settings page opens ───────────────
@@ -51,6 +53,10 @@ class SettingsManager {
 
             // --- Customer Tab ---
             this.renderPills('settings-customer-tags-container', s['customer_tags'] || this.DEFAULTS.customer_tags);
+
+            // --- Others Tab (Products) ---
+            this.renderPills('settings-product-categories-container', s['product_categories'] || this.DEFAULTS.product_categories);
+            this.renderPills('settings-product-brands-container',     s['product_brands']     || this.DEFAULTS.product_brands);
 
         } catch (err) {
             console.error('[SettingsManager] loadSettings error:', err);
@@ -98,6 +104,9 @@ class SettingsManager {
                 'additional_statuses': this.getPillsValue('settings-additional-statuses-container'),
                 // Customer
                 'customer_tags':     this.getPillsValue('settings-customer-tags-container'),
+                // Others (Products)
+                'product_categories': this.getPillsValue('settings-product-categories-container'),
+                'product_brands':     this.getPillsValue('settings-product-brands-container'),
             };
 
             await window.AppAPI.updateMultipleSettings(payload);
@@ -135,6 +144,29 @@ class SettingsManager {
 
         } catch (err) {
             console.error('[SettingsManager] populateCreateOrderDropdowns error:', err);
+        }
+    }
+
+    /**
+     * Populate Product Dropdowns
+     * (Called by create_product.js and product_list.js)
+     */
+    static async populateProductDropdowns() {
+        if (!window.AppAPI) return;
+        try {
+            const s = await window.AppAPI.getSettings();
+            const categories = s['product_categories'] || this.DEFAULTS.product_categories;
+            const brands     = s['product_brands']     || this.DEFAULTS.product_brands;
+
+            // 1. Create Product Page
+            this._populateSelect('prod-category', categories, 'Select Category');
+            this._populateSelect('prod-brand',    brands,     'Select Brand');
+
+            // 2. Product List Page Filters
+            this._populateSelect('filter-prod-category', categories, 'All Categories');
+
+        } catch (err) {
+            console.error('[SettingsManager] populateProductDropdowns error:', err);
         }
     }
 

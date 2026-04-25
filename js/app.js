@@ -1,4 +1,4 @@
-// Active sidebar link tracking
+﻿// Active sidebar link tracking
 let _activeStatusLinkId = null;
 
 // ─── Performance: Cache profile so we only hit Supabase ONCE ───
@@ -140,12 +140,16 @@ async function handleRouting() {
         });
     } else if (hash === '#/products') {
         highlightLink('link-inventory', false);
-        navigateTo(productListHTML, fetchAllProducts);
+        navigateTo(productListHTML, async () => {
+            await fetchAllProducts();
+            if (window.SettingsManager) await window.SettingsManager.populateProductDropdowns();
+        });
     } else if (hash === '#/create-product') {
         highlightLink('link-inventory', false);
         navigateTo(createProductHTML, async () => {
             initProductForm();
             loadCKEditorLazy();
+            if (window.SettingsManager) await window.SettingsManager.populateProductDropdowns();
         });
     } else if (hash === '#/purchase') {
         highlightLink('link-inventory', false);
@@ -197,11 +201,23 @@ async function handleRouting() {
         highlightLink('link-customers');
         navigateTo(customersHTML, fetchCustomers);
     } else if (hash === '#/roles') {
+        if (!AuthManager.can('manage_roles')) {
+            if (window.UI) UI.alert('Access Denied', 'আপনি এই পেজে প্রবেশের অনুমতি নেই।', 'error');
+            window.location.hash = '#/dashboard';
+            return;
+        }
         highlightLink('link-roles');
         navigateTo(rolesHTML, fetchRoles);
     } else if (hash === '#/admins') {
+        if (!AuthManager.can('manage_admins')) {
+            if (window.UI) UI.alert('Access Denied', 'আপনি এই পেজে প্রবেশের অনুমতি নেই।', 'error');
+            window.location.hash = '#/dashboard';
+            return;
+        }
         highlightLink('link-admins');
         navigateTo(adminsHTML, fetchAdmins);
+    } else if (hash === '#/profile') {
+        navigateTo(profileHTML, initProfile);
     } else if (hash.startsWith('#/status/')) {
         const status = decodeURIComponent(hash.replace('#/status/', ''));
         navigateTo(statusOrdersHTML(status), async () => {
@@ -766,7 +782,7 @@ function renderTable(orders) {
         <tr class="hover:bg-gray-50 border-b border-gray-100 transition-colors">
             <td class="px-4 py-3">${idx + 1}</td>
             <td class="px-4 py-3">${new Date(order.created_at).toLocaleDateString()}</td>
-            <td class="px-4 py-3 font-medium text-gray-800">${order.name || '-'}<br><span class="text-gray-500 text-[10px] font-normal">${order.phone || '-'}</span></td>
+            <td class="px-4 py-3 font-medium text-gray-800">${UI.escapeHTML(order.name || '-')}<br><span class="text-gray-500 text-[10px] font-normal">${UI.escapeHTML(order.phone || '-')}</span></td>
             <td class="px-4 py-3 text-gray-600">${order.product_name}</td>
             <td class="px-4 py-3 font-bold text-gray-900">${order.amount} TK</td>
             <td class="px-4 py-3">
@@ -1241,8 +1257,8 @@ function initProductForm() {
             sku: document.getElementById('prod-sku')?.value,
             unit: document.getElementById('prod-unit')?.value,
             unit_amount: parseFloat(document.getElementById('prod-unit-amount')?.value || 1),
-            category: document.getElementById('prod-category')?.value,
-            brand: document.getElementById('prod-brand')?.value,
+            category: document.getElementById('prod-category')?.value || '',
+            brand: document.getElementById('prod-brand')?.value || '',
             type: document.getElementById('prod-type')?.value,
             image: imageUrl,
             created_at: new Date().toISOString()

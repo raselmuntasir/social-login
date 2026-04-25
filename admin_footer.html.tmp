@@ -1,0 +1,58 @@
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-y-auto bg-gray-100 p-4 md:p-6 flex flex-col">
+            
+            <!-- View Container -->
+            <div id="view-container" class="flex-1">
+                <!-- Views will be injected here via app.js -->
+            </div>
+
+            <!-- Global Footer -->
+            <div class="mt-auto pt-10 pb-6 border-t border-gray-100/50">
+                <div class="flex flex-col items-center gap-2">
+                    <p class="text-[11px] font-bold text-gray-400 tracking-widest uppercase">Top One Bazar © 2026</p>
+                    <div class="h-1 w-8 bg-purple-500/20 rounded-full"></div>
+                    <p class="text-[9px] text-gray-300 font-medium">All Right Reserved</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/ui_utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/api.js"></script>
+    
+    <!-- Views -->
+    <script src="js/views/dashboard.js"></script>
+    <script src="js/views/product_list.js"></script>
+    <script src="js/views/create_product.js"></script>
+    <script src="js/views/create_order.js"></script>
+    <script src="js/views/all_orders.js"></script>
+    <script src="js/views/status_orders.js"></script>
+    <script src="js/views/purchase.js"></script>
+    <script src="js/views/suppliers.js"></script>
+    <script src="js/views/return_collection.js"></script>
+    <script src="js/views/courier_payment.js"></script>
+    <script src="js/views/bulk_print.js"></script>
+    <script src="js/views/send_courier.js"></script>
+    <script src="js/views/payments.js"></script>
+    <script src="js/views/pre_orders.js"></script>
+    <script src="js/views/customers.js"></script>
+    <script src="js/views/roles.js"></script>
+    <script src="js/views/admins.js"></script>
+    <script src="js/views/settings_tabs/tab_general.js"></script>
+    <script src="js/views/settings_tabs/tab_order.js"></script>
+    <script src="js/views/settings_tabs/tab_invoice.js"></script>
+    <script src="js/views/settings_tabs/tab_customer.js"></script>
+    <script src="js/views/settings_tabs/tab_others.js"></script>
+    <script src="js/views/settings_general.js"></script>
+    <script src="js/views/settings_website.js"></script>
+    <script src="js/views/settings_courier.js"></script>
+    <script src="js/views/profile.js"></script>
+
+    <!-- App Logic -->
+    <script src="js/settings_manager.js"></script>
+    <script src="js/views/filter_manager.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

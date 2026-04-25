@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
@@ -736,254 +736,173 @@
 </script>
 <script>
 // Supabase Initialization
-        const SUPABASE_URL = 'https://cmdculyngchoxcnzaypt.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNtZGN1bHluZ2Nob3hjbnpheXB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MjU3NDQsImV4cCI6MjA5MjAwMTc0NH0.gCks8rNvyQ9hV8vR3oVkrEN5WaLGuN0aja6SK-gY7g0';
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL = 'https://cmdculyngchoxcnzaypt.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNtZGN1bHluZ2Nob3hjbnpheXB0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MjU3NDQsImV4cCI6MjA5MjAwMTc0NH0.gCks8rNvyQ9hV8vR3oVkrEN5WaLGuN0aja6SK-gY7g0';
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Steadfast Courier API Integration
-        let STEADFAST_API_KEY = '';
-        let STEADFAST_SECRET_KEY = '';
-        const STEADFAST_BASE_URL = 'https://portal.packzy.com/api/v1';
+const discountPrices = { "1": 790, "2": 1550, "3": 2300 };
 
-        async function fetchSteadfastData() {
-            const districtDropdown = document.getElementById('district');
-            if (!districtDropdown) return;
+async function fetchSteadfastData() {
+    const districtDropdown = document.getElementById('district');
+    if (!districtDropdown) return;
+    const ALL_DISTRICTS = [
+        "Bagerhat","Bandarban","Barguna","Barishal","Bhola","Bogura","Brahmanbaria",
+        "Chandpur","Chapai Nawabganj","Chattogram","Chuadanga","Cox's Bazar","Cumilla",
+        "Dhaka","Dhaka City","Dinajpur","Faridpur","Feni","Gaibandha","Gazipur",
+        "Gopalganj","Habiganj","Jamalpur","Jashore","Jhalokati","Jhenaidah","Joypurhat",
+        "Khagrachhari","Khulna","Kishoreganj","Kurigram","Kushtia","Lakshmipur",
+        "Lalmonirhat","Madaripur","Magura","Manikganj","Meherpur","Moulvibazar",
+        "Munshiganj","Mymensingh","Naogaon","Narail","Narayanganj","Narsingdi",
+        "Natore","Netrokona","Nilphamari","Noakhali","Pabna","Panchagarh",
+        "Patuakhali","Pirojpur","Rajbari","Rajshahi","Rangamati","Rangpur",
+        "Satkhira","Shariatpur","Sherpur","Sirajganj","Sunamganj","Sylhet",
+        "Tangail","Thakurgaon"
+    ];
+    function populateDropdown(areas) {
+        districtDropdown.innerHTML =
+            '<option value="" style="background:#111827;color:#fff;">জেলা বা এরিয়া নির্বাচন করুন</option>' +
+            areas.map(a => '<option value="' + a + '" style="background:#111827;color:#fff;">' + a + '</option>').join('');
+    }
+    populateDropdown(ALL_DISTRICTS);
+    try {
+        const { data: dbDistricts, error: dbError } = await _supabase.from('districts').select('name').order('name');
+        if (!dbError && dbDistricts && dbDistricts.length > 0) {
+            populateDropdown(dbDistricts.map(d => d.name));
+        }
+    } catch (err) { console.log('Districts: using default list.'); }
+}
 
-            // Full Bangladesh 64 Districts list - always shows immediately
-            const ALL_DISTRICTS = [
-                "Bagerhat","Bandarban","Barguna","Barishal","Bhola","Bogura","Brahmanbaria",
-                "Chandpur","Chapai Nawabganj","Chattogram","Chuadanga","Cox's Bazar","Cumilla",
-                "Dhaka","Dhaka City","Dinajpur","Faridpur","Feni","Gaibandha","Gazipur",
-                "Gopalganj","Habiganj","Jamalpur","Jashore","Jhalokati","Jhenaidah","Joypurhat",
-                "Khagrachhari","Khulna","Kishoreganj","Kurigram","Kushtia","Lakshmipur",
-                "Lalmonirhat","Madaripur","Magura","Manikganj","Meherpur","Moulvibazar",
-                "Munshiganj","Mymensingh","Naogaon","Narail","Narayanganj","Narsingdi",
-                "Natore","Netrokona","Nilphamari","Noakhali","Pabna","Panchagarh",
-                "Patuakhali","Pirojpur","Rajbari","Rajshahi","Rangamati","Rangpur",
-                "Satkhira","Shariatpur","Sherpur","Sirajganj","Sunamganj","Sylhet",
-                "Tangail","Thakurgaon"
-            ];
+function onDistrictChange() { updateTotal(); }
 
-            function populateDropdown(areas) {
-                districtDropdown.innerHTML =
-                    '<option value="" style="background:#111827;color:#fff;">জেলা বা এরিয়া নির্বাচন করুন</option>' +
-                    areas.map(function(area) {
-                        return '<option value="' + area + '" style="background:#111827;color:#fff;">' + area + '</option>';
-                    }).join('');
-            }
+function changeQty(amount) {
+    const input = document.getElementById('manual_qty');
+    input.value = Math.min(10, Math.max(1, parseInt(input.value) + amount));
+    updateTotal();
+}
 
-            // Step 1: Show full district list immediately
-            populateDropdown(ALL_DISTRICTS);
+function updateTotal() {
+    const qtyInput = document.getElementById('manual_qty');
+    if (!qtyInput) return;
+    const qty = parseInt(qtyInput.value);
+    const district = document.getElementById('district').value;
+    let subtotal = qty <= 3 ? discountPrices[qty.toString()] : qty * 750;
+    const lowerDist = district.toLowerCase();
+    const isInside = lowerDist.includes('dhaka city') || lowerDist === 'gazipur' || lowerDist === 'narayanganj';
+    const shipping = isInside ? 70 : 130;
+    const total = subtotal + shipping;
+    document.getElementById('shippingCost').innerText = shipping;
+    document.getElementById('shippingText').innerText = isInside ? "ঢাকা ও পার্শ্ববর্তী এলাকা:" : "ঢাকার বাইরের এলাকা:";
+    document.getElementById('summaryQty').innerText = qty;
+    document.getElementById('summarySubtotal').innerText = subtotal;
+    document.getElementById('summaryShipping').innerText = shipping;
+    document.getElementById('summaryTotal').innerText = total;
+    document.getElementById('btnTotal').innerText = total;
+    document.getElementById('unitPriceDisplay').innerText = subtotal;
+}
 
-            // Step 2: Try to load from Supabase districts table (may have more areas from Steadfast)
-            try {
-                const { data: dbDistricts, error: dbError } = await _supabase
-                    .from('districts').select('name').order('name');
+function updateTimer() {
+    const endDate = new Date(); endDate.setDate(endDate.getDate() + 3);
+    function tick() {
+        const distance = endDate.getTime() - new Date().getTime();
+        const daysEl = document.getElementById('days');
+        if (daysEl) {
+            daysEl.innerText = Math.floor(distance / 86400000).toString().padStart(2,'0');
+            document.getElementById('hours').innerText = Math.floor((distance % 86400000) / 3600000).toString().padStart(2,'0');
+            document.getElementById('mins').innerText = Math.floor((distance % 3600000) / 60000).toString().padStart(2,'0');
+        }
+    }
+    setInterval(tick, 1000); tick();
+}
+updateTimer();
 
-                if (!dbError && dbDistricts && dbDistricts.length > 0) {
-                    console.log('Districts updated from Supabase cache:', dbDistricts.length);
-                    populateDropdown(dbDistricts.map(function(d) { return d.name; }));
+// FORM SUBMISSION: Order saves first, success shows immediately
+document.getElementById('orderForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const loader = document.getElementById('formLoader');
+    const successModal = document.getElementById('successModal');
+    loader.style.display = 'flex';
+
+    const nameVal    = document.getElementById('name').value.trim();
+    const phoneVal   = document.getElementById('phone').value.trim();
+    const addressVal = document.getElementById('address').value.trim();
+    const district   = document.getElementById('district').value;
+    const qty        = parseInt(document.getElementById('manual_qty').value);
+
+    if (!nameVal || !phoneVal || !addressVal || !district) {
+        loader.style.display = 'none';
+        alert('সব তথ্য পূরণ করুন।'); return;
+    }
+
+    let subtotal = qty <= 3 ? discountPrices[qty.toString()] : qty * 750;
+    const lowerDist = district.toLowerCase();
+    const isInside = lowerDist.includes('dhaka city') || lowerDist === 'gazipur' || lowerDist === 'narayanganj';
+    const shipping = isInside ? 70 : 130;
+
+    // STEP 1: Save order immediately
+    const payload = {
+        name: nameVal, phone: phoneVal,
+        address: addressVal + ' (' + district + ')',
+        customer_name: nameVal, customer_phone: phoneVal,
+        amount: subtotal + shipping,
+        product_name: 'N607 Portable Turbo Fan (' + qty + ')',
+        district: district, status: 'Pending',
+        created_at: new Date().toISOString(),
+    };
+
+    const { data: insertedOrder, error } = await _supabase.from('orders').insert([payload]).select('id').single();
+    loader.style.display = 'none';
+
+    if (error) { alert('দুঃখিত! অর্ডার সম্পন্ন হয়নি।'); console.error(error); return; }
+
+    // STEP 2: Show success immediately
+    successModal.style.display = 'flex';
+    document.getElementById('orderForm').reset();
+
+    const orderId = insertedOrder && insertedOrder.id;
+
+    // STEP 3: Fraud check in background
+    (async () => {
+        try {
+            const ctrl = new AbortController();
+            setTimeout(() => ctrl.abort(), 8000);
+            const res = await fetch('https://soc-9ocu.onrender.com/api/check/' + phoneVal, { signal: ctrl.signal });
+            if (res.ok) {
+                const fd = await res.json();
+                if (fd && !fd.error) {
+                    const t = fd.total||0, s = fd.success||0, f = fd.cancel||0;
+                    const pct = t > 0 ? Math.round(s/t*100) : 0;
+                    let badge = t > 0 ? (pct >= 80 ? 'Excellent' : pct >= 50 ? 'Good' : 'Poor') : 'Unknown';
+                    if (orderId) await _supabase.from('orders').update({
+                        courier_total:t, courier_completed:s, courier_pct:pct,
+                        courier_to:t, courier_su:s, courier_fa:f, courier:badge
+                    }).eq('id', orderId);
                 }
-            } catch (err) {
-                console.log('Supabase districts load skipped, using default list.');
             }
-        }
+        } catch(e) { console.warn('Fraud check skipped.'); }
+    })();
 
-        function onDistrictChange() {
-            updateTotal();
-        }
-
-        // Price Configuration
-        const unitPrice = 790;
-        const discountPrices = { "1": 790, "2": 1550, "3": 2300 };
-
-        function changeQty(amount) {
-            const input = document.getElementById('manual_qty');
-            let current = parseInt(input.value);
-            current += amount;
-            if (current < 1) current = 1;
-            if (current > 10) current = 10;
-            input.value = current;
-            updateTotal();
-        }
-
-        function updateTotal() {
-            const qtyInput = document.getElementById('manual_qty');
-            if (!qtyInput) return;
-            const qty = parseInt(qtyInput.value);
-            const district = document.getElementById('district').value;
-
-            let subtotal;
-            if (qty <= 3) {
-                subtotal = discountPrices[qty.toString()];
+    // STEP 4: Customer upsert in background
+    (async () => {
+        try {
+            const { data: c } = await _supabase.from('customers').select('id,total_orders,total_amount').eq('phone',phoneVal).single();
+            if (c) {
+                await _supabase.from('customers').update({
+                    name: nameVal, address: payload.address,
+                    total_orders: (c.total_orders||0)+1,
+                    total_amount: (parseFloat(c.total_amount)||0)+payload.amount
+                }).eq('id', c.id);
             } else {
-                subtotal = qty * 750;
+                await _supabase.from('customers').insert([{
+                    name:nameVal, phone:phoneVal, address:payload.address,
+                    total_orders:1, total_amount:payload.amount, status:'Active'
+                }]);
             }
+        } catch(e) { console.warn('Customer update skipped.'); }
+    })();
+});
 
-            // Shipping Logic
-            const lowerDist = district.toLowerCase();
-            const isInside = lowerDist.includes('dhaka city') || lowerDist === 'dhaka city' || lowerDist === 'gazipur' || lowerDist === 'narayanganj';
-            const shipping = isInside ? 70 : 130;
-            const total = subtotal + shipping;
-
-            // Update UI
-            document.getElementById('shippingCost').innerText = shipping;
-            document.getElementById('shippingText').innerText = isInside ? "ঢাকা ও পার্শ্ববর্তী এলাকা:" : "ঢাকার বাইরের এলাকা:";
-
-            document.getElementById('summaryQty').innerText = qty;
-            document.getElementById('summarySubtotal').innerText = subtotal;
-            document.getElementById('summaryShipping').innerText = shipping;
-            document.getElementById('summaryTotal').innerText = total;
-            document.getElementById('btnTotal').innerText = total;
-            document.getElementById('unitPriceDisplay').innerText = subtotal;
-        }
-
-        // Countdown Timer Logic
-        function updateTimer() {
-            const endDate = new Date();
-            endDate.setDate(endDate.getDate() + 3);
-            function tick() {
-                const now = new Date().getTime();
-                const distance = endDate.getTime() - now;
-                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-
-                const daysEl = document.getElementById('days');
-                if (daysEl) {
-                    daysEl.innerText = days.toString().padStart(2, '0');
-                    document.getElementById('hours').innerText = hours.toString().padStart(2, '0');
-                    document.getElementById('mins').innerText = minutes.toString().padStart(2, '0');
-                }
-            }
-            setInterval(tick, 1000);
-            tick();
-        }
-        updateTimer();
-
-        // Form Submission
-        const form = document.getElementById('orderForm');
-        const loader = document.getElementById('formLoader');
-        const successModal = document.getElementById('successModal');
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            loader.style.display = 'flex';
-
-            const qty = parseInt(document.getElementById('manual_qty').value);
-            const district = document.getElementById('district').value;
-            const phoneVal = document.getElementById('phone').value;
-
-            let subtotal;
-            if (qty <= 3) {
-                subtotal = discountPrices[qty.toString()];
-            } else {
-                subtotal = qty * 750;
-            }
-
-            const lowerDist = district.toLowerCase();
-            const isInside = lowerDist.includes('dhaka city') || lowerDist === 'dhaka city' || lowerDist === 'gazipur' || lowerDist === 'narayanganj';
-            const shipping = isInside ? 70 : 130;
-
-            // Check Fraud API with timeout
-            let fraudData = {};
-            try {
-                // AbortController for 10s timeout
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-                const fraudRes = await fetch(`https://soc-9ocu.onrender.com/api/check/${phoneVal}`, {
-                    signal: controller.signal
-                });
-                clearTimeout(timeoutId);
-
-                if (fraudRes.ok) {
-                    const funcData = await fraudRes.json();
-                    if (funcData && !funcData.error) {
-                        const allTotal = funcData.total || 0;
-                        const allSuccess = funcData.success || 0;
-                        const allFailed = funcData.cancel || 0;
-                        const allRate = allTotal > 0 ? Math.round((allSuccess / allTotal) * 100) : 0;
-                        
-                        let badgeText = 'Unknown';
-                        if (allTotal > 0) {
-                            if (allRate >= 80) { badgeText = 'Excellent'; }
-                            else if (allRate > 0 && allRate < 50) { badgeText = 'Poor'; }
-                            else if (allRate >= 50 && allRate < 80) { badgeText = 'Good'; }
-                        }
-
-                        fraudData = {
-                            courier_total: allTotal, 
-                            courier_completed: allSuccess, 
-                            courier_pct: allRate,
-                            courier_to: allTotal,
-                            courier_su: allSuccess,
-                            courier_fa: allFailed,
-                            courier: badgeText
-                        };
-                    }
-                }
-            } catch (err) {
-                console.error('Fraud API check skipped or timed out:', err);
-                // If it timed out or failed, we just proceed with empty fraudData
-            }
-
-            const payload = {
-                name: document.getElementById('name').value,
-                phone: phoneVal,
-                address: document.getElementById('address').value + " (" + district + ")",
-                customer_name: document.getElementById('name').value,
-                customer_phone: phoneVal,
-                amount: subtotal + shipping,
-                product_name: `N607 Portable Turbo Fan (${qty})`,
-                status: 'Pending',
-                created_at: new Date().toISOString(),
-                ...fraudData
-            };
-
-            const { data, error } = await _supabase
-                .from('orders')
-                .insert([payload]);
-
-            if (!error && payload.phone) {
-                const { data: existingCustomer } = await _supabase
-                    .from('customers')
-                    .select('*')
-                    .eq('phone', payload.phone)
-                    .single();
-
-                if (existingCustomer) {
-                    await _supabase.from('customers').update({
-                        name: payload.name,
-                        address: payload.address,
-                        total_orders: (existingCustomer.total_orders || 0) + 1,
-                        total_amount: (parseFloat(existingCustomer.total_amount) || 0) + payload.amount
-                    }).eq('id', existingCustomer.id);
-                } else {
-                    await _supabase.from('customers').insert([{
-                        name: payload.name,
-                        phone: payload.phone,
-                        address: payload.address,
-                        total_orders: 1,
-                        total_amount: payload.amount,
-                        status: 'Active'
-                    }]);
-                }
-            }
-
-            loader.style.display = 'none';
-            if (error) {
-                alert('দুঃখিত! অর্ডার সম্পন্ন হয়নি। আবার চেষ্টা করুন।');
-                console.error(error);
-            } else {
-                successModal.style.display = 'flex';
-                form.reset();
-            }
-        });
-
-        // Initial call
-        updateTotal();
-        fetchSteadfastData();
-    </script>
+updateTotal();
+fetchSteadfastData();
+</script>
 </body>
 </html>

@@ -136,4 +136,80 @@ const profileHTML = `
 </div>
 `;
 
+/**
+ * Initialize Profile View
+ */
+window.initProfile = () => {
+    const admin = AuthManager.getProfile();
+    if (!admin) return;
 
+    // Fill UI
+    const displayNameEl = document.getElementById('profile-display-name');
+    if (displayNameEl) displayNameEl.innerText = admin.name || 'Admin';
+    
+    const roleEl = document.querySelector('.text-gray-500.text-sm.font-medium');
+    if (roleEl) roleEl.innerText = `${admin.role_name || 'n/a'} • Top One Bazar`;
+    
+    const nameInput = document.getElementById('profile-name');
+    const emailInput = document.getElementById('profile-email');
+    const mobileInput = document.getElementById('profile-mobile');
+    const addressInput = document.getElementById('profile-address');
+
+    if (nameInput) nameInput.value = admin.name || '';
+    if (emailInput) emailInput.value = admin.email || '';
+    if (mobileInput) mobileInput.value = admin.phone || '';
+    if (addressInput) addressInput.value = admin.address || '';
+
+    // Handle Profile Update
+    const updateBtn = document.getElementById('update-profile-btn');
+    if (updateBtn) {
+        updateBtn.onclick = async () => {
+            const name = nameInput.value;
+            const email = emailInput.value;
+            const phone = mobileInput.value;
+            const address = addressInput.value;
+
+            updateBtn.disabled = true;
+            updateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+            try {
+                const { error } = await _supabase
+                    .from('admins')
+                    .update({ name, email, phone, address })
+                    .eq('id', admin.id);
+
+                if (error) throw error;
+
+                // Update local state
+                const updatedAdmin = { ...admin, name, email, phone, address };
+                AuthManager._currentAdmin = updatedAdmin;
+                sessionStorage.setItem('admin_profile', JSON.stringify(updatedAdmin));
+
+                UI.alert('Success', 'Profile updated successfully!', 'success');
+                AuditLogger.log('Profile Update', `Admin ${name} updated their profile`);
+                
+                // Refresh Header display if visible
+                const headerNameEl = document.querySelector('.text-sm.font-black.text-gray-800');
+                if (headerNameEl) headerNameEl.innerText = name;
+                
+            } catch (err) {
+                UI.alert('Error', err.message, 'error');
+            } finally {
+                updateBtn.disabled = false;
+                updateBtn.innerHTML = '<i class="fas fa-check-circle"></i> Save Changes';
+            }
+        };
+    }
+
+    // Password Update Mock
+    const passwordBtn = document.getElementById('update-password-btn');
+    if (passwordBtn) {
+        passwordBtn.onclick = () => {
+            UI.alert('Security', 'Password change is restricted to Supabase Auth settings.', 'danger');
+        };
+    }
+};
+
+window.removeProfilePic = () => {
+    UI.alert('Notice', 'Profile picture removal logic coming soon.', 'success');
+};

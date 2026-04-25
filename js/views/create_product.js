@@ -170,26 +170,16 @@ const createProductHTML = `
                     </div>
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <label class="text-xs font-bold text-gray-700">Product Category <span class="text-teal-600 cursor-pointer">Create</span></label>
+                            <label class="text-xs font-bold text-gray-700">Product Category <span class="text-teal-600 cursor-pointer" onclick="window.location.hash='#/settings'">Create</span></label>
                         </div>
                         <select id="prod-category" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-purple-500 bg-white">
-                            <option value="">Nothing selected</option>
-                            <option>Electronics</option>
-                            <option>Fashion & Apparel</option>
-                            <option>Home & Kitchen</option>
-                            <option>Beauty & Personal Care</option>
-                            <option>Gadgets</option>
+                            <option value="">Select Category</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-700 mb-1">Product Brand</label>
                         <select id="prod-brand" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-purple-500 bg-white">
                             <option value="">Select Brand</option>
-                            <option>Top One</option>
-                            <option>Apple</option>
-                            <option>Samsung</option>
-                            <option>Nike</option>
-                            <option>Logitech</option>
                         </select>
                     </div>
                     <div>

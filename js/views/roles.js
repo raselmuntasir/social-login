@@ -213,7 +213,11 @@ const rolesHTML = `
                         </tr>
                     </thead>
                     <tbody id="roles-table-body" class="divide-y divide-gray-50 bg-white">
-                        <tr id="roles-loader"><td colspan="3" class="px-4 py-10 text-center text-gray-400">Loading...</td></tr>
+                        <tr class="animate-pulse"><td class="px-4 py-5"><div class="h-4 bg-gray-100 rounded-full w-full opacity-50"></div></td><td class="px-4 py-5"><div class="h-4 bg-gray-100 rounded-full w-full opacity-50"></div></td><td class="px-4 py-5"><div class="h-4 bg-gray-100 rounded-full w-full opacity-50"></div></td><td class="px-4 py-5"><div class="h-4 bg-gray-100 rounded-full w-full opacity-50"></div></td></tr>
+                        <tr class="animate-pulse"><td class="px-4 py-5"><div class="h-4 bg-gray-100 rounded-full w-full opacity-50"></div></td><td class="px-4 py-5"><div class="h-4 bg-gray-100 rounded-full w-full opacity-50"></div></td><td class="px-4 py-5"><div class="h-4 bg-gray-100 rounded-full w-full opacity-50"></div></td><td class="px-4 py-5"><div class="h-4 bg-gray-100 rounded-full w-full opacity-50"></div></td></tr>
+                        <tr class="animate-pulse"><td class="px-4 py-5"><div class="h-4 bg-gray-100 rounded-full w-full opacity-50"></div></td><td class="px-4 py-5"><div class="h-4 bg-gray-100 rounded-full w-full opacity-50"></div></td><td class="px-4 py-5"><div class="h-4 bg-gray-100 rounded-full w-full opacity-50"></div></td><td class="px-4 py-5"><div class="h-4 bg-gray-100 rounded-full w-full opacity-50"></div></td></tr>
+                        <tr class="animate-pulse"><td class="px-4 py-5"><div class="h-4 bg-gray-100 rounded-full w-full opacity-50"></div></td><td class="px-4 py-5"><div class="h-4 bg-gray-100 rounded-full w-full opacity-50"></div></td><td class="px-4 py-5"><div class="h-4 bg-gray-100 rounded-full w-full opacity-50"></div></td><td class="px-4 py-5"><div class="h-4 bg-gray-100 rounded-full w-full opacity-50"></div></td></tr>
+                        <tr class="animate-pulse"><td class="px-4 py-5"><div class="h-4 bg-gray-100 rounded-full w-full opacity-50"></div></td><td class="px-4 py-5"><div class="h-4 bg-gray-100 rounded-full w-full opacity-50"></div></td><td class="px-4 py-5"><div class="h-4 bg-gray-100 rounded-full w-full opacity-50"></div></td><td class="px-4 py-5"><div class="h-4 bg-gray-100 rounded-full w-full opacity-50"></div></td></tr>
                     </tbody>
                 </table>
             </div>
@@ -381,17 +385,19 @@ window.openEditRole = async function(id, name) {
  * Delete Role - Dynamic Deletion
  */
 window.deleteRole = async function(id, name) {
-    if (!confirm(`Are you sure you want to delete the role "${name}"?`)) return;
+    const confirmed = await UI.confirm('Delete Role', `Are you sure you want to delete the role "${name}"? This will affect all admins assigned to this role.`);
+    if (!confirmed) return;
     
     try {
         const { error } = await _supabase.from('roles').delete().eq('id', id);
         if (error) throw error;
         
-        alert(`Role "${name}" deleted successfully.`);
+        UI.alert('Success', `Role "${name}" deleted successfully.`);
+        AuditLogger.log('Delete Role', `Role ${name} (ID: ${id}) was deleted`);
         fetchRoles(); // Refresh list
     } catch (err) {
         console.error('Error deleting role:', err);
-        alert('Error deleting role: ' + err.message);
+        UI.alert('Error', 'Error deleting role: ' + err.message, 'error');
     }
 };
 
@@ -422,18 +428,20 @@ window.saveRolePermissions = async function(roleId, isNew = false) {
         if (isNew) {
             const { error: err } = await _supabase.from('roles').insert([{ name, permissions: selected }]);
             error = err;
+            AuditLogger.log('Create Role', `New role created: ${name}`);
         } else {
             const { error: err } = await _supabase.from('roles').update({ name, permissions: selected }).eq('id', roleId);
             error = err;
+            AuditLogger.log('Update Role', `Role updated: ${name} (ID: ${roleId})`);
         }
         
         if (error) throw error;
         
-    alert(`Success! Role "${name}" has been ${isNew ? 'created' : 'updated'}.`);
-    goBackToRoles();
-} catch (err) {
+        UI.alert('Success', `Role "${name}" has been ${isNew ? 'created' : 'updated'}.`);
+        goBackToRoles();
+    } catch (err) {
         console.error('Error saving role:', err);
-        alert('Error saving role: ' + err.message);
+        UI.alert('Error', 'Error saving role: ' + err.message, 'error');
     }
 };
 
